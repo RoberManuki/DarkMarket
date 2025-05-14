@@ -1,0 +1,37 @@
+{
+  "Files": [
+    {
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/DarkMarket/DarkMarket/wwwroot/css/site.css",
+      "PackagePath": "staticwebassets/css/site.css"
+    },
+    {
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/DarkMarket/DarkMarket/wwwroot/darkmode.js",
+      "PackagePath": "staticwebassets/darkmode.js"
+    },
+    {
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/DarkMarket/DarkMarket/wwwroot/favicon.ico",
+      "PackagePath": "staticwebassets/favicon.ico"
+    },
+    {
+      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.DarkMarket.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.DarkMarket.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.build.DarkMarket.props",
+      "PackagePath": "build\\DarkMarket.props"
+    },
+    {
+      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.buildMultiTargeting.DarkMarket.props",
+      "PackagePath": "buildMultiTargeting\\DarkMarket.props"
+    },
+    {
+      "Id": "obj/Debug/net9.0/staticwebassets/msbuild.buildTransitive.DarkMarket.props",
+      "PackagePath": "buildTransitive\\DarkMarket.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

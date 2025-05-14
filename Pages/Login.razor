@@ -1,0 +1,42 @@
+@page "/login"
+
+@using DarkMarket.Models
+
+<h3>Login</h3>
+
+<div class="login-container">
+    <EditForm Model="@user" OnValidSubmit="HandleLogin">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <InputText id="username" @bind-value="@user.Username" class="form-control" />
+            <ValidationMessage For="@(() => user.Username)" />
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <InputText id="password" @bind-value="@user.Password" type="password" class="form-control" />
+            <ValidationMessage For="@(() => user.Password)" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Login</button>
+    </EditForm>
+
+    @if (loginFailed)
+    {
+        <div class="alert alert-danger mt-2">Login failed. Please try again.</div>
+    }
+</div>
+
+@code {
+    private User user = new User();
+    private bool loginFailed = false;
+
+    private async Task HandleLogin()
+    {
+        var authService = new AuthService();
+        loginFailed = !await authService.Login(user.Username, user.Password);
+    }
+}

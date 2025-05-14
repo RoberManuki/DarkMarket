@@ -1,0 +1,49 @@
+@page "/sidebar"
+
+@using Microsoft.AspNetCore.Components.Routing
+
+<div class="sidebar">
+    <h2>DarkMarket</h2>
+    <nav>
+        <ul>
+            <li><NavLink href="/">Home</NavLink></li>
+            <li><NavLink href="/login">Login</NavLink></li>
+            <li><NavLink href="/about">About</NavLink></li>
+            <li><NavLink href="/contact">Contact</NavLink></li>
+        </ul>
+    </nav>
+</div>
+
+<style>
+    .sidebar {
+        background-color: #1a1a1a;
+        color: #f0f0f0;
+        width: 250px;
+        height: 100vh;
+        padding: 20px;
+        position: fixed;
+    }
+
+    .sidebar h2 {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .sidebar nav ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .sidebar nav ul li {
+        margin: 15px 0;
+    }
+
+    .sidebar nav ul li a {
+        color: #f0f0f0;
+        text-decoration: none;
+    }
+
+    .sidebar nav ul li a:hover {
+        text-decoration: underline;
+    }
+</style>

@@ -1,0 +1,64 @@
+@inherits LayoutComponentBase
+
+<div class="sidebar">
+    <NavMenu />
+</div>
+
+<div class="main">
+    <header>
+        <h1>DarkMarket</h1>
+        <div class="header-actions">
+            <button @onclick="ToggleDarkMode" title="Alternar tema">🌓</button>
+            <a href="https://instagram.com/seuusuario" target="_blank" title="Instagram">📸</a>
+            <a href="https://github.com/seurepo" target="_blank" title="GitHub">🐙</a>
+        </div>
+    </header>
+    <div class="content px-4">
+        @Body
+    </div>
+    <footer>
+        <span>&copy; 2025 Freeza</span>
+    </footer>
+</div>
+
+<style>
+    body, html {
+        background: #181818;
+        color: #f0f0f0;
+        margin: 0;
+        font-family: 'Segoe UI', Arial, sans-serif;
+    }
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 220px;
+        height: 100vh;
+        background: #222;
+        color: #fff;
+        padding: 20px 0;
+    }
+    .main {
+        margin-left: 220px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+    header {
+        background: #111;
+        padding: 1rem;
+        text-align: center;
+        border-bottom: 1px solid #333;
+    }
+    .content {
+        flex: 1;
+        padding: 2rem;
+    }
+    footer {
+        background: #111;
+        color: #aaa;
+        text-align: center;
+        padding: 1rem;
+        border-top: 1px solid #333;
+    }
+</style>

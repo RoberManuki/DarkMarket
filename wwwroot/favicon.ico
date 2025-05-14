@@ -1,0 +1,7 @@
+The favicon.ico file is typically a binary file that represents the icon for your web application. Since I cannot generate binary files directly, you will need to create or obtain a suitable favicon image and save it as "favicon.ico" in the specified directory.
+
+Please ensure that the favicon.ico file is placed in the following path:
+
+/DarkMarket/DarkMarket/wwwroot/favicon.ico
+
+You can create a favicon using online tools or graphic design software, and then save it in the appropriate location.

@@ -1,0 +1,56 @@
+@inherits LayoutComponentBase
+
+<div class="header">
+    <div class="header-content">
+        <h1>DarkMarket</h1>
+        <div class="header-buttons">
+            <button @onclick="ToggleDarkMode">Toggle Dark Mode</button>
+            <a href="https://instagram.com" target="_blank" class="social-button">Instagram</a>
+            <a href="https://github.com" target="_blank" class="social-button">GitHub</a>
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool isDarkMode = true;
+
+    private void ToggleDarkMode()
+    {
+        isDarkMode = !isDarkMode;
+        // Logic to apply dark mode styles can be added here
+    }
+}
+
+<style>
+    .header {
+        background-color: #1a1a1a;
+        color: #f0f0f0;
+        padding: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-content {
+        display: flex;
+        align-items: center;
+    }
+
+    .header-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .social-button {
+        color: #f0f0f0;
+        text-decoration: none;
+        padding: 5px 10px;
+        border: 1px solid #f0f0f0;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+    }
+
+    .social-button:hover {
+        background-color: #333;
+    }
+</style>
