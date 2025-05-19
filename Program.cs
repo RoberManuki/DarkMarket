@@ -1,19 +1,23 @@
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using DarkMarket;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+builder.Services.AddRazorPages();
+builder.Services.AddServerSideBlazor();
+
+builder.Services.AddScoped<DarkMarket.Services.CustomAuthStateProvider>();
+builder.Services.AddScoped<DarkMarket.Services.AuthService>();
+builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<AuthenticationStateProvider, DarkMarket.Services.CustomAuthStateProvider>();
 
 var app = builder.Build();
 
-app.UseAntiforgery();
-app.UseStaticFiles(); // Garante que wwwroot seja servido
+app.UseStaticFiles();
+app.UseRouting();
 
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+app.MapBlazorHub();
+app.MapFallbackToPage("/_Host");
 
 app.Run();

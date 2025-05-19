@@ -2,7 +2,8 @@
 
 @using DarkMarket.Models
 
-<h3>Login</h3>
+@inject DarkMarket.Services.AuthService AuthService
+@inject NavigationManager NavigationManager
 
 <div class="login-container">
     <EditForm Model="@user" OnValidSubmit="HandleLogin">
@@ -10,33 +11,164 @@
         <ValidationSummary />
 
         <div class="form-group">
-            <label for="username">Username:</label>
+            <label for="username" class="input-label">Username:</label>
             <InputText id="username" @bind-value="@user.Username" class="form-control" />
             <ValidationMessage For="@(() => user.Username)" />
         </div>
 
         <div class="form-group">
-            <label for="password">Password:</label>
-            <InputText id="password" @bind-value="@user.Password" type="password" class="form-control" />
+            <label for="password" class="input-label">Password:</label>
+            <input id="password" class="form-control" @bind="@user.Password" type="@passwordInputType" />
             <ValidationMessage For="@(() => user.Password)" />
         </div>
 
-        <button type="submit" class="btn btn-primary">Login</button>
+        <button type="submit" class="btn btn-primary" disabled="@isLoading">
+            @(isLoading ? "Logging in..." : "Login")
+        </button>
     </EditForm>
 
     @if (loginFailed)
     {
         <div class="alert alert-danger mt-2">Login failed. Please try again.</div>
     }
+    @if (loginSuccess)
+    {
+        <div class="alert alert-success mt-2">Login successful! Welcome.</div>
+    }
 </div>
 
 @code {
     private User user = new User();
     private bool loginFailed = false;
+    private bool loginSuccess = false;
+    private bool isLoading = false;
+    private bool showPassword = false;
+
+    private string passwordInputType => showPassword ? "text" : "password";
+
+    private void TogglePasswordVisibility()
+    {
+        showPassword = !showPassword;
+        StateHasChanged();
+    }
 
     private async Task HandleLogin()
     {
-        var authService = new AuthService();
-        loginFailed = !await authService.Login(user.Username, user.Password);
+        isLoading = true;
+        loginFailed = false;
+        loginSuccess = false;
+
+        var result = await AuthService.Login(user.Username, user.Password);
+        if (result)
+        {
+            loginSuccess = true;
+            NavigationManager.NavigateTo("/dashboard");
+        }
+        else
+        {
+            loginFailed = true;
+        }
+        isLoading = false;
     }
 }
+
+<style>
+    .login-title {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .login-container {
+        max-width: 400px;
+        margin: 40px auto;
+        background: #232323;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px #0008;
+    }
+    .form-group {
+        margin-bottom: 1.2rem;
+    }
+    .input-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+    }
+    .input-group {
+        display: flex;
+        align-items: center;
+    }
+    .form-control {
+        width: 100%;
+        padding: 0.5rem;
+        border-radius: 4px;
+        border: 1px solid #444;
+        background: #181818;
+        color: #f0f0f0;
+    }
+    .btn-primary {
+        width: 100%;
+        background: #333;
+        color: #fff;
+        border: none;
+        padding: 0.7rem;
+        border-radius: 4px;
+        font-weight: bold;
+        transition: background 0.2s;
+    }
+    .btn-primary:disabled {
+        background: #555;
+    }
+    .btn-icon {
+        background: transparent;
+        border: none;
+        margin-left: 8px;
+        cursor: pointer;
+        padding: 0.2rem;
+        display: flex;
+        align-items: center;
+    }
+    .btn-icon svg {
+        display: block;
+    }
+    .btn-show {
+        margin-left: 8px;
+        display: flex;
+        align-items: center;
+        padding: 0.3rem 0.7rem;
+        border-radius: 4px;
+        background: #444;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .btn-show svg {
+        display: block;
+    }
+    .btn-secondary {
+        background: #444;
+        color: #fff;
+        border: none;
+        padding: 0.3rem 0.7rem;
+        border-radius: 4px;
+        margin-top: 0.3rem;
+    }
+    .alert {
+        padding: 0.7rem;
+        border-radius: 4px;
+        margin-top: 1rem;
+    }
+    .alert-danger {
+        background: #6c2323;
+        color: #fff;
+    }
+    .alert-success {
+        background: #236c23;
+        color: #fff;
+    }
+    .show-password-row {
+        margin-top: 0.5rem;
+        display: flex;
+        justify-content: flex-end;
+    }
+</style>

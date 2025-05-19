@@ -5,10 +5,6 @@
       "PackagePath": "staticwebassets/css/site.css"
     },
     {
-      "Id": "/home/freeza/Documents/Projects/DarkMarket/DarkMarket/DarkMarket/wwwroot/darkmode.js",
-      "PackagePath": "staticwebassets/darkmode.js"
-    },
-    {
       "Id": "/home/freeza/Documents/Projects/DarkMarket/DarkMarket/DarkMarket/wwwroot/favicon.ico",
       "PackagePath": "staticwebassets/favicon.ico"
     },

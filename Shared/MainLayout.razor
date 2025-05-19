@@ -1,3 +1,5 @@
+@namespace DarkMarket.Shared
+
 @inherits LayoutComponentBase
 
 <div class="sidebar">
@@ -7,11 +9,11 @@
 <div class="main">
     <header>
         <h1>DarkMarket</h1>
-        <div class="header-actions">
+        @* <div class="header-actions">
             <button @onclick="ToggleDarkMode" title="Alternar tema">🌓</button>
             <a href="https://instagram.com/seuusuario" target="_blank" title="Instagram">📸</a>
             <a href="https://github.com/seurepo" target="_blank" title="GitHub">🐙</a>
-        </div>
+        </div> *@
     </header>
     <div class="content px-4">
         @Body
