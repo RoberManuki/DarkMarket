@@ -1,0 +1,47 @@
+@page "/products"
+
+@using Microsoft.AspNetCore.Components.Forms
+
+@inject DarkMarket.Services.ProductService ProductService
+
+<h3>Produtos</h3>
+
+<EditForm Model="@newProduct" OnValidSubmit="AddProduct">
+    <InputText @bind-value="newProduct.Name" placeholder="Nome do produto" />
+    <InputText @bind-value="newProduct.Description" placeholder="Descrição" />
+    <InputNumber @bind-value="newProduct.Price" placeholder="Preço" />
+    <button type="submit">Adicionar</button>
+</EditForm>
+
+<ul>
+    @foreach (var product in products)
+    {
+        <li>
+            <b>@product.Name</b> - @product.Description - R$ @product.Price
+            <button @onclick="() => DeleteProduct(product.Id)">Remover</button>
+        </li>
+    }
+</ul>
+
+@code {
+    private List<Product> products = new();
+    private Product newProduct = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ProductService.GetAllAsync();
+    }
+
+    private async Task AddProduct()
+    {
+        await ProductService.AddAsync(newProduct);
+        newProduct = new Product();
+        products = await ProductService.GetAllAsync();
+    }
+
+    private async Task DeleteProduct(int id)
+    {
+        await ProductService.DeleteAsync(id);
+        products = await ProductService.GetAllAsync();
+    }
+}
