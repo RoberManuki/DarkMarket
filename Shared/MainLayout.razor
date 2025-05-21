@@ -2,26 +2,46 @@
 
 @inherits LayoutComponentBase
 
-<div class="sidebar">
-    <NavMenu />
-</div>
+@using Microsoft.AspNetCore.Components.Authorization
+@inject DarkMarket.Services.AuthService AuthService
+@inject NavigationManager NavigationManager
 
-<div class="main">
-    <header>
-        <h1>DarkMarket</h1>
-        @* <div class="header-actions">
-            <button @onclick="ToggleDarkMode" title="Alternar tema">🌓</button>
-            <a href="https://instagram.com/seuusuario" target="_blank" title="Instagram">📸</a>
-            <a href="https://github.com/seurepo" target="_blank" title="GitHub">🐙</a>
-        </div> *@
-    </header>
-    <div class="content px-4">
-        @Body
+<CascadingAuthenticationState>
+    <div class="sidebar">
+        <NavMenu />
     </div>
-    <footer>
-        <span>&copy; 2025 Freeza</span>
-    </footer>
-</div>
+
+    <div class="main">
+        <header>
+            <h1>DarkMarket</h1>
+            <div class="header-actions">
+                <AuthorizeView>
+                    <Authorized>
+                        <span>Olá, @context.User.Identity?.Name ?? "Usuário"!</span>
+                        <button class="btn btn-link" @onclick="Logout">Sair</button>
+                    </Authorized>
+                    <NotAuthorized>
+                        <span>Bem-vindo, visitante!</span>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </header>
+        <div class="content px-4">
+            @Body
+        </div>
+        <footer>
+            <span>&copy; 2025 Freeza</span>
+        </footer>
+    </div>
+</CascadingAuthenticationState>
+
+@code {
+    private async Task Logout()
+    {
+        await AuthService.Logout();
+        NavigationManager.NavigateTo("/login");
+    }
+}
 
 <style>
     body, html {
@@ -51,6 +71,28 @@
         padding: 1rem;
         text-align: center;
         border-bottom: 1px solid #333;
+        position: relative;
+    }
+    .header-actions {
+        position: absolute;
+        top: 1rem;
+        right: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .btn-link {
+        background: none;
+        border: none;
+        color: #4e8cff;
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 0.3rem 0.7rem;
+        border-radius: 4px;
+        transition: background 0.2s;
+    }
+    .btn-link:hover {
+        background: #222;
     }
     .content {
         flex: 1;

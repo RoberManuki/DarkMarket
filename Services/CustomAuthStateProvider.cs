@@ -9,6 +9,11 @@ namespace DarkMarket.Services
         private ClaimsPrincipal _anonymous = new ClaimsPrincipal(new ClaimsIdentity());
         private ClaimsPrincipal _user;
 
+        public CustomAuthStateProvider()
+        {
+            _user = _anonymous;
+        }
+        
         public override Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             return Task.FromResult(new AuthenticationState(_user ?? _anonymous));

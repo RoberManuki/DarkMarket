@@ -9,12 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-builder.Services.AddScoped<DarkMarket.Services.CustomAuthStateProvider>();
 builder.Services.AddScoped<DarkMarket.Services.AuthService>();
-builder.Services.AddAuthorizationCore();
 builder.Services.AddScoped<AuthenticationStateProvider, DarkMarket.Services.CustomAuthStateProvider>();
 builder.Services.AddScoped<DarkMarket.Services.ProductService>();
 builder.Services.AddScoped<DarkMarket.Services.UserService>();
+builder.Services.AddAuthorizationCore();
 // builder.Services.AddScoped<DarkMarket.Services.OrderService>();
 // builder.Services.AddScoped<DarkMarket.Services.CartService>();
 // builder.Services.AddScoped<DarkMarket.Services.NotificationService>();

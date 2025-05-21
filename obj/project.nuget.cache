@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "sGwqTmp0bKY=",
+  "dgSpecHash": "6k9HZY4GjLM=",
   "success": true,
-  "projectFilePath": "/home/freeza/Documents/Projects/DarkMarket/DarkMarket/DarkMarket/DarkMarket.csproj",
+  "projectFilePath": "/home/freeza/Documents/Projects/DarkMarket/DarkMarket.csproj",
   "expectedPackageFiles": [
     "/home/freeza/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
     "/home/freeza/.nuget/packages/microsoft.aspnetcore.authorization/9.0.5/microsoft.aspnetcore.authorization.9.0.5.nupkg.sha512",

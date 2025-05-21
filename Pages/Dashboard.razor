@@ -1,8 +1,25 @@
 @page "/dashboard"
 
-@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 
-@attribute [Authorize]
+@inject DarkMarket.Services.AuthService AuthService
+@inject NavigationManager NavigationManager
 
-<h3>Dashboard</h3>
-<p>Bem-vindo ao painel do usuário!</p>
+<AuthorizeView>
+    <Authorized>
+        <h2>Bem-vindo, @(context.User?.Identity?.Name ?? "Usuário")!</h2>
+        <button class="btn btn-secondary" @onclick="Logout">Sair</button>
+        <!-- Conteúdo da dashboard -->
+    </Authorized>
+    <NotAuthorized>
+        <h2>Você não está logado.</h2>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private async Task Logout()
+    {
+        await AuthService.Logout();
+        NavigationManager.NavigateTo("/login");
+    }
+}

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/freeza/Documents/Projects/DarkMarket/DarkMarket/DarkMarket/DarkMarket.csproj": {}
+    "/home/freeza/Documents/Projects/DarkMarket/DarkMarket.csproj": {}
   },
   "projects": {
-    "/home/freeza/Documents/Projects/DarkMarket/DarkMarket/DarkMarket/DarkMarket.csproj": {
+    "/home/freeza/Documents/Projects/DarkMarket/DarkMarket.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/freeza/Documents/Projects/DarkMarket/DarkMarket/DarkMarket/DarkMarket.csproj",
+        "projectUniqueName": "/home/freeza/Documents/Projects/DarkMarket/DarkMarket.csproj",
         "projectName": "DarkMarket",
-        "projectPath": "/home/freeza/Documents/Projects/DarkMarket/DarkMarket/DarkMarket/DarkMarket.csproj",
+        "projectPath": "/home/freeza/Documents/Projects/DarkMarket/DarkMarket.csproj",
         "packagesPath": "/home/freeza/.nuget/packages/",
-        "outputPath": "/home/freeza/Documents/Projects/DarkMarket/DarkMarket/DarkMarket/obj/",
+        "outputPath": "/home/freeza/Documents/Projects/DarkMarket/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/freeza/.nuget/NuGet/NuGet.Config"

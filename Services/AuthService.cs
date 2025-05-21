@@ -7,16 +7,15 @@ namespace DarkMarket.Services
     {
         private readonly CustomAuthStateProvider _authProvider;
 
-        public AuthService(CustomAuthStateProvider authProvider)
+        public AuthService(AuthenticationStateProvider authProvider)
         {
-            _authProvider = authProvider;
+            _authProvider = (CustomAuthStateProvider)authProvider;
         }
 
         public Task<bool> Login(string username, string password)
         {
             var success = username == "admin" && password == "password";
-            if (success)
-                _authProvider.MarkUserAsAuthenticated(username);
+            if (success) _authProvider.MarkUserAsAuthenticated(username);
             return Task.FromResult(success);
         }
 

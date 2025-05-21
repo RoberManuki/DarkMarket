@@ -1,11 +1,15 @@
 {
   "Files": [
     {
-      "Id": "/home/freeza/Documents/Projects/DarkMarket/DarkMarket/DarkMarket/wwwroot/css/site.css",
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/css/login.css",
+      "PackagePath": "staticwebassets/css/login.css"
+    },
+    {
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/css/site.css",
       "PackagePath": "staticwebassets/css/site.css"
     },
     {
-      "Id": "/home/freeza/Documents/Projects/DarkMarket/DarkMarket/DarkMarket/wwwroot/favicon.ico",
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/favicon.ico",
       "PackagePath": "staticwebassets/favicon.ico"
     },
     {
