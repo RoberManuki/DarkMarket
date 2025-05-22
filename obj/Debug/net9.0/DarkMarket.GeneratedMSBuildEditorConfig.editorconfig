@@ -40,16 +40,8 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kZXgucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Login.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTG9naW4ucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
 [/home/freeza/Documents/Projects/DarkMarket/Pages/Products.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZHVjdHMucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Teste.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVGVzdGUucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/freeza/Documents/Projects/DarkMarket/Pages/Users.razor]
@@ -78,6 +70,22 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/home/freeza/Documents/Projects/DarkMarket/Shared/Sidebar.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1NpZGViYXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/freeza/Documents/Projects/DarkMarket/Areas/Identity/Pages/Account/Logout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9Mb2dvdXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/freeza/Documents/Projects/DarkMarket/Areas/Identity/Pages/Shared/_LoginPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvU2hhcmVkL19Mb2dpblBhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/freeza/Documents/Projects/DarkMarket/Areas/Identity/Pages/_ViewImports.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/freeza/Documents/Projects/DarkMarket/Areas/Identity/Pages/_ViewStart.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/freeza/Documents/Projects/DarkMarket/Pages/_Host.cshtml]

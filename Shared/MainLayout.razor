@@ -3,7 +3,10 @@
 @inherits LayoutComponentBase
 
 @using Microsoft.AspNetCore.Components.Authorization
-@inject DarkMarket.Services.AuthService AuthService
+@using Microsoft.AspNetCore.Identity
+
+@inject NavigationManager NavigationManager
+@inject SignInManager<IdentityUser> SignInManager
 @inject NavigationManager NavigationManager
 
 <CascadingAuthenticationState>
@@ -17,8 +20,8 @@
             <div class="header-actions">
                 <AuthorizeView>
                     <Authorized>
-                        <span>Olá, @context.User.Identity?.Name ?? "Usuário"!</span>
-                        <button class="btn btn-link" @onclick="Logout">Sair</button>
+                        <span>Olá, @(string.IsNullOrWhiteSpace(context.User.Identity?.Name) ? "Usuário" : context.User.Identity.Name)!</span>
+                        <a href="/Identity/Account/Logout">Sair</a>
                     </Authorized>
                     <NotAuthorized>
                         <span>Bem-vindo, visitante!</span>
@@ -34,14 +37,6 @@
         </footer>
     </div>
 </CascadingAuthenticationState>
-
-@code {
-    private async Task Logout()
-    {
-        await AuthService.Logout();
-        NavigationManager.NavigateTo("/login");
-    }
-}
 
 <style>
     body, html {
