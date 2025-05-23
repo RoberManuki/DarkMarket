@@ -12,9 +12,9 @@
 ## Fase 2: Usuário e Autenticação
 - [x] Cadastro de usuário (registro)
 - [x] Logout e controle de sessão
-- [ ] Página de perfil do usuário
+- [x] Página de perfil do usuário
 - [x] Proteção de páginas (acesso só logado)
-- [ ] Controle de roles/permissões (admin, user, etc)
+- [x] Controle de roles/permissões (admin, user, etc)
 
 ---
 

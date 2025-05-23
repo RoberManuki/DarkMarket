@@ -1,10 +1,10 @@
 @page
-@model DarkMarket.Areas.Identity.Pages.Account.LoginModel
+@model DarkMarket.Areas.Identity.Pages.Account.RegisterModel
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Registrar";
 }
 
-<h2>Login DarkMarket</h2>
+<h2>Registrar no DarkMarket</h2>
 
 <div asp-validation-summary="All" class="text-danger"></div>
 
@@ -16,19 +16,19 @@
     </div>
     <div>
         <label asp-for="Input.Password"></label>
-        <input asp-for="Input.Password" autocomplete="current-password" />
+        <input asp-for="Input.Password" autocomplete="new-password" />
         <span asp-validation-for="Input.Password" class="text-danger"></span>
     </div>
-    <div class="identity-remember">
-        <input asp-for="Input.RememberMe" />
-        <label asp-for="Input.RememberMe">Lembrar-me</label>
+    <div>
+        <label asp-for="Input.ConfirmPassword"></label>
+        <input asp-for="Input.ConfirmPassword" autocomplete="new-password" />
+        <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
     </div>
-    <button type="submit">Entrar</button>
+    <button type="submit">Registrar</button>
 </form>
 
 <div class="identity-actions">
-    <a asp-page="./ForgotPassword">Esqueceu a senha?</a>
-    <a asp-page="./Register">Registrar</a>
+    <a asp-page="./Login">Já tem conta? Login</a>
     <a asp-page="./ResendEmailConfirmation">Reenviar confirmação</a>
 </div>
 

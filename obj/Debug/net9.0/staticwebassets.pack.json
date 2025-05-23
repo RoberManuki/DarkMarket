@@ -1,10 +1,6 @@
 {
   "Files": [
     {
-      "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/css/login.css",
-      "PackagePath": "staticwebassets/css/login.css"
-    },
-    {
       "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/css/site.css",
       "PackagePath": "staticwebassets/css/site.css"
     },

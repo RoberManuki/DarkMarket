@@ -17,6 +17,11 @@
                 </NavLink></li>
             </Authorized>
         </AuthorizeView>
+        <AuthorizeView Roles="admin">
+            <Authorized>
+                <li><NavLink href="/admin">Admin</NavLink></li>
+            </Authorized>
+        </AuthorizeView>
         <li><NavLink href="/about">About</NavLink></li>
         <li><NavLink href="/contact">Contact</NavLink></li>
     </ul>

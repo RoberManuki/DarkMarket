@@ -32,6 +32,10 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/freeza/Documents/Projects/DarkMarket/Pages/Dashboard.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRGFzaGJvYXJkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
@@ -80,8 +84,16 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9Mb2dvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/freeza/Documents/Projects/DarkMarket/Areas/Identity/Pages/Account/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9SZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/freeza/Documents/Projects/DarkMarket/Areas/Identity/Pages/Shared/_LoginPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvU2hhcmVkL19Mb2dpblBhcnRpYWwuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/freeza/Documents/Projects/DarkMarket/Areas/Identity/Pages/Shared/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvU2hhcmVkL19WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/freeza/Documents/Projects/DarkMarket/Areas/Identity/Pages/_Layout.cshtml]

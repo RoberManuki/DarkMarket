@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DarkMarket")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9c7401b8a259e07540b0abef2f69600a88cbf16a")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8a32087509a019dd52add901cab55339400c65c1")]
 [assembly: System.Reflection.AssemblyProductAttribute("DarkMarket")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DarkMarket")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
