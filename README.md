@@ -1,35 +1,91 @@
-# DarkMarket Project
+# DarkMarket
 
-## Overview
-DarkMarket is a Blazor application designed with a dark/gothic aesthetic, featuring a responsive layout that includes a sidebar menu, header, and footer. The application is structured to facilitate user authentication and provides a pre-styled body for development.
+Marketplace de Bitcoin desenvolvido em **Blazor Server** com autenticação robusta via **ASP.NET Core Identity**.
 
-## Features
-- **Responsive Design**: The layout adapts to different screen sizes, ensuring a seamless user experience across devices.
-- **Dark/Gothic Styling**: The application incorporates a dark theme to enhance visual appeal and user engagement.
-- **Sidebar Menu**: A navigation menu that allows users to easily access different sections of the application.
-- **Header with Social Links**: Includes buttons for dark mode toggle, Instagram, and GitHub.
-- **Login/Authentication Page**: A dedicated page for user login and authentication.
-- **Footer**: Displays basic information, including copyright details.
+---
 
-## Project Structure
-- **DarkMarket.sln**: Solution file containing project configuration.
-- **Program.cs**: Entry point for the Blazor application.
-- **App.razor**: Root component that sets up routing.
-- **wwwroot/css/site.css**: Custom CSS styles for dark/gothic design.
-- **Shared Components**: Includes MainLayout, Sidebar, Header, Footer, and NavMenu.
-- **Pages**: Contains Index and Login pages.
-- **Data and Services**: UserService and AuthService for handling user operations and authentication logic.
-- **Models**: User model definition.
+## 🚀 Visão Geral
 
-## Getting Started
-To run the application, ensure you have the .NET SDK installed. Clone the repository and navigate to the project directory. Use the following command to run the application:
+O DarkMarket é um marketplace focado em transações com Bitcoin, com arquitetura moderna, tema escuro e autenticação segura.  
+O projeto está sendo desenvolvido em etapas, com foco em boas práticas, extensibilidade e experiência do usuário.
 
-```
-dotnet run
-```
+---
 
-## License
-This project is licensed under the MIT License. See the LICENSE file for more details.
+## 🛠️ Tecnologias e Ferramentas
 
-## Acknowledgments
-Special thanks to the Blazor community and contributors for their support and resources.
+- **.NET 8+**
+- **Blazor Server** (SPA com C#)
+- **ASP.NET Core Identity** (autenticação, registro, logout, roles)
+- **Entity Framework Core** (PostgreSQL)
+- **Razor Pages** (para telas do Identity)
+- **Hot Reload** para desenvolvimento ágil
+- **CSS customizado** (tema escuro centralizado)
+- **Estrutura modular**: Pages, Shared, Services, Models, Data
+
+---
+
+## 🔒 Autenticação
+
+- Utilizamos **ASP.NET Core Identity** para login, registro, logout e controle de sessão.
+- As telas de login/registro/logout usam Razor Pages do Identity, customizadas para combinar com o layout escuro do app.
+- O fluxo de logout é imediato e seguro, com redirecionamento automático para a home.
+- Proteção de páginas sensíveis via `[Authorize]` e controle de sessão por cookie.
+
+---
+
+## 📁 Estrutura do Projeto
+
+- `/Pages` — Páginas Blazor principais (Dashboard, etc)
+- `/Shared` — Layouts, NavMenu, componentes reutilizáveis
+- `/Areas/Identity/Pages` — Telas de autenticação (login, registro, logout, layout customizado)
+- `/wwwroot/css/site.css` — CSS principal do app
+- `/wwwroot/Identity/css/site.css` — CSS específico para telas do Identity (opcional)
+- `/Data` — Contexto do Entity Framework e migrations
+- `/Services` — Serviços de domínio (ex: ProductService, UserService)
+- `/Models` — Modelos de domínio e ViewModels
+
+---
+
+## 📝 Como rodar
+
+1. **Configure o banco de dados** no `appsettings.json` (PostgreSQL).
+2. **Restaure e rode:**
+   ```sh
+   dotnet restore
+   dotnet ef database update
+   dotnet watch run
+   ```
+3. Acesse `http://localhost:5000`
+
+---
+
+## 📅 Roadmap
+
+Veja o arquivo [`roadmap.md`](./roadmap.md) para acompanhar o progresso e as próximas etapas.
+
+---
+
+## 📚 Documentação e Boas Práticas
+
+- Código limpo, comentado e modularizado.
+- Estrutura pronta para expansão (novos módulos, integrações, etc).
+- Telas do Identity integradas visualmente ao tema do app.
+- Roadmap e documentação para facilitar reuso e contribuição.
+
+---
+
+## 🤝 Contribuição
+
+- Sinta-se à vontade para sugerir melhorias ou abrir issues.
+- O projeto está em evolução e aberto a feedback!
+
+---
+
+## 👤 Autoria
+
+Desenvolvido por Freeza e colaboradores.
+
+---
+
+**Status:**  
+Projeto em desenvolvimento ativo — autenticação funcional, layout escuro, dashboard protegido e estrutura pronta para expansão.

@@ -1,0 +1,39 @@
+@page
+@model Microsoft.AspNetCore.Identity.UI.V5.Pages.Account.Internal.LoginModel
+@{
+    ViewData["Title"] = "Login";
+}
+
+<h2>Login DarkMarket</h2>
+
+<form method="post">
+    <div>
+        <label asp-for="Input.Email"></label>
+        <input asp-for="Input.Email" autocomplete="username" />
+        <span asp-validation-for="Input.Email" class="text-danger"></span>
+    </div>
+    <div>
+        <label asp-for="Input.Password"></label>
+        <input asp-for="Input.Password" autocomplete="current-password" />
+        <span asp-validation-for="Input.Password" class="text-danger"></span>
+    </div>
+    <div class="identity-remember">
+        <input asp-for="Input.RememberMe" />
+        <label asp-for="Input.RememberMe">Lembrar-me</label>
+    </div>
+    <button type="submit">Entrar</button>
+</form>
+
+<div class="identity-actions">
+    <a asp-page="./ForgotPassword">Esqueceu a senha?</a>
+    <a asp-page="./Register">Registrar</a>
+    <a asp-page="./ResendEmailConfirmation">Reenviar confirmação</a>
+</div>
+
+<div class="identity-footer">
+    <span>&copy; 2025 DarkMarket</span>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

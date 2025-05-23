@@ -4,16 +4,16 @@
 - [x] Organizar estrutura de pastas (Pages, Shared, Services, Models, Data)
 - [x] Criar layout principal (MainLayout, NavMenu, Header, Footer)
 - [x] Definir tema escuro centralizado (CSS base)
-- [ ] Página de login funcional (com validação e autenticação)
-- [ ] Página inicial (Dashboard) protegida
+- [x] Página de login funcional (com validação e autenticação)
+- [x] Página inicial (Dashboard) protegida
 
 ---
 
 ## Fase 2: Usuário e Autenticação
-- [ ] Cadastro de usuário (registro)
-- [ ] Logout e controle de sessão
+- [x] Cadastro de usuário (registro)
+- [x] Logout e controle de sessão
 - [ ] Página de perfil do usuário
-- [ ] Proteção de páginas (acesso só logado)
+- [x] Proteção de páginas (acesso só logado)
 - [ ] Controle de roles/permissões (admin, user, etc)
 
 ---

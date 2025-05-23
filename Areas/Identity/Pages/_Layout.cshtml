@@ -1,0 +1,130 @@
+@{
+    Layout = null;
+    var title = ViewData["Title"] ?? "DarkMarket";
+}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="utf-8" />
+    <title>@title</title>
+    <base href="~/" />
+    <link rel="stylesheet" href="~/css/site.css" />
+
+    <style>
+        body {
+            background: #181818;
+            color: #f0f0f0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .identity-container {
+            max-width: 480px;
+            margin: 60px auto;
+            background: #222;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px #000a;
+            padding: 2.5rem 2rem 2rem 2rem; /* padding lateral menor */
+            box-sizing: border-box;
+        }
+        .identity-container h1, .identity-container h2 {
+            color: #f0f0f0;
+        }
+        .identity-container label {
+            color: #ccc;
+        }
+        .identity-container input, .identity-container select {
+            width: 100%;
+            margin-bottom: 1.1rem;
+            padding: 0.7rem 1rem;
+            font-size: 1.1rem;
+            box-sizing: border-box;
+        }
+        .identity-remember {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.2rem;
+            width: fit-content;
+        }
+        .identity-remember input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        .identity-remember label {
+            margin: 0;
+            font-weight: normal;
+        }
+        .identity-container button, .identity-container input[type="submit"] {
+            background: #333;
+            color: #fff;
+            border: none;
+            padding: 1.2rem 0;
+            border-radius: 4px;
+            margin: 1.5rem auto 0 auto;
+            cursor: pointer;
+            width: 80%;
+            font-size: 1.3rem;
+            display: block;
+            transition: background 0.2s;
+        }
+        .identity-container button:hover, .identity-container input[type="submit"]:hover {
+            background: #444;
+        }
+        .identity-container a {
+            color: #8ab4f8;
+        }
+        .identity-actions a:hover {
+            color: #4e8cff;
+            text-decoration: underline;
+        }
+        .identity-container form > div {
+            margin-bottom: 1.2rem;
+        }
+        .identity-container input::placeholder {
+            color: #888;
+            opacity: 1;
+        }
+        .identity-container input:focus, .identity-container select:focus {
+            outline: 2px solid #8ab4f8;
+            background: #e8f0fe
+        }
+        @@media (max-width: 600px) {
+            .identity-container {
+                max-width: 98vw;
+                padding: 1rem 0.5rem 1rem 0.5rem;
+            }
+        }
+        .validation-summary-errors, .text-danger {
+            color: #ff6b6b;
+        }
+        .identity-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            justify-content: center;
+            margin-top: 1.2rem;
+            font-size: 0.98rem;
+        }
+        .identity-actions a {
+            color: #8ab4f8;
+            text-decoration: underline;
+            transition: color 0.2s;
+        }
+        .identity-actions a:hover {
+            color: #4e8cff;
+        }
+        .identity-footer {
+            margin-top: 2rem;
+            text-align: center;
+            color: #888;
+            font-size: 0.95rem;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="identity-container">
+        @RenderBody()
+    </div>
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

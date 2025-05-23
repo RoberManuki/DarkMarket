@@ -21,7 +21,7 @@
                 <AuthorizeView>
                     <Authorized>
                         <span>Olá, @(string.IsNullOrWhiteSpace(context.User.Identity?.Name) ? "Usuário" : context.User.Identity.Name)!</span>
-                        <a href="/Identity/Account/Logout">Sair</a>
+                        <a href="/Identity/Account/Logout" class="logout-btn">Sair</a>
                     </Authorized>
                     <NotAuthorized>
                         <span>Bem-vindo, visitante!</span>
@@ -99,5 +99,23 @@
         text-align: center;
         padding: 1rem;
         border-top: 1px solid #333;
+    }
+    .logout-btn {
+        background: linear-gradient(90deg, #333 0%, #444 100%);
+        color: #fff !important;
+        border: none;
+        padding: 0.4rem 1.2rem;
+        border-radius: 4px;
+        font-weight: bold;
+        font-size: 1rem;
+        cursor: pointer;
+        box-shadow: 0 2px 8px #0002;
+        transition: background 0.2s, color 0.2s;
+        text-decoration: none;
+        margin-left: 0.5rem;
+    }
+    .logout-btn:hover {
+        background: linear-gradient(90deg, #555 0%, #222 100%);
+        color: #fff;
     }
 </style>
