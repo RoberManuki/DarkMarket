@@ -12,7 +12,9 @@
                 <li><NavLink href="/Identity/Account/Register">Registrar</NavLink></li>
             </NotAuthorized>
             <Authorized>
-                <li><NavLink href="/dashboard">Dashboard</NavLink></li>
+                <li><NavLink href="/dashboard" Match="NavLinkMatch.All">
+                    <span class="oi oi-dashboard"></span> Dashboard
+                </NavLink></li>
             </Authorized>
         </AuthorizeView>
         <li><NavLink href="/about">About</NavLink></li>

@@ -5,6 +5,7 @@ using DarkMarket.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using DarkMarket.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +13,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 builder.Services.AddScoped<DarkMarket.Services.ProductService>();
-builder.Services.AddScoped<DarkMarket.Services.UserService>();
+builder.Services.AddScoped<UserService>();
 // builder.Services.AddScoped<DarkMarket.Services.OrderService>();
 // builder.Services.AddScoped<DarkMarket.Services.CartService>();
 // builder.Services.AddScoped<DarkMarket.Services.NotificationService>();
@@ -20,7 +21,7 @@ builder.Services.AddScoped<DarkMarket.Services.UserService>();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => 
+builder.Services.AddDefaultIdentity<ApplicationUser>(options => 
     options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<AppDbContext>();
 

@@ -6,24 +6,83 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Identity
 
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthStateProvider
+@inject UserService UserService
 
-<h2>Bem-vindo, @userName!</h2>
-<!-- Conteúdo da dashboard -->
-<div class="dashboard-content">
-    <h3>Conteúdo da Dashboard</h3>
-    <p>Esta é a área protegida da sua aplicação.</p>
-    <!-- Adicione mais conteúdo aqui -->
-</div>
+<PageTitle>Dashboard</PageTitle>
+
+<AuthorizeView>
+    <Authorized>
+        @if (userName is null)
+        {
+            <p>Carregando informações...</p>
+        }
+        else
+        {
+            <h2>Olá, @userName!</h2>
+            <div class="dashboard-cards">
+                <div class="dashboard-card">
+                    <h3>Perfil</h3>
+                    <p>Email: @userEmail</p>
+                    <p>Role: @userRole</p>
+                </div>
+                <div class="dashboard-card">
+                    <h3>Resumo</h3>
+                    <p>Último login: @lastLogin</p>
+                    <p>Status: Ativo</p>
+                </div>
+                <div class="dashboard-card">
+                    <h3>Notificações</h3>
+                    <p>Você não possui novas notificações.</p>
+                </div>
+            </div>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>Você não tem permissão para acessar esta página.</p>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
-    private string userName = "Usuário";
+    private string? userName;
+    private string? userEmail;
+    private string? userRole;
+    private string? lastLogin = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
+
+    private ApplicationUser? userEntity;
+    private IList<string>? userRoles;
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         userName = user.Identity?.Name ?? "Usuário";
+        userEntity = (ApplicationUser?)await UserService.GetUserByNameAsync(userName);
+        userEmail = userEntity?.Email ?? "-";
+        userRoles = userEntity != null ? await UserService.GetUserRolesAsync(userEntity) : new List<string>();
+        userRole = userRoles.FirstOrDefault() ?? "user";
     }
 }
+
+<style>
+    .dashboard-cards {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    .dashboard-card {
+        background: #23272b;
+        color: #f0f0f0;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px #000a;
+        padding: 1.5rem 2rem;
+        min-width: 220px;
+        flex: 1 1 220px;
+        max-width: 320px;
+    }
+    .dashboard-card h3 {
+        margin-top: 0;
+        color: #8ab4f8;
+    }
+</style>

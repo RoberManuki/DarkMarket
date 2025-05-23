@@ -1,4 +1,4 @@
-@page "/users"
+@* @page "/users"
 
 @inject DarkMarket.Services.UserService UserService
 
@@ -38,4 +38,4 @@
         await UserService.DeleteAsync(id);
         users = await UserService.GetAllAsync();
     }
-}
+} *@

@@ -2,11 +2,11 @@
 
 @inherits LayoutComponentBase
 
+@using DarkMarket.Models
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Identity
 
-@inject NavigationManager NavigationManager
-@inject SignInManager<IdentityUser> SignInManager
+@inject SignInManager<ApplicationUser> SignInManager
 @inject NavigationManager NavigationManager
 
 <CascadingAuthenticationState>
