@@ -1,0 +1,166 @@
+@page "/marketplace"
+
+@inject ProductService ProductService
+@inject NavigationManager Navigation
+
+<h2>Marketplace</h2>
+
+@if (products == null)
+{
+    <p>Carregando...</p>
+}
+else if (!products.Any())
+{
+    <p>Nenhum produto disponível.</p>
+}
+else
+{
+    <div class="product-list">
+        @foreach (var p in products)
+        {
+            <div class="product-card">
+                <!-- 1. Imagem -->
+                <div class="product-img-block">
+                    @if (!string.IsNullOrEmpty(p.ImagePath))
+                    {
+                        <img src="@p.ImagePath" alt="Imagem" />
+                    }
+                </div>
+                <!-- 2. Nome + Preço -->
+                <div class="product-main">
+                    <div class="product-title">@p.Name</div>
+                    <div class="product-price">@p.Price.ToString("C")</div>
+                </div>
+                <!-- 3. Descrição -->
+                <div class="product-desc-block">
+                    <div class="label">Descrição:</div>
+                    <div class="product-desc">@p.Description</div>
+                </div>
+                <!-- 4. Vendedor -->
+                <div class="product-seller-block">
+                    <div class="label">Vendedor:</div>
+                    <div class="product-user">
+                        @if (p.User != null)
+                        {
+                            <a href="@($"/profile/{p.User.Id}")">@p.User.UserName</a>
+                        }
+                    </div>
+                </div>
+                <!-- 5. Botão de compra -->
+                <div class="product-actions">
+                    <button class="buy-btn" @onclick='() => Navigation.NavigateTo($"/products/buy/{p.Id}")'>Comprar</button>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<Product>? products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await ProductService.GetAllAsync();
+    }
+}
+
+<style>
+    .product-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        margin-top: 2rem;
+        padding-left: 2rem;   /* Espaço à esquerda */
+        padding-right: 2rem;  /* Espaço à direita */
+    }
+    .product-card {
+        display: grid;
+        grid-template-columns: 100px 1.2fr 1.5fr 1.2fr 140px;
+        align-items: center;
+        background: #23272b;
+        color: #f0f0f0;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px #0006;
+        padding: 1.5rem 2rem;
+        min-height: 120px;
+        gap: 1.5rem;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .product-img-block {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .product-img-block img {
+        width: 90px;
+        height: 90px;
+        object-fit: cover;
+        border-radius: 8px;
+        background: #181818;
+    }
+    .product-main {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .product-title {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #8ab4f8;
+        margin-bottom: 0.3rem;
+    }
+    .product-price {
+        font-size: 1.1rem;
+        font-weight: bold;
+        color: #f8f8f2;
+        margin-bottom: 0.2rem;
+    }
+    .product-desc-block, .product-seller-block {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .label {
+        font-size: 0.95rem;
+        color: #8ab4f8;
+        font-weight: bold;
+        margin-bottom: 0.2rem;
+    }
+    .product-desc {
+        color: #b0b0b0;
+        font-size: 1rem;
+        word-break: break-word;
+    }
+    .product-user a {
+        color: #f8f8f2;
+        text-decoration: underline;
+        font-weight: bold;
+        transition: color 0.2s;
+    }
+    .product-user a:hover {
+        color: #8ab4f8;
+    }
+    .product-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        height: 100%;
+        margin-right: 1rem; /* Espaço à direita do botão */
+    }
+    .buy-btn {
+        background: #8ab4f8;
+        color: #181818;
+        border: none;
+        padding: 0.7rem 1.5rem;
+        border-radius: 6px;
+        font-weight: bold;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: background 0.2s;
+        width: 100%;
+    }
+    .buy-btn:hover {
+        background: #5a8fd6;
+    }
+</style>

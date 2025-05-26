@@ -9,6 +9,22 @@
       "PackagePath": "staticwebassets/favicon.ico"
     },
     {
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/19152efd-4440-44bd-848e-993c640bd6ff.webp",
+      "PackagePath": "staticwebassets/uploads/19152efd-4440-44bd-848e-993c640bd6ff.webp"
+    },
+    {
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/653093a7-ff72-4cc6-9872-042f309f32b7.webp",
+      "PackagePath": "staticwebassets/uploads/653093a7-ff72-4cc6-9872-042f309f32b7.webp"
+    },
+    {
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/882bc704-1642-47de-901e-fb0b75beb3b7.webp",
+      "PackagePath": "staticwebassets/uploads/882bc704-1642-47de-901e-fb0b75beb3b7.webp"
+    },
+    {
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/b2258412-0c94-4e33-a8e6-85dfafeee630.webp",
+      "PackagePath": "staticwebassets/uploads/b2258412-0c94-4e33-a8e6-85dfafeee630.webp"
+    },
+    {
       "Id": "obj/Debug/net9.0/staticwebassets/msbuild.DarkMarket.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
       "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
     },

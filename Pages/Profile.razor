@@ -1,0 +1,48 @@
+@page "/profile/{Id}"
+
+@using Microsoft.AspNetCore.Identity
+
+@inject UserManager<ApplicationUser> UserManager
+
+<h2>Perfil do Usuário</h2>
+
+@if (loading)
+{
+    <p>Carregando...</p>
+}
+else if (user == null)
+{
+    <p>Usuário não encontrado.</p>
+}
+else
+{
+    <div class="profile-card">
+        <h3>@user.UserName</h3>
+        <p><b>Email:</b> @user.Email</p>
+        <!-- Adicione mais campos públicos se desejar -->
+    </div>
+}
+
+@code {
+    [Parameter] public string Id { get; set; } = string.Empty;
+    private ApplicationUser? user;
+    private bool loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await UserManager.FindByIdAsync(Id);
+        loading = false;
+    }
+}
+
+<style>
+    .profile-card {
+        background: #23272b;
+        color: #f0f0f0;
+        padding: 2rem;
+        border-radius: 8px;
+        max-width: 400px;
+        margin-top: 2rem;
+        box-shadow: 0 2px 8px #0006;
+    }
+</style>

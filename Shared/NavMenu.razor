@@ -5,25 +5,30 @@
 
 <nav>
     <ul>
-        <li><NavLink href="/" Match="NavLinkMatch.All">Home</NavLink></li>
+        <li><NavLink href="/marketplace">Marketplace</NavLink></li>
+        
         <AuthorizeView>
             <NotAuthorized>
                 <li><NavLink href="/Identity/Account/Login">Login</NavLink></li>
                 <li><NavLink href="/Identity/Account/Register">Registrar</NavLink></li>
             </NotAuthorized>
+            
             <Authorized>
                 <li><NavLink href="/dashboard" Match="NavLinkMatch.All">
                     <span class="oi oi-dashboard"></span> Dashboard
                 </NavLink></li>
+                <li><NavLink href="/my-products">Meus Produtos</NavLink></li>
             </Authorized>
         </AuthorizeView>
+
+        <li><NavLink href="/about">About</NavLink></li>
+        <li><NavLink href="/contact">Contact</NavLink></li>
+
         <AuthorizeView Roles="admin">
             <Authorized>
                 <li><NavLink href="/admin">Admin</NavLink></li>
             </Authorized>
         </AuthorizeView>
-        <li><NavLink href="/about">About</NavLink></li>
-        <li><NavLink href="/contact">Contact</NavLink></li>
     </ul>
 </nav>
 

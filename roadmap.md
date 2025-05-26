@@ -19,11 +19,11 @@
 ---
 
 ## Fase 3: Produtos e Marketplace
-- [ ] Cadastro de produtos (formulário)
-- [ ] Listagem de produtos (com filtros e busca)
-- [ ] Página de detalhes do produto
-- [ ] Edição e remoção de produto (CRUD completo)
-- [ ] Upload de imagens do produto (opcional)
+- [x] Cadastro de produtos (formulário)
+- [x] Listagem de produtos (com filtros e busca)
+- [x] Página de detalhes do produto
+- [x] Edição e remoção de produto (CRUD completo)
+- [x] Upload de imagens do produto (opcional)
 
 ---
 
