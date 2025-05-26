@@ -1,0 +1,122 @@
+@page "/products/buy/{ProductId:int}"
+
+@using DarkMarket.Shared
+
+@inject BitcoinPaymentService BitcoinPaymentService
+
+<div class="payment-container">
+    <h2 class="payment-title">Comprar Produto</h2>
+
+    @if (string.IsNullOrEmpty(Address))
+    {
+        <button class="payment-btn" @onclick="GerarEndereco">Gerar endereço de pagamento</button>
+    }
+    else
+    {
+        <div class="payment-card">
+            <strong>Envie o pagamento para:</strong>
+            <div class="payment-address">@Address</div>
+            <QRCode Value="@($"bitcoin:{Address}?amount={Amount}")" />
+            <p>Valor: <b>@Amount BTC (testnet)</b></p>
+            <p><small>Após o pagamento, aguarde a confirmação.</small></p>
+            <p>
+                <b>Status:</b>
+                @if (IsPaid)
+                {
+                    <span class="payment-status-ok">Pagamento recebido!</span>
+                }
+                else
+                {
+                    <span class="payment-status-wait">Aguardando pagamento...</span>
+                    <button class="payment-btn" @onclick="CheckPayment" style="margin-left:1rem;">Verificar pagamento</button>
+                }
+            </p>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public int ProductId { get; set; }
+    public string Address { get; set; } = "";
+    public string PrivateKey { get; set; } = "";
+    public decimal Amount { get; set; } = 0.001m; // Exemplo fixo
+    public bool IsPaid { get; set; } = false;
+
+    private void GerarEndereco()
+    {
+        var result = BitcoinPaymentService.GenerateTestnetAddress();
+        Address = result.Address;
+        PrivateKey = result.PrivateKey;
+    }
+
+    private async Task CheckPayment()
+    {
+        if (!string.IsNullOrEmpty(Address))
+        {
+            var received = await BitcoinPaymentService.GetReceivedAmountAsync(Address);
+            IsPaid = received >= Amount;
+            StateHasChanged();
+        }
+    }
+}
+
+<style>
+    .payment-container {
+        max-width: 420px;
+        margin: 3rem auto;
+        background: #23272b;
+        color: #f0f0f0;
+        border-radius: 16px;
+        box-shadow: 0 2px 16px #000a;
+        padding: 2.5rem 2rem;
+        text-align: center;
+    }
+    .payment-title {
+        color: #f9a825;
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+    .payment-card {
+        background: #181c20;
+        border-radius: 12px;
+        padding: 2rem 1rem;
+        box-shadow: 0 2px 8px #0007;
+        margin-top: 1rem;
+    }
+    .payment-address {
+        font-family: monospace;
+        background: #111;
+        color: #ffe066;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        margin: 1rem 0;
+        word-break: break-all;
+        font-size: 1.1rem;
+    }
+    .payment-btn {
+        background: #f9a825;
+        color: #23272b;
+        font-weight: bold;
+        padding: 0.7rem 2rem;
+        border-radius: 8px;
+        border: none;
+        font-size: 1.1rem;
+        cursor: pointer;
+        margin-top: 1rem;
+        box-shadow: 0 2px 8px #0004;
+        transition: background 0.2s;
+    }
+    .payment-btn:hover {
+        background: #ffe066;
+    }
+    .payment-status-ok {
+        color: #4caf50;
+        font-weight: bold;
+        margin-left: 0.5rem;
+    }
+    .payment-status-wait {
+        color: #ff9800;
+        font-weight: bold;
+        margin-left: 0.5rem;
+    }
+</style>

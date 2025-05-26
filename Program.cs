@@ -18,6 +18,7 @@ builder.Services.AddScoped<UserService>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<BitcoinQuoteService>();
+builder.Services.AddSingleton<BitcoinPaymentService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

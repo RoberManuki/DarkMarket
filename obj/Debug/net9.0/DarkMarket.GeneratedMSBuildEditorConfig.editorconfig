@@ -52,6 +52,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTXlQcm9kdWN0cy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/freeza/Documents/Projects/DarkMarket/Pages/Payment.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGF5bWVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/freeza/Documents/Projects/DarkMarket/Pages/ProductForm.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZHVjdEZvcm0ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
@@ -86,6 +90,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/home/freeza/Documents/Projects/DarkMarket/Shared/NavMenu.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL05hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/freeza/Documents/Projects/DarkMarket/Shared/QRCode.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1FSQ29kZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/freeza/Documents/Projects/DarkMarket/Shared/Sidebar.razor]
