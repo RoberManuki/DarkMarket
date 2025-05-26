@@ -41,7 +41,8 @@ namespace DarkMarket.Areas.Identity.Pages.Account
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    return LocalRedirect("~/dashboard");
+                    // Redireciona sempre para o dashboard
+                    return LocalRedirect("/dashboard");
                 }
                 ModelState.AddModelError(string.Empty, "Login inválido.");
             }

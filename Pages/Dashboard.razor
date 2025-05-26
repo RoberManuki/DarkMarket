@@ -2,87 +2,76 @@
 
 @attribute [Authorize]
 
+@using DarkMarket.Shared
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components.Authorization
-@using Microsoft.AspNetCore.Identity
 
-@inject AuthenticationStateProvider AuthStateProvider
-@inject UserService UserService
+@inject BitcoinQuoteService BitcoinQuoteService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Dashboard</PageTitle>
 
-<AuthorizeView>
-    <Authorized>
-        @if (userName is null)
-        {
-            <p>Carregando informações...</p>
-        }
-        else
-        {
-            <h2>Olá, @userName!</h2>
-            <div class="dashboard-cards">
-                <div class="dashboard-card">
-                    <h3>Perfil</h3>
-                    <p>Email: @userEmail</p>
-                    <p>Role: @userRole</p>
-                </div>
-                <div class="dashboard-card">
-                    <h3>Resumo</h3>
-                    <p>Último login: @lastLogin</p>
-                    <p>Status: Ativo</p>
-                </div>
-                <div class="dashboard-card">
-                    <h3>Notificações</h3>
-                    <p>Você não possui novas notificações.</p>
-                </div>
-            </div>
-        }
-    </Authorized>
-    <NotAuthorized>
-        <p>Você não tem permissão para acessar esta página.</p>
-    </NotAuthorized>
-</AuthorizeView>
+<div class="dashboard-container">
+    <h1>Bem-vindo ao DarkMarket!</h1>
+
+    <BtcQuoteCard Quote="quote" Label="Cotação Atual" />
+    @if (quote == null)
+    {
+        <div class="btc-quote-error">
+            <span class="oi oi-warning"></span>
+            Não foi possível obter a cotação do Bitcoin no momento.<br />
+            <small>Tente novamente mais tarde.</small>
+        </div>
+    }
+
+    <div class="dashboard-cards">
+        <StatCard Title="Perfil">
+            @if (isAuthenticated)
+            {
+                <span>Bem-vindo, @userName!</span>
+            }
+            else
+            {
+                <span>Faça login para ver seu perfil.</span>
+            }
+        </StatCard>
+
+        <StatCard Title="Resumo">
+            @if (isAuthenticated)
+            {
+                <span>Seu resumo aparecerá aqui.</span>
+            }
+            else
+            {
+                <span>Faça login para ver seu resumo.</span>
+            }
+        </StatCard>
+        
+        <StatCard Title="Notificações">
+            @if (isAuthenticated)
+            {
+                <span>Suas notificações aparecerão aqui.</span>
+            }
+            else
+            {
+                <span>Faça login para ver suas notificações.</span>
+            }
+        </StatCard>
+    </div>
+</div>
 
 @code {
+    private BitcoinQuote? quote;
+    private bool isAuthenticated;
     private string? userName;
-    private string? userEmail;
-    private string? userRole;
-    private string? lastLogin = DateTime.Now.ToString("dd/MM/yyyy HH:mm");
-
-    private ApplicationUser? userEntity;
-    private IList<string>? userRoles;
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        quote = await BitcoinQuoteService.GetQuoteAsync();
+
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-        userName = user.Identity?.Name ?? "Usuário";
-        userEntity = (ApplicationUser?)await UserService.GetUserByNameAsync(userName);
-        userEmail = userEntity?.Email ?? "-";
-        userRoles = userEntity != null ? await UserService.GetUserRolesAsync(userEntity) : new List<string>();
-        userRole = userRoles.FirstOrDefault() ?? "user";
+
+        isAuthenticated = user.Identity?.IsAuthenticated ?? false;
+        userName = user.Identity?.Name;
     }
 }
-
-<style>
-    .dashboard-cards {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 2rem;
-        margin-top: 2rem;
-    }
-    .dashboard-card {
-        background: #23272b;
-        color: #f0f0f0;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px #000a;
-        padding: 1.5rem 2rem;
-        min-width: 220px;
-        flex: 1 1 220px;
-        max-width: 320px;
-    }
-    .dashboard-card h3 {
-        margin-top: 0;
-        color: #8ab4f8;
-    }
-</style>

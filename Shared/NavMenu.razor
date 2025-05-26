@@ -5,28 +5,44 @@
 
 <nav>
     <ul>
-        <li><NavLink href="/marketplace">Marketplace</NavLink></li>
-        
+        <li><NavLink href="/" Match="NavLinkMatch.All">
+            <span class="oi oi-home"></span> Home
+        </NavLink></li>
+        <li><NavLink href="/dashboard" Match="NavLinkMatch.All">
+            <span class="oi oi-dashboard"></span> Dashboard
+        </NavLink></li>
+        <li><NavLink href="/marketplace">
+            <span class="oi oi-shopping-cart"></span> Marketplace
+        </NavLink></li>
+
         <AuthorizeView>
             <NotAuthorized>
-                <li><NavLink href="/Identity/Account/Login">Login</NavLink></li>
-                <li><NavLink href="/Identity/Account/Register">Registrar</NavLink></li>
-            </NotAuthorized>
-            
-            <Authorized>
-                <li><NavLink href="/dashboard" Match="NavLinkMatch.All">
-                    <span class="oi oi-dashboard"></span> Dashboard
+                <li><NavLink href="/Identity/Account/Login">
+                    <span class="oi oi-login"></span> Login
                 </NavLink></li>
-                <li><NavLink href="/my-products">Meus Produtos</NavLink></li>
+                <li><NavLink href="/Identity/Account/Register">
+                    <span class="oi oi-user-plus"></span> Registrar
+                </NavLink></li>
+            </NotAuthorized>
+            <Authorized>
+                <li><NavLink href="/my-products">
+                    <span class="oi oi-box"></span> Meus Produtos
+                </NavLink></li>
             </Authorized>
         </AuthorizeView>
 
-        <li><NavLink href="/about">About</NavLink></li>
-        <li><NavLink href="/contact">Contact</NavLink></li>
+        <li><NavLink href="/about">
+            <span class="oi oi-info"></span> About
+        </NavLink></li>
+        <li><NavLink href="/contact">
+            <span class="oi oi-envelope"></span> Contact
+        </NavLink></li>
 
         <AuthorizeView Roles="admin">
             <Authorized>
-                <li><NavLink href="/admin">Admin</NavLink></li>
+                <li><NavLink href="/admin">
+                    <span class="oi oi-lock"></span> Admin
+                </NavLink></li>
             </Authorized>
         </AuthorizeView>
     </ul>

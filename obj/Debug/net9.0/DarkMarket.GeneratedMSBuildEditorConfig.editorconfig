@@ -40,6 +40,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRGFzaGJvYXJkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/freeza/Documents/Projects/DarkMarket/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/freeza/Documents/Projects/DarkMarket/Pages/Marketplace.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFya2V0cGxhY2UucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
@@ -64,6 +68,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvX0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/freeza/Documents/Projects/DarkMarket/Shared/BtcQuoteCard.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0J0Y1F1b3RlQ2FyZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/freeza/Documents/Projects/DarkMarket/Shared/Footer.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0Zvb3Rlci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
@@ -82,6 +90,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/home/freeza/Documents/Projects/DarkMarket/Shared/Sidebar.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1NpZGViYXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/freeza/Documents/Projects/DarkMarket/Shared/StatCard.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL1N0YXRDYXJkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/freeza/Documents/Projects/DarkMarket/Areas/Identity/Pages/Account/Login.cshtml]

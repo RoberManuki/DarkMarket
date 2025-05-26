@@ -1,0 +1,136 @@
+@using DarkMarket.Models
+
+<div class="btc-quote-row">
+    <div class="btc-quote-label">
+        <span class="btc-label-text">@Label</span>
+    </div>
+
+    <div class="btc-quote-content">
+        <div class="btc-quote-col btc-img-col">
+            <img src="https://assets.coingecko.com/coins/images/1/large/bitcoin.png" alt="BTC" class="btc-img" />
+            <span class="btc-amount">1 BTC</span>
+        </div>
+
+        <div class="btc-quote-col btc-usd-col">
+            <span class="btc-currency">USD</span>
+            <span class="btc-value">
+                @if (Quote == null)
+                {
+                    <span>...</span>
+                }
+                else
+                {
+                    @Quote.btc_usd.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))
+                }
+            </span>
+        </div>
+        
+        <div class="btc-quote-col btc-brl-col">
+            <span class="btc-currency">BRL</span>
+            <span class="btc-value">
+                @if (Quote == null)
+                {
+                    <span>...</span>
+                }
+                else
+                {
+                    @Quote.btc_brl.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"))
+                }
+            </span>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public BitcoinQuote? Quote { get; set; }
+    [Parameter] public string Label { get; set; } = "Cotação";
+}
+
+<style>
+    .btc-quote-row {
+        display: flex;
+        align-items: center;
+        background: linear-gradient(90deg, #23272b 60%, #181c20 100%);
+        border-radius: 14px;
+        box-shadow: 0 2px 16px #000a;
+        margin-bottom: 2.5rem;
+        padding: 2rem 2.5rem;
+        width: 100%;
+        min-height: 120px;
+        gap: 2.5rem;
+        box-sizing: border-box;
+    }
+    .btc-quote-label {
+        min-width: 180px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+    .btc-label-text {
+        font-size: 2.1rem;
+        font-weight: bold;
+        color: #f9a825;
+        letter-spacing: 2px;
+        text-shadow: 0 2px 12px #000a;
+        text-transform: uppercase;
+    }
+    .btc-quote-content {
+        display: flex;
+        flex: 1;
+        justify-content: space-evenly;
+        align-items: center;
+        gap: 2.5rem;
+    }
+    .btc-quote-col {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 120px;
+    }
+    .btc-img-col {
+        flex-direction: row;
+        gap: 1rem;
+    }
+    .btc-img {
+        width: 64px;
+        height: 64px;
+        margin-right: 0.5rem;
+        filter: drop-shadow(0 2px 8px #0008);
+    }
+    .btc-amount {
+        font-size: 1.4rem;
+        font-weight: bold;
+        color: #f8f8f2;
+        letter-spacing: 1px;
+    }
+    .btc-currency {
+        font-size: 1.1rem;
+        color: #b0b0b0;
+        margin-bottom: 0.2rem;
+        letter-spacing: 1px;
+    }
+    .btc-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #8ab4f8;
+        text-shadow: 0 2px 8px #0008;
+    }
+    .btc-usd-col .btc-value {
+        color: #8ab4f8;
+    }
+    .btc-brl-col .btc-value {
+        color: #4caf50;
+    }
+    @@media (max-width: 900px) {
+        .btc-quote-row {
+            flex-direction: column;
+            gap: 1.2rem;
+            padding: 1.2rem 1rem;
+        }
+        .btc-quote-content {
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+    }
+</style>

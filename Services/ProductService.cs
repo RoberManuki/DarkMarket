@@ -74,6 +74,11 @@ namespace DarkMarket.Services
             return $"/uploads/{fileName}";
         }
 
+        public async Task<int> GetProductsCountAsync()
+        {
+            return await _context.Products.CountAsync();
+        }
+
         public async Task<List<Product>> GetAllExceptUserAsync(string userId) =>
             await _context.Products.Where(p => p.UserId != userId).OrderByDescending(p => p.CreatedAt).ToListAsync();
 

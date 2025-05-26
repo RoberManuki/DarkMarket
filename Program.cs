@@ -6,14 +6,18 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using DarkMarket.Models;
+using DarkMarket.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-builder.Services.AddScoped<DarkMarket.Services.ProductService>();
+builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<UserService>();
+
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton<BitcoinQuoteService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
