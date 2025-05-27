@@ -9,34 +9,41 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject NavigationManager NavigationManager
 
-<CascadingAuthenticationState>
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <div class="main">
-        <header>
-            <h1>DarkMarket</h1>
-            <div class="header-actions">
-                <AuthorizeView>
-                    <Authorized>
-                        <span>Olá, @(string.IsNullOrWhiteSpace(context.User.Identity?.Name) ? "Usuário" : context.User.Identity.Name)!</span>
-                        <a href="/Identity/Account/Logout" class="logout-btn">Sair</a>
-                    </Authorized>
-                    <NotAuthorized>
-                        <span>Bem-vindo, visitante!</span>
-                    </NotAuthorized>
-                </AuthorizeView>
-            </div>
-        </header>
-        <div class="content px-4">
-            @Body
+<Toast @ref="ToastRef" />
+<CascadingValue Value="ToastRef">
+    <CascadingAuthenticationState>
+        <div class="sidebar">
+            <NavMenu />
         </div>
-        <footer>
-            <span>&copy; 2025 Freeza</span>
-        </footer>
-    </div>
-</CascadingAuthenticationState>
+
+        <div class="main">
+            <header>
+                <h1>DarkMarket</h1>
+                <div class="header-actions">
+                    <AuthorizeView>
+                        <Authorized>
+                            <span>Olá, @(string.IsNullOrWhiteSpace(context.User.Identity?.Name) ? "Usuário" : context.User.Identity.Name)!</span>
+                            <a href="/Identity/Account/Logout" class="logout-btn">Sair</a>
+                        </Authorized>
+                        <NotAuthorized>
+                            <span>Bem-vindo, visitante!</span>
+                        </NotAuthorized>
+                    </AuthorizeView>
+                </div>
+            </header>
+            <div class="content px-4">
+                @Body
+            </div>
+            <footer>
+                <span>&copy; 2025 Freeza</span>
+            </footer>
+        </div>
+    </CascadingAuthenticationState>
+</CascadingValue>
+
+@code {
+    private Toast? ToastRef;
+}
 
 <style>
     body, html {

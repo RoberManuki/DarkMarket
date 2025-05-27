@@ -1,0 +1,67 @@
+@page "/payments-history"
+
+@using DarkMarket.Models
+@using Microsoft.EntityFrameworkCore
+
+@inject AppDbContext Db
+@inject AuthenticationStateProvider AuthProvider
+
+<h2>Histórico de Pagamentos</h2>
+
+@if (payments == null)
+{
+    <p>Carregando...</p>
+}
+else if (!payments.Any())
+{
+    <p>Você ainda não realizou nenhum pagamento.</p>
+}
+else
+{
+    <table class="payments-table">
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Endereço</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var p in payments)
+        {
+            <tr>
+                <td>@p.ProductId</td>
+                <td style="font-family:monospace;">@p.Address</td>
+                <td>@p.Amount BTC</td>
+                <td>
+                    @if (p.IsPaid)
+                    {
+                        <span style="color:#4caf50;font-weight:bold;">Pago</span>
+                    }
+                    else
+                    {
+                        <span style="color:#ff9800;font-weight:bold;">Pendente</span>
+                    }
+                </td>
+                <td>@p.CreatedAt.ToLocalTime().ToString("g")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<PaymentRecord>? payments;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var userId = authState.User.Identity?.Name;
+        payments = await Db.Payments
+            .Where(p => p.UserId == userId)
+            .OrderByDescending(p => p.CreatedAt)
+            .ToListAsync();
+    }
+}

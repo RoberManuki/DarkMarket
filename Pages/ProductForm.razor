@@ -1,5 +1,6 @@
 @page "/products/create"
 @page "/products/edit/{Id:int}"
+@using DarkMarket.Shared
 
 @inject ProductService ProductService
 @inject NavigationManager Navigation
@@ -44,6 +45,7 @@
     [Parameter] public int Id { get; set; }
     private Product product = new();
     private IBrowserFile? imageFile;
+    [CascadingParameter] public Toast? ToastRef { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,10 +66,12 @@
             product.UserId = user.FindFirst(c => c.Type == "sub" || c.Type.Contains("nameidentifier"))?.Value ?? "";
 
             await ProductService.AddAsync(product, imageFile);
+            ToastRef?.Show("Produto cadastrado com sucesso!", "success");
         }
         else
         {
             await ProductService.UpdateAsync(product, imageFile);
+            ToastRef?.Show("Produto atualizado com sucesso!", "success");
         }
 
         Navigation.NavigateTo("/my-products");

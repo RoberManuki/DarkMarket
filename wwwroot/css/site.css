@@ -157,3 +157,23 @@ footer {
     font-size: 1.5rem;
     margin-right: 0.7rem;
 }
+
+.payments-table {
+    width: 100%;
+    background: #23272b;
+    color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px #000a;
+    margin-top: 2rem;
+    border-collapse: collapse;
+}
+
+.payments-table th, .payments-table td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid #333;
+}
+
+.payments-table th {
+    color: #f9a825;
+    font-size: 1.1rem;
+}

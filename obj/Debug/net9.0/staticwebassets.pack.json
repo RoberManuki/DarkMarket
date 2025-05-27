@@ -9,8 +9,20 @@
       "PackagePath": "staticwebassets/favicon.ico"
     },
     {
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/039e1e68-c089-49ba-920a-054d6a432d45.webp",
+      "PackagePath": "staticwebassets/uploads/039e1e68-c089-49ba-920a-054d6a432d45.webp"
+    },
+    {
       "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/19152efd-4440-44bd-848e-993c640bd6ff.webp",
       "PackagePath": "staticwebassets/uploads/19152efd-4440-44bd-848e-993c640bd6ff.webp"
+    },
+    {
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/2c72729f-6fda-4f12-ad75-2885d68980b4.webp",
+      "PackagePath": "staticwebassets/uploads/2c72729f-6fda-4f12-ad75-2885d68980b4.webp"
+    },
+    {
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/303507fe-d455-44a6-ad5b-126b620be5a6.jpg",
+      "PackagePath": "staticwebassets/uploads/303507fe-d455-44a6-ad5b-126b620be5a6.jpg"
     },
     {
       "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/653093a7-ff72-4cc6-9872-042f309f32b7.webp",
@@ -23,6 +35,10 @@
     {
       "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/b2258412-0c94-4e33-a8e6-85dfafeee630.webp",
       "PackagePath": "staticwebassets/uploads/b2258412-0c94-4e33-a8e6-85dfafeee630.webp"
+    },
+    {
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/da8ec3e4-0a66-4331-b380-14bd60ee625c.webp",
+      "PackagePath": "staticwebassets/uploads/da8ec3e4-0a66-4331-b380-14bd60ee625c.webp"
     },
     {
       "Id": "obj/Debug/net9.0/staticwebassets/msbuild.DarkMarket.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",

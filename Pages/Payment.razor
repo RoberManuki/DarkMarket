@@ -1,15 +1,18 @@
 @page "/products/buy/{ProductId:int}"
 
 @using DarkMarket.Shared
+@using DarkMarket.Models
 
 @inject BitcoinPaymentService BitcoinPaymentService
+@inject AppDbContext Db
+@inject AuthenticationStateProvider AuthProvider
 
 <div class="payment-container">
     <h2 class="payment-title">Comprar Produto</h2>
 
     @if (string.IsNullOrEmpty(Address))
     {
-        <button class="payment-btn" @onclick="GerarEndereco">Gerar endereço de pagamento</button>
+        <button class="payment-btn" @onclick="GenerateAddress">Gerar endereço de pagamento</button>
     }
     else
     {
@@ -41,21 +44,92 @@
     public string PrivateKey { get; set; } = "";
     public decimal Amount { get; set; } = 0.001m; // Exemplo fixo
     public bool IsPaid { get; set; } = false;
+    private System.Threading.Timer? _timer;
+    [CascadingParameter] public Toast? ToastRef { get; set; }
 
-    private void GerarEndereco()
+    private void StartTimer()
     {
-        var result = BitcoinPaymentService.GenerateTestnetAddress();
-        Address = result.Address;
-        PrivateKey = result.PrivateKey;
+        // Evita múltiplos timers
+        _timer?.Dispose();
+        _timer = new System.Threading.Timer(async _ =>
+        {
+            await CheckPayment();
+            StateHasChanged();
+        }, null, 0, 15000); // checa a cada 15s
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (firstRender && !string.IsNullOrEmpty(Address))
+        {
+            StartTimer();
+        }
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+
+    private async Task GenerateAddress()
+    {
+        try
+        {
+            var result = BitcoinPaymentService.GenerateTestnetAddress();
+            Address = result.Address;
+            PrivateKey = result.PrivateKey;
+            IsPaid = false;
+            var authState = await AuthProvider.GetAuthenticationStateAsync();
+            var userId = authState.User.Identity?.Name;
+
+            var payment = new PaymentRecord
+            {
+                ProductId = ProductId,
+                UserId = userId,
+                Address = Address,
+                Amount = Amount,
+                IsPaid = false,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            Db.Payments.Add(payment);
+            await Db.SaveChangesAsync();
+            StartTimer();
+            ToastRef?.Show("Endereço de pagamento gerado!", "success");
+        }
+        catch
+        {
+            ToastRef?.Show("Erro ao gerar endereço de pagamento.", "error");
+        }
     }
 
     private async Task CheckPayment()
     {
-        if (!string.IsNullOrEmpty(Address))
+        try
         {
-            var received = await BitcoinPaymentService.GetReceivedAmountAsync(Address);
-            IsPaid = received >= Amount;
-            StateHasChanged();
+            if (!string.IsNullOrEmpty(Address) && !IsPaid)
+            {
+                var received = await BitcoinPaymentService.GetReceivedAmountAsync(Address);
+                IsPaid = received >= Amount;
+
+                if (IsPaid)
+                {
+                    var payment = Db.Payments.FirstOrDefault(p => p.Address == Address);
+                    if (payment != null)
+                    {
+                        payment.IsPaid = true;
+                        payment.PaidAt = DateTime.UtcNow;
+                        await Db.SaveChangesAsync();
+                    }
+                    _timer?.Dispose();
+                    ToastRef?.Show("Pagamento confirmado com sucesso!", "success");
+                }
+                StateHasChanged();
+            }
+        }
+        catch
+        {
+            ToastRef?.Show("Erro ao verificar pagamento.", "error");
         }
     }
 }

@@ -1,6 +1,8 @@
 using System.Net.Http;
 using System.Net.Http.Json;
 using DarkMarket.Models;
+using DarkMarket.Shared;
+using Microsoft.AspNetCore.Components;
 
 namespace DarkMarket.Services
 {

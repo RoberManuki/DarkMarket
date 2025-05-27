@@ -2,6 +2,7 @@
 
 @inject ProductService ProductService
 @inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthProvider
 
 <h2>Marketplace</h2>
 
@@ -48,7 +49,10 @@ else
                 </div>
                 <!-- 5. Botão de compra -->
                 <div class="product-actions">
-                    <button class="buy-btn" @onclick='() => Navigation.NavigateTo($"/products/buy/{p.Id}")'>Comprar</button>
+                    @if (p.UserId != userId)
+                    {
+                        <button class="buy-btn" @onclick='() => Navigation.NavigateTo($"/products/buy/{p.Id}")'>Comprar</button>
+                    }
                 </div>
             </div>
         }
@@ -57,9 +61,13 @@ else
 
 @code {
     private List<Product>? products;
+    private string? userId;
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userId = user.FindFirst(c => c.Type == "sub" || c.Type.Contains("nameidentifier"))?.Value;
         products = await ProductService.GetAllAsync();
     }
 }

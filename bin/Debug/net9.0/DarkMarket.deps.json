@@ -14,7 +14,6 @@
           "Microsoft.AspNetCore.Identity.UI": "9.0.5",
           "Microsoft.EntityFrameworkCore": "9.0.5",
           "Microsoft.EntityFrameworkCore.Design": "9.0.5",
-          "MudBlazor": "6.0.0",
           "NBitcoin": "8.0.13",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "9.0.4",
           "QRCoder": "1.6.0"
@@ -97,20 +96,6 @@
             "assemblyVersion": "9.0.0.0",
             "fileVersion": "9.0.525.22904"
           }
-        }
-      },
-      "Microsoft.AspNetCore.Components.Forms/6.0.0": {
-        "dependencies": {
-          "Microsoft.AspNetCore.Components": "9.0.5"
-        }
-      },
-      "Microsoft.AspNetCore.Components.Web/6.0.0": {
-        "dependencies": {
-          "Microsoft.AspNetCore.Components": "9.0.5",
-          "Microsoft.AspNetCore.Components.Forms": "6.0.0",
-          "Microsoft.Extensions.DependencyInjection": "9.0.5",
-          "Microsoft.JSInterop": "6.0.0",
-          "System.IO.Pipelines": "7.0.0"
         }
       },
       "Microsoft.AspNetCore.Cryptography.Internal/9.0.5": {
@@ -759,7 +744,6 @@
           "Microsoft.Extensions.Options": "9.0.5"
         }
       },
-      "Microsoft.JSInterop/6.0.0": {},
       "Microsoft.Net.Http.Headers/2.3.0": {
         "dependencies": {
           "Microsoft.Extensions.Primitives": "9.0.5",
@@ -781,18 +765,6 @@
           "lib/net6.0/Mono.TextTemplating.dll": {
             "assemblyVersion": "3.0.0.0",
             "fileVersion": "3.0.0.1"
-          }
-        }
-      },
-      "MudBlazor/6.0.0": {
-        "dependencies": {
-          "Microsoft.AspNetCore.Components": "9.0.5",
-          "Microsoft.AspNetCore.Components.Web": "6.0.0"
-        },
-        "runtime": {
-          "lib/net6.0/MudBlazor.dll": {
-            "assemblyVersion": "6.0.0.0",
-            "fileVersion": "6.0.0.0"
           }
         }
       },
@@ -1018,20 +990,6 @@
       "sha512": "sha512-amVsHIy/+712NIC246Hwtha2GFRVxAwEl5REhNSpgY++aRAKRU6S0x3xrJT8/kU9tfNpXjHbMd3xMedqBb5iJA==",
       "path": "microsoft.aspnetcore.components.authorization/9.0.5",
       "hashPath": "microsoft.aspnetcore.components.authorization.9.0.5.nupkg.sha512"
-    },
-    "Microsoft.AspNetCore.Components.Forms/6.0.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-POjep/9qy79PD/q/5Gai7Xsg6Oybmo10+bVsCkoTrfu1kAO8dWgbQgJWH8I/VMfOPZY/dPgfo+BitqEriWMuKQ==",
-      "path": "microsoft.aspnetcore.components.forms/6.0.0",
-      "hashPath": "microsoft.aspnetcore.components.forms.6.0.0.nupkg.sha512"
-    },
-    "Microsoft.AspNetCore.Components.Web/6.0.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-EvTZEhXCqcIxEs01ScF0ts/CyMOzXQIFfcgwTeLae7dQV7WnPEFhqrlD+1l78lA/h+Uer1RvaRbkAScGE/0tyQ==",
-      "path": "microsoft.aspnetcore.components.web/6.0.0",
-      "hashPath": "microsoft.aspnetcore.components.web.6.0.0.nupkg.sha512"
     },
     "Microsoft.AspNetCore.Cryptography.Internal/9.0.5": {
       "type": "package",
@@ -1355,13 +1313,6 @@
       "path": "microsoft.extensions.webencoders/8.0.11",
       "hashPath": "microsoft.extensions.webencoders.8.0.11.nupkg.sha512"
     },
-    "Microsoft.JSInterop/6.0.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-M7NyTgOY0vhozRtppvxUDJblgPWBUg6ioJ2vpaKpXVYILB0No8Vrv4HPis+ig5BzaOWd3PR9D3oTovYKGBt3mw==",
-      "path": "microsoft.jsinterop/6.0.0",
-      "hashPath": "microsoft.jsinterop.6.0.0.nupkg.sha512"
-    },
     "Microsoft.Net.Http.Headers/2.3.0": {
       "type": "package",
       "serviceable": true,
@@ -1389,13 +1340,6 @@
       "sha512": "sha512-YqueG52R/Xej4VVbKuRIodjiAhV0HR/XVbLbNrJhCZnzjnSjgMJ/dCdV0akQQxavX6hp/LC6rqLGLcXeQYU7XA==",
       "path": "mono.texttemplating/3.0.0",
       "hashPath": "mono.texttemplating.3.0.0.nupkg.sha512"
-    },
-    "MudBlazor/6.0.0": {
-      "type": "package",
-      "serviceable": true,
-      "sha512": "sha512-jPoZuhxq4DLfMvsoHhTkgdskjGi0JTNmg2AQ2k1dRtf7Op4r4zZfYcta7fk9ot14aSDSA0wWQmo6VPU19nf89A==",
-      "path": "mudblazor/6.0.0",
-      "hashPath": "mudblazor.6.0.0.nupkg.sha512"
     },
     "NBitcoin/8.0.13": {
       "type": "package",
