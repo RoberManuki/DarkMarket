@@ -6,7 +6,9 @@
 @inject NavigationManager Navigation
 
 <h2>Meus Produtos</h2>
-<button class="add-btn" @onclick='() => Navigation.NavigateTo("/products/create")'>Novo Produto</button>
+<button class="primary-btn" @onclick='() => Navigation.NavigateTo("/products/create")'>
+    Novo Produto
+</button>
 
 @if (products == null)
 {
@@ -137,5 +139,23 @@ else
     }
     button.edit-btn:hover {
         background: #5a6470;
+    }
+    .primary-btn {
+        background: #f9a825;
+        color: #181818;
+        font-weight: bold;
+        padding: 0.7rem 1.5rem;
+        border-radius: 8px;
+        border: none;
+        font-size: 1.1rem;
+        cursor: pointer;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 8px #0004;
+        display: inline-flex;
+        align-items: center;
+        transition: background 0.2s;
+    }
+    .primary-btn:hover {
+        background: #c17900;
     }
 </style>

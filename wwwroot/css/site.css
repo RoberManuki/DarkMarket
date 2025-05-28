@@ -177,3 +177,43 @@ footer {
     color: #f9a825;
     font-size: 1.1rem;
 }
+
+.payment-btn.payment-btn-generate {
+    background: #f9a825;
+    color: #181818;
+}
+
+.payment-btn.payment-btn-generate:hover {
+    background: #c17900;
+}
+
+.save-btn, .cancel-btn {
+    font-weight: bold;
+    padding: 0.7rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 2px 8px #0004;
+    display: inline-flex;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.save-btn {
+    background: #43a047;
+    color: #fff;
+}
+
+.save-btn:hover {
+    background: #388e3c;
+}
+
+.cancel-btn {
+    background: #e53935;
+    color: #fff;
+}
+
+.cancel-btn:hover {
+    background: #b71c1c;
+}

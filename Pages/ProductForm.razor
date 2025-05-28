@@ -35,8 +35,13 @@
             }
         </div>
         <div class="form-actions">
-            <button type="submit">Salvar</button>
-            <button type="button" @onclick='() => Navigation.NavigateTo("/my-products")'>Cancelar</button>
+            <button class="cancel-btn" type="button" @onclick='() => Navigation.NavigateTo("/my-products")'>
+                Cancelar
+            </button>
+
+            <button class="save-btn" type="submit">
+                Salvar
+            </button>
         </div>
     </EditForm>
 </div>
@@ -119,17 +124,7 @@
     .form-actions {
         display: flex;
         justify-content: space-between;
-        margin-top: 1.5rem;
-    }
-    .form-actions button {
-        background: #8ab4f8;
-        color: #181818;
-        border: none;
-        padding: 0.5rem 1.5rem;
-        border-radius: 4px;
-        font-weight: bold;
-        cursor: pointer;
-        transition: background 0.2s;
+        gap: 1rem;
     }
     .form-actions button[type="button"] {
         background: #a33;

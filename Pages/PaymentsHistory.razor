@@ -1,10 +1,12 @@
 @page "/payments-history"
 
 @using DarkMarket.Models
+@using DarkMarket.Shared
 @using Microsoft.EntityFrameworkCore
 
 @inject AppDbContext Db
 @inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager Navigation
 
 <h2>Histórico de Pagamentos</h2>
 
@@ -26,6 +28,7 @@ else
                 <th>Valor</th>
                 <th>Status</th>
                 <th>Data</th>
+                <th></th> <!-- Nova coluna para o botão -->
             </tr>
         </thead>
         <tbody>
@@ -46,6 +49,17 @@ else
                     }
                 </td>
                 <td>@p.CreatedAt.ToLocalTime().ToString("g")</td>
+                <td>
+                    @if (!p.IsPaid)
+                    {
+                        <button class="payment-btn payment-btn-view" @onclick='() => Navigation.NavigateTo($"/payments/view/{p.Id}")'>
+                            Visualizar
+                        </button>
+                        <button class="payment-btn payment-btn-cancel" @onclick='() => CancelPayment(p.Id)'>
+                            Cancelar
+                        </button>
+                    }
+                </td>
             </tr>
         }
         </tbody>
@@ -54,6 +68,7 @@ else
 
 @code {
     private List<PaymentRecord>? payments;
+    [CascadingParameter] public Toast? ToastRef { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,4 +79,55 @@ else
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
     }
+
+    private async Task CancelPayment(int paymentId)
+    {
+        var payment = await Db.Payments.FindAsync(paymentId);
+        if (payment != null && !payment.IsPaid)
+        {
+            Db.Payments.Remove(payment);
+            await Db.SaveChangesAsync();
+            payments?.Remove(payment);
+            StateHasChanged();
+            ToastRef?.Show("Pedido cancelado.", "info");
+        }
+    }
 }
+
+<style>
+    .payment-btn {
+        background: #23272b;
+        color: #f9a825;
+        font-weight: bold;
+        padding: 0.5rem 1.2rem;
+        border-radius: 8px;
+        border: none;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 0.2rem;
+        margin-bottom: 0.2rem;
+        margin-right: 0.3rem;
+        box-shadow: 0 2px 8px #0004;
+        transition: background 0.2s, color 0.2s;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .payment-btn-view {
+        background: #f9a825;
+        color: #181818;
+    }
+
+    .payment-btn-view:hover {
+        background: #c17900;
+    }
+
+    .payment-btn-cancel {
+        background: #e53935;
+        color: #fff;
+    }
+    
+    .payment-btn-cancel:hover {
+        background: #b71c1c;
+    }
+</style>

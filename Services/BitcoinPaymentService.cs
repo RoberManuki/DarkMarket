@@ -1,4 +1,6 @@
 using NBitcoin;
+using System.Net.Http.Json;
+using System.Text.Json;
 
 namespace DarkMarket.Services
 {
@@ -13,16 +15,18 @@ namespace DarkMarket.Services
             return (address, wif);
         }
 
-            public async Task<decimal> GetReceivedAmountAsync(string address)
-            {
-                using var http = new HttpClient();
-                var url = $"https://blockstream.info/testnet/api/address/{address}";
-                var response = await http.GetFromJsonAsync<BlockstreamAddressInfo>(url);
-
-                // O saldo é retornado em satoshis, converta para BTC
-                return response?.chain_stats?.funded_txo_sum is long sats
-                    ? sats / 100_000_000m
-                    : 0m;
-            }
+        public async Task<decimal> GetReceivedAmountAsync(string address)
+        {
+            using var http = new HttpClient();
+            // Blockstream testnet API
+            var url = $"https://blockstream.info/testnet/api/address/{address}";
+            var json = await http.GetStringAsync(url);
+            var received = JsonDocument.Parse(json)
+                .RootElement.GetProperty("chain_stats")
+                .GetProperty("funded_txo_sum")
+                .GetInt64();
+            // Convert satoshis to BTC
+            return received / 100_000_000m;
+        }
     }
 }

@@ -2,59 +2,97 @@
 
 @using DarkMarket.Shared
 @using DarkMarket.Models
+@using Microsoft.EntityFrameworkCore
 
 @inject BitcoinPaymentService BitcoinPaymentService
 @inject AppDbContext Db
 @inject AuthenticationStateProvider AuthProvider
 
 <div class="payment-container">
-    <h2 class="payment-title">Comprar Produto</h2>
-
-    @if (string.IsNullOrEmpty(Address))
+    @if (product == null)
     {
-        <button class="payment-btn" @onclick="GenerateAddress">Gerar endereço de pagamento</button>
+        <p>Carregando produto...</p>
     }
     else
     {
-        <div class="payment-card">
-            <strong>Envie o pagamento para:</strong>
-            <div class="payment-address">@Address</div>
-            <QRCode Value="@($"bitcoin:{Address}?amount={Amount}")" />
-            <p>Valor: <b>@Amount BTC (testnet)</b></p>
-            <p><small>Após o pagamento, aguarde a confirmação.</small></p>
-            <p>
-                <b>Status:</b>
-                @if (IsPaid)
+        <div class="product-summary">
+            <div class="product-img-block">
+                @if (!string.IsNullOrEmpty(product.ImagePath))
                 {
-                    <span class="payment-status-ok">Pagamento recebido!</span>
+                    <img src="@product.ImagePath" alt="Imagem" />
                 }
-                else
-                {
-                    <span class="payment-status-wait">Aguardando pagamento...</span>
-                    <button class="payment-btn" @onclick="CheckPayment" style="margin-left:1rem;">Verificar pagamento</button>
-                }
-            </p>
+            </div>
+            <div class="product-main">
+                <div class="product-title">@product.Name</div>
+                <div class="product-price">@product.Price.ToString("C")</div>
+            </div>
+            <div class="product-desc-block">
+                <div class="label">Descrição:</div>
+                <div class="product-desc">@product.Description</div>
+            </div>
+            <div class="product-seller-block">
+                <div class="label">Vendedor:</div>
+                <div class="product-user">
+                    @if (product.User != null)
+                    {
+                        <a href="@($"/profile/{product.User.Id}")">@product.User.UserName</a>
+                    }
+                </div>
+            </div>
+            <div class="delivery-block">
+                <div class="label">Entrega:</div>
+                <div class="delivery-details">
+                    Entregador: <b>João da Entrega</b> <br />
+                    Previsão: <b>2 dias úteis</b>
+                </div>
+            </div>
         </div>
+
+        @if (string.IsNullOrEmpty(Address))
+        {
+            <button class="payment-btn payment-btn-generate" @onclick="GenerateAddress">
+                Gerar endereço de pagamento
+            </button>
+        }
+        else
+        {
+            <PaymentDisplay Address="@Address"
+                            Amount="@Amount"
+                            IsPaid="@IsPaid"
+                            OnCheckPayment="CheckPayment" />
+        }
     }
 </div>
 
 @code {
     [Parameter] public int ProductId { get; set; }
+    public Product? product;
     public string Address { get; set; } = "";
     public string PrivateKey { get; set; } = "";
-    public decimal Amount { get; set; } = 0.001m; // Exemplo fixo
+    public decimal Amount { get; set; } = 0.000001m;
     public bool IsPaid { get; set; } = false;
     private System.Threading.Timer? _timer;
     [CascadingParameter] public Toast? ToastRef { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        product = await Db.Products.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == ProductId);
+        if (product != null)
+        {
+            Amount = product.Price;
+        }
+    }
+
     private void StartTimer()
     {
-        // Evita múltiplos timers
         _timer?.Dispose();
         _timer = new System.Threading.Timer(async _ =>
         {
-            await CheckPayment();
-            StateHasChanged();
+            await InvokeAsync(async () =>
+            {
+                await CheckPayment();
+                StateHasChanged();
+            });
         }, null, 0, 15000); // checa a cada 15s
     }
 
@@ -110,6 +148,8 @@
             if (!string.IsNullOrEmpty(Address) && !IsPaid)
             {
                 var received = await BitcoinPaymentService.GetReceivedAmountAsync(Address);
+                ToastRef?.Show($"Recebido: {received} BTC", "info");
+
                 IsPaid = received >= Amount;
 
                 if (IsPaid)
@@ -124,7 +164,6 @@
                     _timer?.Dispose();
                     ToastRef?.Show("Pagamento confirmado com sucesso!", "success");
                 }
-                StateHasChanged();
             }
         }
         catch
@@ -136,7 +175,7 @@
 
 <style>
     .payment-container {
-        max-width: 420px;
+        max-width: 520px;
         margin: 3rem auto;
         background: #23272b;
         color: #f0f0f0;
@@ -145,52 +184,70 @@
         padding: 2.5rem 2rem;
         text-align: center;
     }
-    .payment-title {
-        color: #f9a825;
-        font-size: 2rem;
-        margin-bottom: 2rem;
-    }
-    .payment-card {
-        background: #181c20;
+    .product-summary {
+        margin-bottom: 2.5rem;
+        background: #181818;
         border-radius: 12px;
-        padding: 2rem 1rem;
-        box-shadow: 0 2px 8px #0007;
-        margin-top: 1rem;
+        padding: 1.5rem 1rem;
+        box-shadow: 0 1px 8px #0006;
     }
-    .payment-address {
-        font-family: monospace;
-        background: #111;
-        color: #ffe066;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        margin: 1rem 0;
-        word-break: break-all;
-        font-size: 1.1rem;
+    .product-img-block img {
+        max-width: 120px;
+        border-radius: 8px;
+        margin-bottom: 1rem;
     }
-    .payment-btn {
-        background: #f9a825;
-        color: #23272b;
+    .product-title {
+        font-size: 1.3rem;
         font-weight: bold;
-        padding: 0.7rem 2rem;
+        margin-bottom: 0.2rem;
+    }
+    .product-price {
+        color: #8ab4f8;
+        font-size: 1.1rem;
+        margin-bottom: 0.7rem;
+    }
+    .label {
+        color: #8ab4f8;
+        font-weight: bold;
+        margin-bottom: 0.2rem;
+    }
+    .product-desc {
+        color: #b0b0b0;
+        font-size: 1rem;
+        word-break: break-word;
+        margin-bottom: 0.7rem;
+    }
+    .product-user a {
+        color: #f8f8f2;
+        text-decoration: underline;
+        font-weight: bold;
+        transition: color 0.2s;
+    }
+    .product-user a:hover {
+        color: #8ab4f8;
+    }
+    .delivery-block {
+        margin-top: 1rem;
+        font-size: 0.98rem;
+        color: #f0f0f0;
+    }
+    .payment-btn.payment-btn-generate {
+        background: #f9a825;
+        color: #181818;
+        font-weight: bold;
+        padding: 0.7rem 1.5rem;
         border-radius: 8px;
         border: none;
         font-size: 1.1rem;
         cursor: pointer;
-        margin-top: 1rem;
+        margin-top: 1.2rem;
+        margin-bottom: 0.5rem;
         box-shadow: 0 2px 8px #0004;
+        display: inline-flex;
+        align-items: center;
         transition: background 0.2s;
     }
-    .payment-btn:hover {
-        background: #ffe066;
-    }
-    .payment-status-ok {
-        color: #4caf50;
-        font-weight: bold;
-        margin-left: 0.5rem;
-    }
-    .payment-status-wait {
-        color: #ff9800;
-        font-weight: bold;
-        margin-left: 0.5rem;
+    .payment-btn.payment-btn-generate:hover {
+        background: #c17900;
     }
 </style>

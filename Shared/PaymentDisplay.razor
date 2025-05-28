@@ -1,0 +1,112 @@
+@using DarkMarket.Shared
+@using Microsoft.AspNetCore.Components
+
+<div class="payment-card">
+    <div class="payment-address-block">
+        <span class="label">Endereço de pagamento:</span>
+        <div class="payment-address">@Address</div>
+    </div>
+    <div class="payment-qrcode-block">
+        <QRCode Value="@($"bitcoin:{Address}?amount={Amount}")" />
+    </div>
+    <div class="payment-amount-block">
+        <span class="label">Valor:</span>
+        <span class="payment-amount">@Amount BTC (testnet)</span>
+    </div>
+    <div class="payment-status-block">
+        <span class="label">Status:</span>
+        @if (IsPaid)
+        {
+            <span class="payment-status-ok">Pagamento recebido!</span>
+        }
+        else
+        {
+            <span class="payment-status-wait">Aguardando pagamento...</span>
+            @if (OnCheckPayment.HasDelegate)
+            {
+                <button class="payment-btn" @onclick="OnCheckPayment" style="margin-left:1rem;">Verificar pagamento</button>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter] public string Address { get; set; } = "";
+    [Parameter] public decimal Amount { get; set; }
+    [Parameter] public bool IsPaid { get; set; }
+    [Parameter] public EventCallback OnCheckPayment { get; set; }
+
+}
+
+<style>
+    .payment-card {
+        background: #181818;
+        border-radius: 12px;
+        box-shadow: 0 1px 8px #0006;
+        padding: 2rem 1.5rem 1.5rem 1.5rem;
+        margin: 0 auto 1.5rem auto;
+        max-width: 400px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .payment-address-block, .payment-amount-block, .payment-status-block {
+        margin-bottom: 1.2rem;
+        width: 100%;
+        text-align: center;
+    }
+    .payment-address {
+        font-family: monospace;
+        font-size: 1.1rem;
+        background: #23272b;
+        padding: 0.5rem 0.7rem;
+        border-radius: 6px;
+        margin-top: 0.3rem;
+        word-break: break-all;
+        color: #f9a825;
+    }
+    .payment-qrcode-block {
+        margin: 1.2rem 0;
+    }
+    .payment-amount {
+        color: #8ab4f8;
+        font-size: 1.1rem;
+        font-weight: bold;
+        margin-left: 0.3rem;
+    }
+    .label {
+        color: #8ab4f8;
+        font-weight: bold;
+        font-size: 1rem;
+    }
+    .payment-status-ok {
+        color: #43a047;
+        font-weight: bold;
+        margin-left: 0.5rem;
+    }
+    .payment-status-wait {
+        color: #ff9800;
+        font-weight: bold;
+        margin-left: 0.5rem;
+    }
+    .payment-btn {
+        background: #f9a825;
+        color: #181818;
+        font-weight: bold;
+        padding: 0.5rem 1.2rem;
+        border-radius: 8px;
+        border: none;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-top: 0.7rem;
+        margin-bottom: 0.2rem;
+        margin-left: 0.5rem;
+        box-shadow: 0 2px 8px #0004;
+        transition: background 0.2s, color 0.2s;
+        display: inline-flex;
+        align-items: center;
+    }
+    .payment-btn:hover {
+        background: #c17900;
+    }
+</style>

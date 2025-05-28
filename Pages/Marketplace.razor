@@ -49,10 +49,23 @@ else
                 </div>
                 <!-- 5. Botão de compra -->
                 <div class="product-actions">
-                    @if (p.UserId != userId)
-                    {
-                        <button class="buy-btn" @onclick='() => Navigation.NavigateTo($"/products/buy/{p.Id}")'>Comprar</button>
-                    }
+                    <AuthorizeView>
+                        <Authorized>
+                            @if (p.UserId != userId)
+                            {
+                                <button class="buy-btn" @onclick='() => Navigation.NavigateTo($"/products/buy/{p.Id}")'>
+                                    Comprar
+                                </button>
+                            }
+                            else
+                            {
+                                <span class="own-product-label">Seu produto</span>
+                            }
+                        </Authorized>
+                        <NotAuthorized>
+                            <span class="own-product-label">Faça login para comprar</span>
+                        </NotAuthorized>
+                    </AuthorizeView>
                 </div>
             </div>
         }
@@ -157,18 +170,27 @@ else
         margin-right: 1rem; /* Espaço à direita do botão */
     }
     .buy-btn {
-        background: #8ab4f8;
+        background: #f9a825;
         color: #181818;
-        border: none;
-        padding: 0.7rem 1.5rem;
-        border-radius: 6px;
         font-weight: bold;
+        padding: 0.7rem 1.5rem;
+        border-radius: 8px;
+        border: none;
         font-size: 1.1rem;
         cursor: pointer;
+        margin-top: 0.7rem;
+        margin-bottom: 0.2rem;
+        box-shadow: 0 2px 8px #0004;
+        display: inline-flex;
+        align-items: center;
         transition: background 0.2s;
-        width: 100%;
     }
     .buy-btn:hover {
-        background: #5a8fd6;
+        background: #c17900;
+    }
+    .own-product-label {
+        color: #b0b0b0;
+        font-size: 1rem;
+        font-weight: bold;
     }
 </style>
