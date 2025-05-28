@@ -87,5 +87,35 @@ Desenvolvido por Freeza e colaboradores.
 
 ---
 
+## Problema conhecido: EventCallback não funciona em componente Blazor
+
+Tentamos centralizar a lógica de exibição do pagamento em um componente (`PaymentDisplay.razor`), mas o botão de callback nunca chama o método na página pai, apesar de todas as tentativas de ajuste de tipo, rebuild, etc.
+
+**Workaround:**  
+Repetimos o código de exibição e botão nas telas `Payment.razor` e `ViewPayment.razor` até encontrar uma solução definitiva ou resposta da comunidade.
+
+Se você souber a solução, por favor, abra uma issue ou envie um PR!
+
 **Status:**  
 Projeto em desenvolvimento ativo — autenticação funcional, layout escuro, dashboard protegido e estrutura pronta para expansão.
+
+---
+
+🚨 Documentação do Problema: EventCallback não funciona em componente Blazor
+Resumo do problema
+Criamos um componente Blazor chamado PaymentDisplay.razor para centralizar a exibição do endereço, valor e botão "Verificar pagamento".
+O botão "Verificar pagamento" chama um EventCallback para executar um método na página pai.
+O botão é renderizado, mas o clique nunca chama o método na página pai.
+Testamos todas as variações possíveis de EventCallback, tipos de parâmetro, chamadas, rebuild, clean, etc.
+O mesmo método funciona se chamado por um botão diretamente na página, mas não via componente.
+O que já foi tentado
+EventCallback e EventCallback<object?> com .InvokeAsync() e .InvokeAsync(null)
+Parâmetro obrigatório e opcional
+Teste em página mínima (Teste.razor)
+Remover dependências externas e markup comentado
+Clean, rebuild, restart do projeto
+Conferência de namespaces e imports
+Teste de log no componente e na página
+Conclusão
+O problema é específico do uso do componente, não do método nem do binding na página.
+Decidimos remover o componente e repetir o código nas telas, até encontrar uma solução definitiva ou resposta oficial da comunidade Blazor.

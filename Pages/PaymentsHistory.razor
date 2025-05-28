@@ -20,7 +20,7 @@ else if (!payments.Any())
 }
 else
 {
-    <table class="payments-table">
+    <table class="product-table">
         <thead>
             <tr>
                 <th>Produto</th>
@@ -28,7 +28,7 @@ else
                 <th>Valor</th>
                 <th>Status</th>
                 <th>Data</th>
-                <th></th> <!-- Nova coluna para o botão -->
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody>
@@ -48,14 +48,14 @@ else
                         <span style="color:#ff9800;font-weight:bold;">Pendente</span>
                     }
                 </td>
-                <td>@p.CreatedAt.ToLocalTime().ToString("g")</td>
+                <td>@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
                 <td>
                     @if (!p.IsPaid)
                     {
-                        <button class="payment-btn payment-btn-view" @onclick='() => Navigation.NavigateTo($"/payments/view/{p.Id}")'>
+                        <button class="edit-btn" @onclick='() => Navigation.NavigateTo($"/payments/view/{p.Id}")'>
                             Visualizar
                         </button>
-                        <button class="payment-btn payment-btn-cancel" @onclick='() => CancelPayment(p.Id)'>
+                        <button class="danger" @onclick='() => CancelPayment(p.Id)'>
                             Cancelar
                         </button>
                     }
@@ -93,41 +93,3 @@ else
         }
     }
 }
-
-<style>
-    .payment-btn {
-        background: #23272b;
-        color: #f9a825;
-        font-weight: bold;
-        padding: 0.5rem 1.2rem;
-        border-radius: 8px;
-        border: none;
-        font-size: 1rem;
-        cursor: pointer;
-        margin-top: 0.2rem;
-        margin-bottom: 0.2rem;
-        margin-right: 0.3rem;
-        box-shadow: 0 2px 8px #0004;
-        transition: background 0.2s, color 0.2s;
-        display: inline-flex;
-        align-items: center;
-    }
-    
-    .payment-btn-view {
-        background: #f9a825;
-        color: #181818;
-    }
-
-    .payment-btn-view:hover {
-        background: #c17900;
-    }
-
-    .payment-btn-cancel {
-        background: #e53935;
-        color: #fff;
-    }
-    
-    .payment-btn-cancel:hover {
-        background: #b71c1c;
-    }
-</style>

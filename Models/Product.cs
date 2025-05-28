@@ -12,7 +12,7 @@ namespace DarkMarket.Models
         [StringLength(500)]
         public string? Description { get; set; }
 
-        [Required, Range(0.01, double.MaxValue)]
+        [Required, Range(0.00001, double.MaxValue, ErrorMessage = "O preço deve ser no mínimo 0.00001.")]
         public decimal Price { get; set; }
 
         public string? ImagePath { get; set; }

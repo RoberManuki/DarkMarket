@@ -56,10 +56,31 @@
         }
         else
         {
-            <PaymentDisplay Address="@Address"
-                            Amount="@Amount"
-                            IsPaid="@IsPaid"
-                            OnCheckPayment="CheckPayment" />
+            <div class="payment-card">
+                <div class="payment-address-block">
+                    <span class="label">Endereço de pagamento:</span>
+                    <div class="payment-address">@Address</div>
+                </div>
+                <div class="payment-qrcode-block">
+                    <QRCode Value="@($"bitcoin:{Address}?amount={Amount}")" />
+                </div>
+                <div class="payment-amount-block">
+                    <span class="label">Valor:</span>
+                    <span class="payment-amount">@Amount BTC (testnet)</span>
+                </div>
+                <div class="payment-status-block">
+                    <span class="label">Status:</span>
+                    @if (IsPaid)
+                    {
+                        <span class="payment-status-ok">Pagamento recebido!</span>
+                    }
+                    else
+                    {
+                        <span class="payment-status-wait">Aguardando pagamento...</span>
+                        <button class="payment-btn" @onclick="CheckPayment">Verificar pagamento</button>
+                    }
+                </div>
+            </div>
         }
     }
 </div>
@@ -71,7 +92,6 @@
     public string PrivateKey { get; set; } = "";
     public decimal Amount { get; set; } = 0.000001m;
     public bool IsPaid { get; set; } = false;
-    private System.Threading.Timer? _timer;
     [CascadingParameter] public Toast? ToastRef { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -81,32 +101,6 @@
         {
             Amount = product.Price;
         }
-    }
-
-    private void StartTimer()
-    {
-        _timer?.Dispose();
-        _timer = new System.Threading.Timer(async _ =>
-        {
-            await InvokeAsync(async () =>
-            {
-                await CheckPayment();
-                StateHasChanged();
-            });
-        }, null, 0, 15000); // checa a cada 15s
-    }
-
-    protected override void OnAfterRender(bool firstRender)
-    {
-        if (firstRender && !string.IsNullOrEmpty(Address))
-        {
-            StartTimer();
-        }
-    }
-
-    public void Dispose()
-    {
-        _timer?.Dispose();
     }
 
     private async Task GenerateAddress()
@@ -132,7 +126,6 @@
 
             Db.Payments.Add(payment);
             await Db.SaveChangesAsync();
-            StartTimer();
             ToastRef?.Show("Endereço de pagamento gerado!", "success");
         }
         catch
@@ -143,27 +136,29 @@
 
     private async Task CheckPayment()
     {
+        if (string.IsNullOrEmpty(Address) || IsPaid)
+            return;
+
         try
         {
-            if (!string.IsNullOrEmpty(Address) && !IsPaid)
+            var received = await BitcoinPaymentService.GetReceivedAmountAsync(Address);
+            ToastRef?.Show($"Recebido: {received} BTC", "info");
+
+            if (received >= Amount)
             {
-                var received = await BitcoinPaymentService.GetReceivedAmountAsync(Address);
-                ToastRef?.Show($"Recebido: {received} BTC", "info");
-
-                IsPaid = received >= Amount;
-
-                if (IsPaid)
+                IsPaid = true;
+                var payment = Db.Payments.FirstOrDefault(p => p.Address == Address);
+                if (payment != null)
                 {
-                    var payment = Db.Payments.FirstOrDefault(p => p.Address == Address);
-                    if (payment != null)
-                    {
-                        payment.IsPaid = true;
-                        payment.PaidAt = DateTime.UtcNow;
-                        await Db.SaveChangesAsync();
-                    }
-                    _timer?.Dispose();
-                    ToastRef?.Show("Pagamento confirmado com sucesso!", "success");
+                    payment.IsPaid = true;
+                    payment.PaidAt = DateTime.UtcNow;
+                    await Db.SaveChangesAsync();
                 }
+                ToastRef?.Show("Pagamento confirmado com sucesso!", "success");
+            }
+            else
+            {
+                ToastRef?.Show("Pagamento ainda não recebido.", "warning");
             }
         }
         catch
@@ -249,5 +244,36 @@
     }
     .payment-btn.payment-btn-generate:hover {
         background: #c17900;
+    }
+    .payment-card {
+        background: #2c2f33;
+        border-radius: 12px;
+        padding: 1.5rem 1rem;
+        box-shadow: 0 1px 8px #0006;
+        text-align: left;
+        margin-top: 1.5rem;
+    }
+    .payment-address-block,
+    .payment-qrcode-block,
+    .payment-amount-block,
+    .payment-status-block {
+        margin-bottom: 1.2rem;
+    }
+    .payment-address {
+        font-family: monospace;
+        word-break: break-all;
+        background: #23272b;
+        padding: 0.8rem;
+        border-radius: 8px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .payment-status-ok {
+        color: #2ecc71;
+        font-weight: bold;
+    }
+    .payment-status-wait {
+        color: #f39c12;
+        font-weight: bold;
     }
 </style>

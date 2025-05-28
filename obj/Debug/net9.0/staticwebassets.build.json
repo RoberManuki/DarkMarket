@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "f+3EUiW0inpRn7yvMtlGuZG8uYDYpyx8vMfh+v26qOg=",
+  "Hash": "4WK8NqovYLNoWZHUPgLlfUzZVFKyT92xsXux0yHnyQA=",
   "Source": "DarkMarket",
   "BasePath": "_content/DarkMarket",
   "Mode": "Default",
@@ -1970,12 +1970,12 @@
       "OriginalItemSpec": "/home/freeza/.nuget/packages/microsoft.aspnetcore.identity.ui/9.0.5/staticwebassets/V5/lib/bootstrap/dist/css/bootstrap-reboot.min.css"
     },
     {
-      "Identity": "/home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/compressed/kjhlhgeagh-abjrrkdllj.gz",
+      "Identity": "/home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/compressed/kjhlhgeagh-a4rmqs9hfu.gz",
       "SourceId": "DarkMarket",
       "SourceType": "Discovered",
       "ContentRoot": "/home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/compressed/",
       "BasePath": "_content/DarkMarket",
-      "RelativePath": "css/site#[.{fingerprint=abjrrkdllj}]?.css.gz",
+      "RelativePath": "css/site#[.{fingerprint=a4rmqs9hfu}]?.css.gz",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Alternative",
@@ -1984,8 +1984,8 @@
       "RelatedAsset": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/css/site.css",
       "AssetTraitName": "Content-Encoding",
       "AssetTraitValue": "gzip",
-      "Fingerprint": "mjaaeuuxp7",
-      "Integrity": "4nms6lPNNqp6m1lC34SUDsqa5gy6e5igu7La31HRGkU=",
+      "Fingerprint": "4yjwvlkzxx",
+      "Integrity": "/B9mSki5ixVqtrTAXMO4CeKlPHgYa5DF1rKIBVBfHig=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/css/site.css"
@@ -2698,8 +2698,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "abjrrkdllj",
-      "Integrity": "eorjCv89CLGLpwhQqWiKLs8S1+NNYvaxn8VTgg6A7sY=",
+      "Fingerprint": "a4rmqs9hfu",
+      "Integrity": "ykx1oLsdyjpikCFmD8/beMoeqnjHV6/t+yUoTMs4kO4=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/css/site.css"
@@ -2852,6 +2852,27 @@
       "OriginalItemSpec": "wwwroot/uploads/653093a7-ff72-4cc6-9872-042f309f32b7.webp"
     },
     {
+      "Identity": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/7738c537-19af-4f32-8bf9-a8dae5af850e",
+      "SourceId": "DarkMarket",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/",
+      "BasePath": "_content/DarkMarket",
+      "RelativePath": "uploads/7738c537-19af-4f32-8bf9-a8dae5af850e#[.{fingerprint}]?",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "ezjpd5bekh",
+      "Integrity": "asKZqtrQA1c/X1TZ6Ll9JcWmK8WbXF1+Nc+agBuCywI=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/uploads/7738c537-19af-4f32-8bf9-a8dae5af850e"
+    },
+    {
       "Identity": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/882bc704-1642-47de-901e-fb0b75beb3b7.webp",
       "SourceId": "DarkMarket",
       "SourceType": "Discovered",
@@ -2934,17 +2955,38 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot/uploads/da8ec3e4-0a66-4331-b380-14bd60ee625c.webp"
+    },
+    {
+      "Identity": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/e023cd88-65bd-4fd4-8f4b-64327c86a264.jpg",
+      "SourceId": "DarkMarket",
+      "SourceType": "Discovered",
+      "ContentRoot": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/",
+      "BasePath": "_content/DarkMarket",
+      "RelativePath": "uploads/e023cd88-65bd-4fd4-8f4b-64327c86a264#[.{fingerprint}]?.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "qk4xojfjid",
+      "Integrity": "lnawqnZPBnWIidjbX0KIEYQfvyQXMlCAbGi9bfr4zA8=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot/uploads/e023cd88-65bd-4fd4-8f4b-64327c86a264.jpg"
     }
   ],
   "Endpoints": [
     {
-      "Route": "css/site.abjrrkdllj.css",
-      "AssetFile": "/home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/compressed/kjhlhgeagh-abjrrkdllj.gz",
+      "Route": "css/site.a4rmqs9hfu.css",
+      "AssetFile": "/home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/compressed/kjhlhgeagh-a4rmqs9hfu.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.001001001001"
+          "Quality": "0.000694927033"
         }
       ],
       "ResponseHeaders": [
@@ -2954,15 +2996,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "998"
+          "Value": "1438"
         },
         {
           "Name": "ETag",
-          "Value": "\"4nms6lPNNqp6m1lC34SUDsqa5gy6e5igu7La31HRGkU=\""
+          "Value": "\"/B9mSki5ixVqtrTAXMO4CeKlPHgYa5DF1rKIBVBfHig=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 28 May 2025 00:22:02 GMT"
+          "Value": "Wed, 28 May 2025 04:58:37 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -2982,13 +3024,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"eorjCv89CLGLpwhQqWiKLs8S1+NNYvaxn8VTgg6A7sY=\""
+          "Value": "W/\"ykx1oLsdyjpikCFmD8/beMoeqnjHV6/t+yUoTMs4kO4=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "abjrrkdllj"
+          "Value": "a4rmqs9hfu"
         },
         {
           "Name": "label",
@@ -2996,12 +3038,12 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-eorjCv89CLGLpwhQqWiKLs8S1+NNYvaxn8VTgg6A7sY="
+          "Value": "sha256-ykx1oLsdyjpikCFmD8/beMoeqnjHV6/t+yUoTMs4kO4="
         }
       ]
     },
     {
-      "Route": "css/site.abjrrkdllj.css",
+      "Route": "css/site.a4rmqs9hfu.css",
       "AssetFile": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/css/site.css",
       "Selectors": [],
       "ResponseHeaders": [
@@ -3011,7 +3053,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "3302"
+          "Value": "6457"
         },
         {
           "Name": "Content-Type",
@@ -3019,11 +3061,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"eorjCv89CLGLpwhQqWiKLs8S1+NNYvaxn8VTgg6A7sY=\""
+          "Value": "\"ykx1oLsdyjpikCFmD8/beMoeqnjHV6/t+yUoTMs4kO4=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 28 May 2025 00:22:02 GMT"
+          "Value": "Wed, 28 May 2025 04:58:37 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -3033,7 +3075,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "abjrrkdllj"
+          "Value": "a4rmqs9hfu"
         },
         {
           "Name": "label",
@@ -3041,13 +3083,13 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-eorjCv89CLGLpwhQqWiKLs8S1+NNYvaxn8VTgg6A7sY="
+          "Value": "sha256-ykx1oLsdyjpikCFmD8/beMoeqnjHV6/t+yUoTMs4kO4="
         }
       ]
     },
     {
-      "Route": "css/site.abjrrkdllj.css.gz",
-      "AssetFile": "/home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/compressed/kjhlhgeagh-abjrrkdllj.gz",
+      "Route": "css/site.a4rmqs9hfu.css.gz",
+      "AssetFile": "/home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/compressed/kjhlhgeagh-a4rmqs9hfu.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -3056,7 +3098,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "998"
+          "Value": "1438"
         },
         {
           "Name": "Content-Type",
@@ -3064,11 +3106,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"4nms6lPNNqp6m1lC34SUDsqa5gy6e5igu7La31HRGkU=\""
+          "Value": "\"/B9mSki5ixVqtrTAXMO4CeKlPHgYa5DF1rKIBVBfHig=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 28 May 2025 00:22:02 GMT"
+          "Value": "Wed, 28 May 2025 04:58:37 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -3086,7 +3128,7 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "abjrrkdllj"
+          "Value": "a4rmqs9hfu"
         },
         {
           "Name": "label",
@@ -3094,18 +3136,18 @@
         },
         {
           "Name": "integrity",
-          "Value": "sha256-4nms6lPNNqp6m1lC34SUDsqa5gy6e5igu7La31HRGkU="
+          "Value": "sha256-/B9mSki5ixVqtrTAXMO4CeKlPHgYa5DF1rKIBVBfHig="
         }
       ]
     },
     {
       "Route": "css/site.css",
-      "AssetFile": "/home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/compressed/kjhlhgeagh-abjrrkdllj.gz",
+      "AssetFile": "/home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/compressed/kjhlhgeagh-a4rmqs9hfu.gz",
       "Selectors": [
         {
           "Name": "Content-Encoding",
           "Value": "gzip",
-          "Quality": "0.001001001001"
+          "Quality": "0.000694927033"
         }
       ],
       "ResponseHeaders": [
@@ -3115,15 +3157,15 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "998"
+          "Value": "1438"
         },
         {
           "Name": "ETag",
-          "Value": "\"4nms6lPNNqp6m1lC34SUDsqa5gy6e5igu7La31HRGkU=\""
+          "Value": "\"/B9mSki5ixVqtrTAXMO4CeKlPHgYa5DF1rKIBVBfHig=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 28 May 2025 00:22:02 GMT"
+          "Value": "Wed, 28 May 2025 04:58:37 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -3143,13 +3185,13 @@
         },
         {
           "Name": "ETag",
-          "Value": "W/\"eorjCv89CLGLpwhQqWiKLs8S1+NNYvaxn8VTgg6A7sY=\""
+          "Value": "W/\"ykx1oLsdyjpikCFmD8/beMoeqnjHV6/t+yUoTMs4kO4=\""
         }
       ],
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-eorjCv89CLGLpwhQqWiKLs8S1+NNYvaxn8VTgg6A7sY="
+          "Value": "sha256-ykx1oLsdyjpikCFmD8/beMoeqnjHV6/t+yUoTMs4kO4="
         }
       ]
     },
@@ -3164,7 +3206,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "3302"
+          "Value": "6457"
         },
         {
           "Name": "Content-Type",
@@ -3172,11 +3214,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"eorjCv89CLGLpwhQqWiKLs8S1+NNYvaxn8VTgg6A7sY=\""
+          "Value": "\"ykx1oLsdyjpikCFmD8/beMoeqnjHV6/t+yUoTMs4kO4=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 28 May 2025 00:22:02 GMT"
+          "Value": "Wed, 28 May 2025 04:58:37 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -3186,13 +3228,13 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-eorjCv89CLGLpwhQqWiKLs8S1+NNYvaxn8VTgg6A7sY="
+          "Value": "sha256-ykx1oLsdyjpikCFmD8/beMoeqnjHV6/t+yUoTMs4kO4="
         }
       ]
     },
     {
       "Route": "css/site.css.gz",
-      "AssetFile": "/home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/compressed/kjhlhgeagh-abjrrkdllj.gz",
+      "AssetFile": "/home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/compressed/kjhlhgeagh-a4rmqs9hfu.gz",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -3201,7 +3243,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "998"
+          "Value": "1438"
         },
         {
           "Name": "Content-Type",
@@ -3209,11 +3251,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"4nms6lPNNqp6m1lC34SUDsqa5gy6e5igu7La31HRGkU=\""
+          "Value": "\"/B9mSki5ixVqtrTAXMO4CeKlPHgYa5DF1rKIBVBfHig=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 28 May 2025 00:22:02 GMT"
+          "Value": "Wed, 28 May 2025 04:58:37 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -3231,7 +3273,7 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-4nms6lPNNqp6m1lC34SUDsqa5gy6e5igu7La31HRGkU="
+          "Value": "sha256-/B9mSki5ixVqtrTAXMO4CeKlPHgYa5DF1rKIBVBfHig="
         }
       ]
     },
@@ -12557,6 +12599,88 @@
       ]
     },
     {
+      "Route": "uploads/7738c537-19af-4f32-8bf9-a8dae5af850e",
+      "AssetFile": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/7738c537-19af-4f32-8bf9-a8dae5af850e",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "348800"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/octet-stream"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"asKZqtrQA1c/X1TZ6Ll9JcWmK8WbXF1+Nc+agBuCywI=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 28 May 2025 01:34:39 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-asKZqtrQA1c/X1TZ6Ll9JcWmK8WbXF1+Nc+agBuCywI="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/7738c537-19af-4f32-8bf9-a8dae5af850e.ezjpd5bekh",
+      "AssetFile": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/7738c537-19af-4f32-8bf9-a8dae5af850e",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "348800"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "application/octet-stream"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"asKZqtrQA1c/X1TZ6Ll9JcWmK8WbXF1+Nc+agBuCywI=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 28 May 2025 01:34:39 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "ezjpd5bekh"
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/7738c537-19af-4f32-8bf9-a8dae5af850e"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-asKZqtrQA1c/X1TZ6Ll9JcWmK8WbXF1+Nc+agBuCywI="
+        }
+      ]
+    },
+    {
       "Route": "uploads/882bc704-1642-47de-901e-fb0b75beb3b7.cfbr89wo4f.webp",
       "AssetFile": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/882bc704-1642-47de-901e-fb0b75beb3b7.webp",
       "Selectors": [],
@@ -12881,6 +13005,88 @@
         {
           "Name": "integrity",
           "Value": "sha256-erKx0drdCYRD2evqICuy3GJupYDqtH+ynuF3qTq70d8="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/e023cd88-65bd-4fd4-8f4b-64327c86a264.jpg",
+      "AssetFile": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/e023cd88-65bd-4fd4-8f4b-64327c86a264.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "22546"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"lnawqnZPBnWIidjbX0KIEYQfvyQXMlCAbGi9bfr4zA8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 28 May 2025 01:34:50 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-lnawqnZPBnWIidjbX0KIEYQfvyQXMlCAbGi9bfr4zA8="
+        }
+      ]
+    },
+    {
+      "Route": "uploads/e023cd88-65bd-4fd4-8f4b-64327c86a264.qk4xojfjid.jpg",
+      "AssetFile": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/e023cd88-65bd-4fd4-8f4b-64327c86a264.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "22546"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"lnawqnZPBnWIidjbX0KIEYQfvyQXMlCAbGi9bfr4zA8=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Wed, 28 May 2025 01:34:50 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "qk4xojfjid"
+        },
+        {
+          "Name": "label",
+          "Value": "uploads/e023cd88-65bd-4fd4-8f4b-64327c86a264.jpg"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-lnawqnZPBnWIidjbX0KIEYQfvyQXMlCAbGi9bfr4zA8="
         }
       ]
     }

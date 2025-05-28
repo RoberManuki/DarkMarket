@@ -1,6 +1,8 @@
 @page "/payments/view/{PaymentId:int}"
 
 @using DarkMarket.Shared
+@using DarkMarket.Models
+@using Microsoft.EntityFrameworkCore
 
 @inject AppDbContext Db
 @inject BitcoinPaymentService BitcoinPaymentService
@@ -14,39 +16,41 @@
     }
     else
     {
-        <PaymentDisplay Address="@payment.Address"
-                        Amount="@payment.Amount"
-                        IsPaid="@payment.IsPaid"
-                        OnCheckPayment="CheckPayment" />
-    }
+        <div class="payment-card">
+            <div class="payment-address-block">
+                <span class="label">Endereço de pagamento:</span>
+                <div class="payment-address">@payment.Address</div>
+            </div>
+            <div class="payment-qrcode-block">
+                <QRCode Value="@($"bitcoin:{payment.Address}?amount={payment.Amount}")" />
+            </div>
+            <div class="payment-amount-block">
+                <span class="label">Valor:</span>
+                <span class="payment-amount">@payment.Amount BTC (testnet)</span>
+            </div>
+            <div class="payment-status-block">
+                <span class="label">Status:</span>
+                @if (payment.IsPaid)
+                {
+                    <span class="payment-status-ok">Pagamento recebido!</span>
+                }
+                else
+                {
+                    <span class="payment-status-wait">Aguardando pagamento...</span>
+                    <button class="payment-btn" @onclick="CheckPayment">Verificar pagamento</button>
+                }
+            </div>
+        </div>    }
 </div>
 
 @code {
     [Parameter] public int PaymentId { get; set; }
     private PaymentRecord? payment;
-    private System.Threading.Timer? _timer;
     [CascadingParameter] public Toast? ToastRef { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         payment = await Db.Payments.FindAsync(PaymentId);
-        if (payment != null && !payment.IsPaid)
-        {
-            StartTimer();
-        }
-    }
-
-    private void StartTimer()
-    {
-        _timer?.Dispose();
-        _timer = new System.Threading.Timer(async _ =>
-        {
-            await InvokeAsync(async () =>
-            {
-                await CheckPayment();
-                StateHasChanged();
-            });
-        }, null, 0, 15000);
     }
 
     private async Task CheckPayment()
@@ -56,15 +60,18 @@
         try
         {
             var received = await BitcoinPaymentService.GetReceivedAmountAsync(payment.Address);
-            ToastRef?.Show($"Recebido: {received} BTC", "info");
+            Console.WriteLine($"Received amount for {payment.Address}: {received} BTC");
 
             if (received >= payment.Amount)
             {
                 payment.IsPaid = true;
                 payment.PaidAt = DateTime.UtcNow;
                 await Db.SaveChangesAsync();
-                _timer?.Dispose();
                 ToastRef?.Show("Pagamento confirmado com sucesso!", "success");
+            }
+            else
+            {
+                ToastRef?.Show("Pagamento ainda não recebido.", "warning");
             }
         }
         catch
@@ -72,27 +79,22 @@
             ToastRef?.Show("Erro ao verificar pagamento.", "error");
         }
     }
-
-    public void Dispose()
-    {
-        _timer?.Dispose();
-    }
 }
 
 <style>
-    .payment-container {
-        max-width: 520px;
-        margin: 3rem auto;
-        background: #23272b;
-        color: #f0f0f0;
-        border-radius: 16px;
-        box-shadow: 0 2px 16px #000a;
-        padding: 2.5rem 2rem;
-        text-align: center;
-    }
-    .payment-title {
-        color: #f9a825;
-        font-size: 2rem;
-        margin-bottom: 2rem;
-    }
+.payment-container {
+    max-width: 520px;
+    margin: 3rem auto;
+    background: #23272b;
+    color: #f0f0f0;
+    border-radius: 16px;
+    box-shadow: 0 2px 16px #000a;
+    padding: 2.5rem 2rem;
+    text-align: center;
+}
+.payment-title {
+    color: #f9a825;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
 </style>

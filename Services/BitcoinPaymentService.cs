@@ -10,23 +10,28 @@ namespace DarkMarket.Services
         {
             var network = Network.TestNet;
             var key = new Key();
-            var address = key.PubKey.GetAddress(ScriptPubKeyType.Segwit, network).ToString();
+            var address = key.PubKey.GetAddress(ScriptPubKeyType.Legacy, network).ToString();
             var wif = key.GetWif(network).ToString();
             return (address, wif);
         }
 
         public async Task<decimal> GetReceivedAmountAsync(string address)
         {
-            using var http = new HttpClient();
-            // Blockstream testnet API
-            var url = $"https://blockstream.info/testnet/api/address/{address}";
-            var json = await http.GetStringAsync(url);
-            var received = JsonDocument.Parse(json)
-                .RootElement.GetProperty("chain_stats")
-                .GetProperty("funded_txo_sum")
-                .GetInt64();
-            // Convert satoshis to BTC
-            return received / 100_000_000m;
+            try
+            {
+                using var http = new HttpClient();
+                var url = $"https://api.blockcypher.com/v1/btc/test3/addrs/{address}/balance";
+                var json = await http.GetStringAsync(url);
+
+                using var doc = JsonDocument.Parse(json);
+                var received = doc.RootElement.GetProperty("total_received").GetInt64();
+                return received / 100_000_000m;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro em GetReceivedAmountAsync: {ex.Message}");
+                throw;
+            }
         }
     }
 }
