@@ -13,12 +13,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
-builder.Services.AddScoped<ProductService>();
-builder.Services.AddScoped<UserService>();
-
 builder.Services.AddHttpClient();
 builder.Services.AddSingleton<BitcoinQuoteService>();
-builder.Services.AddSingleton<BitcoinPaymentService>();
+
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IBitcoinPaymentService, TestnetBitcoinPaymentService>();
+builder.Services.AddScoped<IBitcoinPaymentService, BtcPayServerPaymentService>();
+builder.Services.AddScoped<IBitcoinPaymentService, LightningPaymentService>();
+builder.Services.AddScoped<BitcoinPaymentFactory>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));

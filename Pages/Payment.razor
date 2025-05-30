@@ -4,7 +4,7 @@
 @using DarkMarket.Models
 @using Microsoft.EntityFrameworkCore
 
-@inject BitcoinPaymentService BitcoinPaymentService
+@inject BitcoinPaymentFactory PaymentFactory
 @inject AppDbContext Db
 @inject AuthenticationStateProvider AuthProvider
 
@@ -50,6 +50,15 @@
 
         @if (string.IsNullOrEmpty(Address))
         {
+            <div>
+                <label for="payment-method">Método de pagamento:</label>
+                <select id="payment-method" @bind="SelectedMethod">
+                    @foreach (var method in PaymentFactory.GetAvailableMethods())
+                    {
+                        <option value="@method">@method</option>
+                    }
+                </select>
+            </div>
             <button class="payment-btn payment-btn-generate" @onclick="GenerateAddress">
                 Gerar endereço de pagamento
             </button>
@@ -57,16 +66,34 @@
         else
         {
             <div class="payment-card">
-                <div class="payment-address-block">
-                    <span class="label">Endereço de pagamento:</span>
-                    <div class="payment-address">@Address</div>
-                </div>
-                <div class="payment-qrcode-block">
-                    <QRCode Value="@($"bitcoin:{Address}?amount={Amount}")" />
-                </div>
+                @if (SelectedMethod == "BTCPayServer" && Address.StartsWith("http"))
+                {
+                    <div class="payment-address-block">
+                        <span class="label">Checkout:</span>
+                        <div class="payment-address">
+                            <a href="@Address" target="_blank" class="payment-btn">
+                                Abrir checkout do @SelectedMethod
+                            </a>
+                        </div>
+                        <div>
+                            <small>O QR code de pagamento será exibido na página do @SelectedMethod.</small>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="payment-address-block">
+                        <span class="label">Endereço/Invoice:</span>
+                        <div class="payment-address">@Address</div>
+                    </div>
+                    <div class="payment-qrcode-block">
+                        <QRCode Value="@QRCodeValue" />
+                    </div>
+                }
+
                 <div class="payment-amount-block">
                     <span class="label">Valor:</span>
-                    <span class="payment-amount">@Amount BTC (testnet)</span>
+                    <span class="payment-amount">@Amount BTC (@SelectedMethod)</span>
                 </div>
                 <div class="payment-status-block">
                     <span class="label">Status:</span>
@@ -89,10 +116,18 @@
     [Parameter] public int ProductId { get; set; }
     public Product? product;
     public string Address { get; set; } = "";
-    public string PrivateKey { get; set; } = "";
+    public string? PaymentId { get; set; }
     public decimal Amount { get; set; } = 0.000001m;
     public bool IsPaid { get; set; } = false;
+    public string SelectedMethod { get; set; } = "Testnet";
     [CascadingParameter] public Toast? ToastRef { get; set; }
+
+    private const decimal MinBtcAmount = 0.000003m;
+
+    public string QRCodeValue =>
+        SelectedMethod == "Lightning" && Address.StartsWith("lnbc")
+            ? Address
+            : $"bitcoin:{Address}?amount={Amount}";
 
     protected override async Task OnInitializedAsync()
     {
@@ -105,12 +140,20 @@
 
     private async Task GenerateAddress()
     {
+        if (Amount < MinBtcAmount)
+        {
+            ToastRef?.Show($"O valor mínimo para pagamento é {MinBtcAmount} BTC.", "warning");
+            return;
+        }
+
         try
         {
-            var result = BitcoinPaymentService.GenerateTestnetAddress();
-            Address = result.Address;
-            PrivateKey = result.PrivateKey;
+            var service = PaymentFactory.GetService(SelectedMethod);
+            var (address, paymentId) = await service.GenerateAddressAsync(Amount, $"order-{ProductId}-{Guid.NewGuid()}");
+            Address = address;
+            PaymentId = paymentId;
             IsPaid = false;
+
             var authState = await AuthProvider.GetAuthenticationStateAsync();
             var userId = authState.User.Identity?.Name;
 
@@ -119,18 +162,20 @@
                 ProductId = ProductId,
                 UserId = userId,
                 Address = Address,
+                PaymentId = PaymentId,
                 Amount = Amount,
                 IsPaid = false,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                PaymentMethod = SelectedMethod
             };
 
             Db.Payments.Add(payment);
             await Db.SaveChangesAsync();
-            ToastRef?.Show("Endereço de pagamento gerado!", "success");
+            ToastRef?.Show("Endereço/Invoice de pagamento gerado!", "success");
         }
-        catch
+        catch (Exception ex)
         {
-            ToastRef?.Show("Erro ao gerar endereço de pagamento.", "error");
+            ToastRef?.Show($"Erro ao gerar endereço/invoice: {ex.Message}", "error");
         }
     }
 
@@ -141,7 +186,8 @@
 
         try
         {
-            var received = await BitcoinPaymentService.GetReceivedAmountAsync(Address);
+            var service = PaymentFactory.GetService(SelectedMethod);
+            var received = await service.GetReceivedAmountAsync(PaymentId ?? Address);
             ToastRef?.Show($"Recebido: {received} BTC", "info");
 
             if (received >= Amount)

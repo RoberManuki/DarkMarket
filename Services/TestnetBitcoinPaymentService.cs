@@ -4,15 +4,17 @@ using System.Text.Json;
 
 namespace DarkMarket.Services
 {
-    public class BitcoinPaymentService
+    public class TestnetBitcoinPaymentService : IBitcoinPaymentService
     {
-        public (string Address, string PrivateKey) GenerateTestnetAddress()
+        public string Name => "Testnet";
+
+        public Task<(string Address, string? PaymentId)> GenerateAddressAsync(decimal amount, string? orderId = null)
         {
             var network = Network.TestNet;
             var key = new Key();
             var address = key.PubKey.GetAddress(ScriptPubKeyType.Legacy, network).ToString();
-            var wif = key.GetWif(network).ToString();
-            return (address, wif);
+
+            return Task.FromResult((address, null as string));
         }
 
         public async Task<decimal> GetReceivedAmountAsync(string address)
@@ -22,15 +24,14 @@ namespace DarkMarket.Services
                 using var http = new HttpClient();
                 var url = $"https://api.blockcypher.com/v1/btc/test3/addrs/{address}/balance";
                 var json = await http.GetStringAsync(url);
-
                 using var doc = JsonDocument.Parse(json);
                 var received = doc.RootElement.GetProperty("total_received").GetInt64();
+
                 return received / 100_000_000m;
             }
-            catch (Exception ex)
+            catch
             {
-                Console.WriteLine($"Erro em GetReceivedAmountAsync: {ex.Message}");
-                throw;
+                return 0m;
             }
         }
     }

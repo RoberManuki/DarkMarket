@@ -28,9 +28,9 @@
 ---
 
 ## Fase 4: Integração com Bitcoin
-- [ ] Serviço para cotação do Bitcoin (exibir preço em BTC e BRL/USD)
+- [x] Serviço para cotação do Bitcoin (exibir preço em BTC e BRL/USD)
 - [ ] Integração com gateway de pagamento Bitcoin (BTCPayServer, OpenNode, Blockonomics, etc)
-- [ ] Geração de QR Code para pagamento
+- [x] Geração de QR Code para pagamento
 - [ ] Confirmação automática de pagamento
 
 ---

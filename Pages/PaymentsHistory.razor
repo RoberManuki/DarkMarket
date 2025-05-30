@@ -27,6 +27,7 @@ else
                 <th>Endereço</th>
                 <th>Valor</th>
                 <th>Status</th>
+                <th>Gateway</th>
                 <th>Data</th>
                 <th>Ações</th>
             </tr>
@@ -48,6 +49,7 @@ else
                         <span style="color:#ff9800;font-weight:bold;">Pendente</span>
                     }
                 </td>
+                <td>@p.PaymentMethod</td>
                 <td>@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
                 <td>
                     @if (!p.IsPaid)

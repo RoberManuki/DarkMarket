@@ -5,7 +5,7 @@
 @using Microsoft.EntityFrameworkCore
 
 @inject AppDbContext Db
-@inject BitcoinPaymentService BitcoinPaymentService
+@inject BitcoinPaymentFactory PaymentFactory
 
 <div class="payment-container">
     <h2 class="payment-title">Detalhes do Pagamento</h2>
@@ -17,16 +17,33 @@
     else
     {
         <div class="payment-card">
-            <div class="payment-address-block">
-                <span class="label">Endereço de pagamento:</span>
-                <div class="payment-address">@payment.Address</div>
-            </div>
-            <div class="payment-qrcode-block">
-                <QRCode Value="@($"bitcoin:{payment.Address}?amount={payment.Amount}")" />
-            </div>
+            @if (payment.PaymentMethod != null && payment.Address.StartsWith("http"))
+            {
+                <div class="payment-address-block">
+                    <span class="label">Checkout:</span>
+                    <div class="payment-address">
+                        <a href="@payment.Address" target="_blank" class="payment-btn">
+                            Abrir checkout do @payment.PaymentMethod
+                        </a>
+                    </div>
+                    <div>
+                        <small>O QR code de pagamento será exibido na página do @payment.PaymentMethod.</small>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="payment-address-block">
+                    <span class="label">Endereço/Invoice:</span>
+                    <div class="payment-address">@payment.Address</div>
+                </div>
+                <div class="payment-qrcode-block">
+                    <QRCode Value="@QRCodeValue" />
+                </div>
+            }
             <div class="payment-amount-block">
                 <span class="label">Valor:</span>
-                <span class="payment-amount">@payment.Amount BTC (testnet)</span>
+                <span class="payment-amount">@payment.Amount BTC (@payment.PaymentMethod)</span>
             </div>
             <div class="payment-status-block">
                 <span class="label">Status:</span>
@@ -40,13 +57,19 @@
                     <button class="payment-btn" @onclick="CheckPayment">Verificar pagamento</button>
                 }
             </div>
-        </div>    }
+        </div>
+    }
 </div>
 
 @code {
     [Parameter] public int PaymentId { get; set; }
     private PaymentRecord? payment;
     [CascadingParameter] public Toast? ToastRef { get; set; }
+
+    public string QRCodeValue =>
+        payment != null && payment.PaymentMethod == "Lightning" && payment.Address.StartsWith("lnbc")
+            ? payment.Address
+            : $"bitcoin:{payment?.Address}?amount={payment?.Amount}";
 
     protected override async Task OnInitializedAsync()
     {
@@ -59,8 +82,8 @@
 
         try
         {
-            var received = await BitcoinPaymentService.GetReceivedAmountAsync(payment.Address);
-            Console.WriteLine($"Received amount for {payment.Address}: {received} BTC");
+            var service = PaymentFactory.GetService(payment.PaymentMethod ?? "Testnet");
+            var received = await service.GetReceivedAmountAsync(payment.PaymentId ?? payment.Address);
 
             if (received >= payment.Amount)
             {
@@ -82,19 +105,19 @@
 }
 
 <style>
-.payment-container {
-    max-width: 520px;
-    margin: 3rem auto;
-    background: #23272b;
-    color: #f0f0f0;
-    border-radius: 16px;
-    box-shadow: 0 2px 16px #000a;
-    padding: 2.5rem 2rem;
-    text-align: center;
-}
-.payment-title {
-    color: #f9a825;
-    font-size: 2rem;
-    margin-bottom: 2rem;
-}
+    .payment-container {
+        max-width: 520px;
+        margin: 3rem auto;
+        background: #23272b;
+        color: #f0f0f0;
+        border-radius: 16px;
+        box-shadow: 0 2px 16px #000a;
+        padding: 2.5rem 2rem;
+        text-align: center;
+    }
+    .payment-title {
+        color: #f9a825;
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
 </style>
