@@ -1,0 +1,38 @@
+@page "/admin"
+
+@using Microsoft.AspNetCore.Authorization
+
+@attribute [Authorize(Roles = "admin")]
+
+<h2>Painel Administrativo</h2>
+<p>Bem-vindo, administrador!</p>
+
+<nav class="admin-nav">
+    <a href="/admin/users">Usuários</a>
+    <a href="/admin/products">Produtos</a>
+    <a href="/admin/payments">Pagamentos</a>
+    <a href="/admin/gateways">Gateways</a>
+    <a href="/admin/logs">Logs</a>
+</nav>
+
+<style>
+.admin-nav {
+    margin: 2rem 0 1.5rem 0;
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+}
+.admin-nav a {
+    background: #23272b;
+    color: #f9a825;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+}
+.admin-nav a:hover {
+    background: #f9a825;
+    color: #23272b;
+}
+</style>

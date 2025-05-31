@@ -1,0 +1,79 @@
+@page "/admin/payments"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using DarkMarket.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+
+@inject AppDbContext Db
+
+<h2>Pagamentos</h2>
+
+@if (isLoading)
+{
+    <div class="loading-spinner">Carregando pagamentos...</div>
+}
+else if (payments == null || !payments.Any())
+{
+    <p>Nenhum pagamento encontrado.</p>
+}
+else
+{
+    <table class="payments-table align-right">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Usuário</th>
+                <th>Produto</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th>Data</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var p in payments)
+        {
+            <tr>
+                <td data-label="ID">@p.Id</td>
+                <td data-label="Usuário">@p.UserId</td>
+                <td data-label="Produto">@p.ProductId</td>
+                <td data-label="Valor">@p.Amount BTC</td>
+                <td data-label="Status">
+                    @if (p.IsPaid)
+                    {
+                        <span style="color:#4caf50;font-weight:bold;">Pago</span>
+                    }
+                    else
+                    {
+                        <span style="color:#ff9800;font-weight:bold;">Pendente</span>
+                    }
+                </td>
+                <td data-label="Data">@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                <td data-label="Ações">
+                    <button class="view-btn action-btn" @onclick="() => ViewPayment(p.Id)">Ver</button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+<button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
+
+@code {
+    private List<PaymentRecord>? payments;
+    private bool isLoading = true;
+
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        payments = await Db.Payments.OrderByDescending(p => p.CreatedAt).Take(200).ToListAsync();
+        isLoading = false;
+    }
+
+    private void ViewPayment(int id) => NavigationManager.NavigateTo($"/admin/payments/view/{id}");
+}

@@ -5,7 +5,9 @@
 @using DarkMarket.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
+
 @inject AppDbContext Db
+@inject NavigationManager NavigationManager
 
 <h2>Logs do Sistema</h2>
 
@@ -47,6 +49,8 @@
         }
     </tbody>
 </table>
+
+<button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
 
 @code {
     private List<AppLog> logs = new();

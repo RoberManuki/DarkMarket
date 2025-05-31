@@ -1,0 +1,142 @@
+@page "/admin/users"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using DarkMarket.Models
+@using Microsoft.JSInterop
+
+@attribute [Authorize(Roles = "admin")]
+
+<h3>Usuários do Sistema</h3>
+
+@if (isLoading)
+{
+    <div class="loading-spinner">Carregando usuários...</div>
+}
+else if (users == null || !users.Any())
+{
+    <p>Nenhum usuário encontrado.</p>
+}
+else
+{
+    <table class="product-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Usuário</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Ativo</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var u in users)
+        {
+            <tr>
+                <td data-label="ID">@u.Id</td>
+                <td data-label="Usuário">@u.UserName</td>
+                <td data-label="Email">@u.Email</td>
+                <td data-label="Role">@userRoles.GetValueOrDefault(u.Id, "-")</td>
+
+                @* <td data-label="Data Cadastro">@u.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td> *@
+
+                <td data-label="Ativo">
+                    @if (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)
+                    {
+                        <span style="color:#e53935;font-weight:bold;">Bloqueado</span>
+                    }
+                    else
+                    {
+                        <span style="color:#4caf50;font-weight:bold;">Ativo</span>
+                    }
+                </td>
+                <td data-label="Ações">
+                    <button class="edit-btn action-btn" @onclick="() => EditUser(u.Id)">Editar</button>
+                    <button class="view-btn action-btn" @onclick="() => ViewUser(u.Id)">Ver</button>
+                    @if (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)
+                    {
+                        <button class="success-btn action-btn" @onclick="() => UnlockUser(u.Id)">Desbloquear</button>
+                    }
+                    else
+                    {
+                        <button class="warning-btn action-btn" @onclick="() => LockUser(u.Id)">Bloquear</button>
+                    }
+                    <button class="danger" @onclick="() => DeleteUser(u.Id)">Deletar</button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+<button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
+
+@code {
+    [Inject] public UserManager<ApplicationUser> UserManager { get; set; } = default!;
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+    [Inject] IJSRuntime JS { get; set; } = default!;
+    private List<ApplicationUser>? users;
+    private bool isLoading = true;
+    private Dictionary<string, string> userRoles = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        users = await Task.Run(() => UserManager.Users.ToList());
+        userRoles.Clear();
+        if (users != null)
+        {
+            foreach (var user in users)
+            {
+                var roles = await UserManager.GetRolesAsync(user);
+                userRoles[user.Id] = roles.Any() ? string.Join(", ", roles) : "-";
+            }
+        }
+        isLoading = false;
+    }
+
+    private async Task LockUser(string userId)
+    {
+        var user = await UserManager.FindByIdAsync(userId);
+        if (user != null)
+        {
+            await UserManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
+            await OnInitializedAsync();
+        }
+    }
+
+    private async Task UnlockUser(string userId)
+    {
+        var user = await UserManager.FindByIdAsync(userId);
+        if (user != null)
+        {
+            await UserManager.SetLockoutEndDateAsync(user, null);
+            await OnInitializedAsync();
+        }
+    }
+
+    private void EditUser(string userId)
+    {
+        NavigationManager.NavigateTo($"/admin/users/edit/{userId}");
+    }
+
+    private void ViewUser(string userId)
+    {
+        NavigationManager.NavigateTo($"/admin/users/view/{userId}");
+    }
+
+    private async Task DeleteUser(string userId)
+    {
+        var confirm = await JS.InvokeAsync<bool>("confirm", "Tem certeza que deseja deletar este usuário?");
+        if (!confirm)
+            return;
+
+        var user = await UserManager.FindByIdAsync(userId);
+        if (user != null)
+        {
+            await UserManager.DeleteAsync(user);
+            await OnInitializedAsync();
+        }
+    }
+}

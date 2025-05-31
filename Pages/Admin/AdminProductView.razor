@@ -1,0 +1,46 @@
+@page "/admin/products/view/{Id:int}"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using DarkMarket.Models
+@using Microsoft.AspNetCore.Authorization
+
+@inject ProductService ProductService
+
+<h2>Detalhes do Produto</h2>
+
+@if (isLoading)
+{
+    <div class="loading-spinner">Carregando...</div>
+}
+else if (product == null)
+{
+    <p>Produto não encontrado.</p>
+}
+else
+{
+    <div class="form-card">
+        <p><b>ID:</b> @product.Id</p>
+        <p><b>Nome:</b> @product.Name</p>
+        <p><b>Usuário:</b> @product.UserId</p>
+        <p><b>Preço:</b> @product.Price.ToString("C")</p>
+        <p><b>Criado em:</b> @product.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</p>
+        <button class="edit-btn" @onclick='() => NavigationManager.NavigateTo($"/admin/products/edit/{product.Id}")'>Editar</button>
+        <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin/products")'>Voltar</button>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Product? product;
+    private bool isLoading = true;
+
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        product = await ProductService.GetByIdAsync(Id);
+        isLoading = false;
+    }
+}

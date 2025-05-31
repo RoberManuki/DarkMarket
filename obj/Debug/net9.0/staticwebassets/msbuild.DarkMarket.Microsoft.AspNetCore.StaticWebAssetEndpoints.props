@@ -1,16 +1,16 @@
 ﻿<Project>
   <ItemGroup>
-    <StaticWebAssetEndpoint Include="_content/DarkMarket/css/site.7wjy8v9gp1.css">
-      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\site.css'))</AssetFile>
-      <Selectors><![CDATA[[]]]></Selectors>
-      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"7wjy8v9gp1"},{"Name":"integrity","Value":"sha256-Nw1Yyyq4xopkhwDjY7kn9\u002BRRId0C0U14vgYe8u78tbA="},{"Name":"label","Value":"_content/DarkMarket/css/site.css"}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"7647"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022Nw1Yyyq4xopkhwDjY7kn9\u002BRRId0C0U14vgYe8u78tbA=\u0022"},{"Name":"Last-Modified","Value":"Fri, 30 May 2025 21:38:59 GMT"}]]]></ResponseHeaders>
-    </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/DarkMarket/css/site.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\site.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
-      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-Nw1Yyyq4xopkhwDjY7kn9\u002BRRId0C0U14vgYe8u78tbA="}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"7647"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022Nw1Yyyq4xopkhwDjY7kn9\u002BRRId0C0U14vgYe8u78tbA=\u0022"},{"Name":"Last-Modified","Value":"Fri, 30 May 2025 21:38:59 GMT"}]]]></ResponseHeaders>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-usiTs86\u002BfXfMGf\u002BQoZyhmi\u002BecLlZdR1ugjwujuBVoeo="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"10366"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022usiTs86\u002BfXfMGf\u002BQoZyhmi\u002BecLlZdR1ugjwujuBVoeo=\u0022"},{"Name":"Last-Modified","Value":"Sat, 31 May 2025 06:17:15 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/DarkMarket/css/site.eif7ladej9.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\site.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"eif7ladej9"},{"Name":"integrity","Value":"sha256-usiTs86\u002BfXfMGf\u002BQoZyhmi\u002BecLlZdR1ugjwujuBVoeo="},{"Name":"label","Value":"_content/DarkMarket/css/site.css"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"10366"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022usiTs86\u002BfXfMGf\u002BQoZyhmi\u002BecLlZdR1ugjwujuBVoeo=\u0022"},{"Name":"Last-Modified","Value":"Sat, 31 May 2025 06:17:15 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/DarkMarket/favicon.i3m2cqn2rg.ico">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\favicon.ico'))</AssetFile>

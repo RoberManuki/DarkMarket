@@ -1,0 +1,55 @@
+@page "/admin/users/view/{UserId}"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using DarkMarket.Models
+
+@attribute [Authorize(Roles = "admin")]
+
+@inject UserManager<ApplicationUser> UserManager
+@inject NavigationManager NavigationManager
+
+<h3>Detalhes do Usuário</h3>
+
+@if (isLoading)
+{
+    <div class="loading-spinner">Carregando...</div>
+}
+else if (user == null)
+{
+    <p>Usuário não encontrado.</p>
+}
+else
+{
+    <div class="form-card">
+        <p><b>ID:</b> @user.Id</p>
+        <p><b>Usuário:</b> @user.UserName</p>
+        <p><b>Email:</b> @user.Email</p>
+        <p><b>Nome Completo:</b> @user.FullName</p>
+        <p><b>Data de Nascimento:</b> @(user.BirthDate?.ToString("dd/MM/yyyy") ?? "-")</p>
+        <p><b>Status:</b>
+            @if (user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.Now)
+            {
+                <span style="color:#e53935;font-weight:bold;">Bloqueado</span>
+            }
+            else
+            {
+                <span style="color:#4caf50;font-weight:bold;">Ativo</span>
+            }
+        </p>
+        <button class="edit-btn" @onclick='() => NavigationManager.NavigateTo($"/admin/users/edit/{user.Id}")'>Editar</button>
+        <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin/users")'>Voltar</button>
+    </div>
+}
+
+@code {
+    [Parameter] public string UserId { get; set; } = "";
+    private ApplicationUser? user;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await UserManager.FindByIdAsync(UserId);
+        isLoading = false;
+    }
+}

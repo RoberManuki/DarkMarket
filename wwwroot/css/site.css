@@ -218,6 +218,22 @@ footer {
     background: #b71c1c;
 }
 
+.success-btn {
+    background: #388e3c;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.45rem 1.1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.success-btn:hover {
+    background: #2e7031;
+}
+
 /* --- Payment Card Styles --- */
 .payment-card {
     background: #181818;
@@ -438,4 +454,115 @@ footer {
 .gateway-select option {
     background: #23272b;
     color: #f0f0f0;
+}
+
+.view-btn {
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.45rem 1.1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-right: 0.3rem;
+    transition: background 0.2s;
+}
+.view-btn:hover {
+    background: #125ea2;
+}
+
+.action-btn {
+    margin-right: 0.3rem;
+}
+
+.warning-btn {
+    background: #757575;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 0.45rem 1.1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-right: 0.3rem;
+    transition: background 0.2s;
+}
+
+.warning-btn:hover {
+    background: #616161;
+    color: #fff;
+}
+
+.back-btn {
+    background: #f9a825;
+    color: #23272b;
+    border: 1px solid #f9a825;
+    border-radius: 6px;
+    padding: 0.6rem 1.4rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 2rem;      /* Espaço acima do botão */
+    display: inline-block;
+    transition: background 0.2s, color 0.2s;
+}
+
+.back-btn:hover {
+    background: #c17900;
+    color: #fff;
+}
+
+/* Form Card - centralizado para todos os forms */
+.form-card {
+    background: #23272b;
+    color: #f0f0f0;
+    max-width: 420px;
+    margin: 2rem auto;
+    padding: 2rem 2.5rem;
+    border-radius: 10px;
+    box-shadow: 0 2px 12px #0008;
+}
+
+.form-card h2 {
+    color: #8ab4f8;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 1.2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    margin-bottom: 0.3rem;
+    color: #b0b0b0;
+    font-size: 1rem;
+}
+
+.input, .form-group input, .form-group textarea {
+    background: #181818;
+    color: #f0f0f0;
+    border: 1px solid #333;
+    border-radius: 4px;
+    padding: 0.6rem;
+    font-size: 1rem;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1.2rem;
+}
+
+.loading-spinner {
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.align-right {
+    text-align: right;
 }

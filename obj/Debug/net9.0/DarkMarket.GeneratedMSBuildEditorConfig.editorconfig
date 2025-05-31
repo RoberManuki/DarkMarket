@@ -32,8 +32,48 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4ucmF6b3I=
+[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/Admin.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminGateways.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5HYXRld2F5cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminLogs.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5Mb2dzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminPayments.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5QYXltZW50cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminPaymentView.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5QYXltZW50Vmlldy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminProductEdit.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5Qcm9kdWN0RWRpdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminProducts.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5Qcm9kdWN0cy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminProductView.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5Qcm9kdWN0Vmlldy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminUserEdit.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5Vc2VyRWRpdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminUsers.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5Vc2Vycy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminUserView.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5Vc2VyVmlldy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/freeza/Documents/Projects/DarkMarket/Pages/Dashboard.razor]
@@ -42,10 +82,6 @@ build_metadata.AdditionalFiles.CssScope =
 
 [/home/freeza/Documents/Projects/DarkMarket/Pages/Index.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kZXgucmF6b3I=
-build_metadata.AdditionalFiles.CssScope = 
-
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Logs.razor]
-build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTG9ncy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [/home/freeza/Documents/Projects/DarkMarket/Pages/Marketplace.razor]

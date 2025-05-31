@@ -1,0 +1,46 @@
+@page "/admin/payments/view/{Id:int}"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using DarkMarket.Models
+@using Microsoft.AspNetCore.Authorization
+
+@inject AppDbContext Db
+
+<h2>Detalhes do Pagamento</h2>
+
+@if (isLoading)
+{
+    <div class="loading-spinner">Carregando...</div>
+}
+else if (payment == null)
+{
+    <p>Pagamento não encontrado.</p>
+}
+else
+{
+    <div class="form-card">
+        <p><b>ID:</b> @payment.Id</p>
+        <p><b>Usuário:</b> @payment.UserId</p>
+        <p><b>Produto:</b> @payment.ProductId</p>
+        <p><b>Valor:</b> @payment.Amount BTC</p>
+        <p><b>Status:</b> @(payment.IsPaid ? "Pago" : "Pendente")</p>
+        <p><b>Data:</b> @payment.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</p>
+        <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin/payments")'>Voltar</button>
+    </div>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private PaymentRecord? payment;
+    private bool isLoading = true;
+
+    [Inject] public NavigationManager NavigationManager { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        payment = await Db.Payments.FindAsync(Id);
+        isLoading = false;
+    }
+}

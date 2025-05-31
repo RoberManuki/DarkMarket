@@ -1,0 +1,85 @@
+@page "/admin/gateways"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+
+@inject BitcoinPaymentFactory PaymentFactory
+@inject IJSRuntime JS
+@inject NavigationManager NavigationManager
+
+<h2>Gateways de Pagamento</h2>
+
+<table class="product-table">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Status</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var method in methods)
+    {
+        <tr>
+            <td data-label="Nome">@method.Name</td>
+            <td data-label="Status">
+                @if (method.Enabled)
+                {
+                    <span style="color:#4caf50;font-weight:bold;">Ativo</span>
+                }
+                else
+                {
+                    <span style="color:#e53935;font-weight:bold;">Desativado</span>
+                }
+            </td>
+            <td data-label="Ações">
+                @if (method.Enabled)
+                {
+                    <button class="danger" @onclick="() => ToggleGateway(method.Name, false)">Desativar</button>
+                }
+                else
+                {
+                    <button class="success-btn" @onclick="() => ToggleGateway(method.Name, true)">Ativar</button>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
+
+@code {
+    private List<GatewayInfo> methods = new();
+
+    protected override void OnInitialized()
+    {
+        // Exemplo: adapte para buscar do seu serviço real
+        methods = PaymentFactory.GetAvailableMethods()
+            .Select(name => new GatewayInfo { Name = name, Enabled = true })
+            .ToList();
+    }
+
+    private async Task ToggleGateway(string name, bool enable)
+    {
+        if (!enable)
+        {
+            var confirm = await JS.InvokeAsync<bool>("confirm", $"Tem certeza que deseja desativar o gateway '{name}'?");
+            if (!confirm)
+                return;
+        }
+
+        var method = methods.FirstOrDefault(m => m.Name == name);
+        if (method != null)
+            method.Enabled = enable;
+        // Salve o estado se necessário
+    }
+
+    public class GatewayInfo
+    {
+        public string Name { get; set; } = "";
+        public bool Enabled { get; set; }
+    }
+}
