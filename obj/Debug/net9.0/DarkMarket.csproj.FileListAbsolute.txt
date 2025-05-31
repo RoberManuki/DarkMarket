@@ -138,6 +138,7 @@
 /home/freeza/Documents/Projects/DarkMarket/DarkMarket/DarkMarket/bin/Debug/net9.0/zh-Hans/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 /home/freeza/Documents/Projects/DarkMarket/DarkMarket/DarkMarket/bin/Debug/net9.0/zh-Hant/Microsoft.CodeAnalysis.Workspaces.MSBuild.BuildHost.resources.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/appsettings.json
+/home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/appsettings.Production.json
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/global.json
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/DarkMarket.staticwebassets.runtime.json
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/DarkMarket.staticwebassets.endpoints.json
@@ -150,11 +151,18 @@
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.AspNetCore.Authorization.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.AspNetCore.Components.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.AspNetCore.Components.Authorization.dll
+/home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.AspNetCore.Connections.Abstractions.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.AspNetCore.Cryptography.Internal.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+/home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.AspNetCore.Http.Connections.Client.dll
+/home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.AspNetCore.Http.Connections.Common.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.AspNetCore.Identity.UI.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.AspNetCore.Metadata.dll
+/home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.AspNetCore.SignalR.Client.dll
+/home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.AspNetCore.SignalR.Client.Core.dll
+/home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.AspNetCore.SignalR.Common.dll
+/home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.AspNetCore.SignalR.Protocols.Json.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.Bcl.AsyncInterfaces.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.Build.Locator.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.CodeAnalysis.dll
@@ -173,6 +181,7 @@
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.Extensions.DependencyInjection.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.Extensions.DependencyInjection.Abstractions.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.Extensions.DependencyModel.dll
+/home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.Extensions.Features.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.Extensions.FileProviders.Abstractions.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.Extensions.FileProviders.Embedded.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/Microsoft.Extensions.Identity.Core.dll
@@ -193,7 +202,9 @@
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/System.Composition.Hosting.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/System.Composition.Runtime.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/System.Composition.TypedParts.dll
+/home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/System.Net.ServerSentEvents.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/System.Text.Json.dll
+/home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/System.Threading.Channels.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/cs/Microsoft.CodeAnalysis.resources.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/de/Microsoft.CodeAnalysis.resources.dll
 /home/freeza/Documents/Projects/DarkMarket/bin/Debug/net9.0/es/Microsoft.CodeAnalysis.resources.dll
@@ -332,7 +343,7 @@
 /home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/compressed/nezrqnk58p-muycvpuwrr.gz
 /home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/compressed/v0zgfp0y55-87fc7y1x7t.gz
 /home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/compressed/yfc7ypekbg-mlv21k5csn.gz
-/home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/compressed/kjhlhgeagh-a4rmqs9hfu.gz
+/home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/compressed/kjhlhgeagh-7wjy8v9gp1.gz
 /home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/compressed/jd0jpyie1a-i3m2cqn2rg.gz
 /home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/staticwebassets.build.json
 /home/freeza/Documents/Projects/DarkMarket/obj/Debug/net9.0/staticwebassets.development.json

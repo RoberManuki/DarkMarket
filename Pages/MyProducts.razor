@@ -4,6 +4,7 @@
 @inject ProductService ProductService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
+@inject LogService LogService
 
 <h2>Meus Produtos</h2>
 <button class="primary-btn" @onclick='() => Navigation.NavigateTo("/products/create")'>
@@ -12,7 +13,9 @@
 
 @if (products == null)
 {
-    <p>Carregando...</p>
+    <div class="loading-spinner">
+        <span class="oi oi-reload spinning"></span> Carregando produtos...
+    </div>
 }
 else if (!products.Any())
 {
@@ -34,18 +37,18 @@ else
             @foreach (var p in products)
             {
                 <tr>
-                    <td>
+                    <td data-label="Imagem">
                         @if (!string.IsNullOrEmpty(p.ImagePath))
                         {
                             <img src="@p.ImagePath" alt="Imagem" style="max-width:60px;max-height:60px;" />
                         }
                     </td>
-                    <td>@p.Name</td>
-                    <td>@p.Price.ToString("C")</td>
-                    <td>@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
-                    <td>
+                    <td data-label="Nome">@p.Name</td>
+                    <td data-label="Preço">@p.Price.ToString("C")</td>
+                    <td data-label="Criado em">@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                    <td data-label="Ações">
                         <button class="edit-btn" @onclick='() => Navigation.NavigateTo($"/products/edit/{p.Id}")'>Editar</button>
-                        <button class="danger" @onclick='() => Delete(p.Id)'>Excluir</button>
+                        <button class="danger" @onclick='() => Delete(p.Id)'>Remover</button>
                     </td>
                 </tr>
             }
@@ -69,6 +72,14 @@ else
         await ProductService.DeleteAsync(id);
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var userId = authState.User.FindFirst(c => c.Type == "sub" || c.Type.Contains("nameidentifier"))?.Value ?? "";
+        
+        await LogService.LogAsync(
+            $"Produto removido (ID: {id})",
+            source: "Product",
+            level: "Warning",
+            userId: userId
+        );
+        
         products = await ProductService.GetByUserIdAsync(userId);
         ToastRef?.Show("Produto removido!", "info");
         StateHasChanged();
@@ -157,5 +168,15 @@ else
     }
     .primary-btn:hover {
         background: #c17900;
+    }
+    .loading-spinner {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100px;
+    }
+    .loading-spinner .oi {
+        font-size: 2rem;
+        margin-right: 0.5rem;
     }
 </style>

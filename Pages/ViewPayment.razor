@@ -3,9 +3,11 @@
 @using DarkMarket.Shared
 @using DarkMarket.Models
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.SignalR.Client
 
 @inject AppDbContext Db
 @inject BitcoinPaymentFactory PaymentFactory
+@inject NavigationManager NavigationManager
 
 <div class="payment-container">
     <h2 class="payment-title">Detalhes do Pagamento</h2>
@@ -59,21 +61,57 @@
             </div>
         </div>
     }
+
+    @if (isLoading)
+    {
+        <div class="loading-spinner">
+            <span class="oi oi-reload spinning"></span> Carregando...
+        </div>
+    }
 </div>
 
 @code {
     [Parameter] public int PaymentId { get; set; }
     private PaymentRecord? payment;
     [CascadingParameter] public Toast? ToastRef { get; set; }
+    private bool isLoading = false;
+    private HubConnection? hubConnection;
+    public string SelectedMethod { get; set; } = "";
 
     public string QRCodeValue =>
-        payment != null && payment.PaymentMethod == "Lightning" && payment.Address.StartsWith("lnbc")
+        payment != null && payment.Address != null && payment.Address.StartsWith("lnbc")
             ? payment.Address
             : $"bitcoin:{payment?.Address}?amount={payment?.Amount}";
 
     protected override async Task OnInitializedAsync()
     {
+        isLoading = true;
         payment = await Db.Payments.FindAsync(PaymentId);
+        isLoading = false;
+
+        var methods = PaymentFactory.GetAvailableMethods().ToList();
+        SelectedMethod = methods.Contains("BTCPayServer") ? "BTCPayServer" : methods.FirstOrDefault() ?? "";
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/paymentHub"))
+            .Build();
+
+        hubConnection.On<string>("PaymentConfirmed", async (paymentId) =>
+        {
+            if (paymentId == payment?.PaymentId)
+            {
+                await CheckPayment();
+                StateHasChanged();
+            }
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection != null)
+            await hubConnection.DisposeAsync();
     }
 
     private async Task CheckPayment()

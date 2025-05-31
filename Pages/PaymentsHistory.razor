@@ -3,10 +3,12 @@
 @using DarkMarket.Models
 @using DarkMarket.Shared
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.SignalR.Client
 
 @inject AppDbContext Db
 @inject AuthenticationStateProvider AuthProvider
 @inject NavigationManager Navigation
+@inject LogService LogService
 
 <h2>Histórico de Pagamentos</h2>
 
@@ -36,10 +38,10 @@ else
         @foreach (var p in payments)
         {
             <tr>
-                <td>@p.ProductId</td>
-                <td style="font-family:monospace;">@p.Address</td>
-                <td>@p.Amount BTC</td>
-                <td>
+                <td data-label="Produto">@p.ProductId</td>
+                <td data-label="Endereço" style="font-family:monospace;">@p.Address</td>
+                <td data-label="Valor">@p.Amount BTC</td>
+                <td data-label="Status">
                     @if (p.IsPaid)
                     {
                         <span style="color:#4caf50;font-weight:bold;">Pago</span>
@@ -49,9 +51,9 @@ else
                         <span style="color:#ff9800;font-weight:bold;">Pendente</span>
                     }
                 </td>
-                <td>@p.PaymentMethod</td>
-                <td>@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
-                <td>
+                <td data-label="Gateway">@p.PaymentMethod</td>
+                <td data-label="Data">@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                <td data-label="Ações">
                     @if (!p.IsPaid)
                     {
                         <button class="edit-btn" @onclick='() => Navigation.NavigateTo($"/payments/view/{p.Id}")'>
@@ -71,6 +73,7 @@ else
 @code {
     private List<PaymentRecord>? payments;
     [CascadingParameter] public Toast? ToastRef { get; set; }
+    private HubConnection? hubConnection;
 
     protected override async Task OnInitializedAsync()
     {
@@ -80,6 +83,30 @@ else
             .Where(p => p.UserId == userId)
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(Navigation.ToAbsoluteUri("/paymentHub"))
+            .Build();
+
+        hubConnection.On<string>("PaymentConfirmed", async (paymentId) =>
+        {
+            var payment = payments?.FirstOrDefault(p => p.PaymentId == paymentId);
+            if (payment != null && !payment.IsPaid)
+            {
+                payment.IsPaid = true;
+                payment.PaidAt = DateTime.UtcNow;
+                await InvokeAsync(StateHasChanged);
+                ToastRef?.Show($"Pagamento {paymentId} confirmado!", "success");
+            }
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection != null)
+            await hubConnection.DisposeAsync();
     }
 
     private async Task CancelPayment(int paymentId)
@@ -90,6 +117,14 @@ else
             Db.Payments.Remove(payment);
             await Db.SaveChangesAsync();
             payments?.Remove(payment);
+
+            await LogService.LogAsync(
+                $"Pagamento cancelado (ID: {paymentId}) para produto {payment.ProductId}.",
+                source: "Payment",
+                level: "Warning",
+                userId: payment.UserId
+            );
+            
             StateHasChanged();
             ToastRef?.Show("Pedido cancelado.", "info");
         }

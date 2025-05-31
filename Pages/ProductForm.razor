@@ -5,6 +5,7 @@
 @inject ProductService ProductService
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthStateProvider
+@inject LogService LogService
 
 <PageTitle>@(Id == 0 ? "Novo Produto" : "Editar Produto")</PageTitle>
 
@@ -14,35 +15,44 @@
         <DataAnnotationsValidator />
         <ValidationSummary />
 
-        <div class="form-group">
-            <label>Nome</label>
-            <InputText @bind-Value="product.Name" class="input" />
-        </div>
-        <div class="form-group">
-            <label>Descrição</label>
-            <InputTextArea @bind-Value="product.Description" class="input" />
-        </div>
-        <div class="form-group">
-            <label>Preço</label>
-            <InputNumber @bind-Value="product.Price" class="input" />
-        </div>
-        <div class="form-group">
-            <label>Imagem</label>
-            <InputFile OnChange="OnInputFileChange" />
-            @if (!string.IsNullOrEmpty(product.ImagePath))
-            {
-                <img src="@product.ImagePath" alt="Imagem do produto" style="max-width:120px;max-height:120px;margin-top:8px;" />
-            }
-        </div>
-        <div class="form-actions">
-            <button class="cancel-btn" type="button" @onclick='() => Navigation.NavigateTo("/my-products")'>
-                Cancelar
-            </button>
+        @if (isLoading)
+        {
+            <div class="loading-spinner">
+                <span class="oi oi-reload spinning"></span> Processando...
+            </div>
+        }
+        else
+        {
+            <div class="form-group">
+                <label>Nome</label>
+                <InputText @bind-Value="product.Name" class="input" />
+            </div>
+            <div class="form-group">
+                <label>Descrição</label>
+                <InputTextArea @bind-Value="product.Description" class="input" />
+            </div>
+            <div class="form-group">
+                <label>Preço</label>
+                <InputNumber @bind-Value="product.Price" class="input" />
+            </div>
+            <div class="form-group">
+                <label>Imagem</label>
+                <InputFile OnChange="OnInputFileChange" />
+                @if (!string.IsNullOrEmpty(product.ImagePath))
+                {
+                    <img src="@product.ImagePath" alt="Imagem do produto" style="max-width:120px;max-height:120px;margin-top:8px;" />
+                }
+            </div>
+            <div class="form-actions">
+                <button class="cancel-btn" type="button" @onclick='() => Navigation.NavigateTo("/my-products")'>
+                    Cancelar
+                </button>
 
-            <button class="save-btn" type="submit">
-                Salvar
-            </button>
-        </div>
+                <button class="save-btn" type="submit">
+                    Salvar
+                </button>
+            </div>
+        }
     </EditForm>
 </div>
 
@@ -51,19 +61,23 @@
     private Product product = new();
     private IBrowserFile? imageFile;
     [CascadingParameter] public Toast? ToastRef { get; set; }
+    private bool isLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
         if (Id != 0)
         {
+            isLoading = true;
             var existing = await ProductService.GetByIdAsync(Id);
             if (existing != null)
                 product = existing;
+            isLoading = false;
         }
     }
 
     private async Task HandleValidSubmit()
     {
+        isLoading = true;
         if (Id == 0)
         {
             var authState = await AuthStateProvider.GetAuthenticationStateAsync();
@@ -71,15 +85,28 @@
             product.UserId = user.FindFirst(c => c.Type == "sub" || c.Type.Contains("nameidentifier"))?.Value ?? "";
 
             await ProductService.AddAsync(product, imageFile);
+            await LogService.LogAsync(
+                $"Produto cadastrado: {product.Name} (ID: {product.Id})",
+                source: "Product",
+                level: "Info",
+                userId: product.UserId
+            );
             ToastRef?.Show("Produto cadastrado com sucesso!", "success");
         }
         else
         {
             await ProductService.UpdateAsync(product, imageFile);
+            await LogService.LogAsync(
+                $"Produto atualizado: {product.Name} (ID: {product.Id})",
+                source: "Product",
+                level: "Info",
+                userId: product.UserId
+            );
             ToastRef?.Show("Produto atualizado com sucesso!", "success");
         }
 
         Navigation.NavigateTo("/my-products");
+        isLoading = false;
     }
 
     private void OnInputFileChange(InputFileChangeEventArgs e)
@@ -132,5 +159,13 @@
     }
     .form-actions button:hover {
         opacity: 0.85;
+    }
+    .loading-spinner {
+        text-align: center;
+        padding: 1rem 0;
+    }
+    .loading-spinner .oi {
+        font-size: 1.5rem;
+        vertical-align: middle;
     }
 </style>

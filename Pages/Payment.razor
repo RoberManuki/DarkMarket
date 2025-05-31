@@ -3,10 +3,13 @@
 @using DarkMarket.Shared
 @using DarkMarket.Models
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.SignalR.Client
 
 @inject BitcoinPaymentFactory PaymentFactory
 @inject AppDbContext Db
 @inject AuthenticationStateProvider AuthProvider
+@inject LogService LogService
+@inject NavigationManager NavigationManager
 
 <div class="payment-container">
     @if (product == null)
@@ -52,7 +55,7 @@
         {
             <div>
                 <label for="payment-method">Método de pagamento:</label>
-                <select id="payment-method" @bind="SelectedMethod">
+                <select id="payment-method" class="gateway-select" @bind="SelectedMethod">
                     @foreach (var method in PaymentFactory.GetAvailableMethods())
                     {
                         <option value="@method">@method</option>
@@ -110,6 +113,13 @@
             </div>
         }
     }
+
+    @if (isLoading)
+    {
+        <div class="loading-spinner">
+            <span class="oi oi-reload spinning"></span> Processando...
+        </div>
+    }
 </div>
 
 @code {
@@ -119,35 +129,71 @@
     public string? PaymentId { get; set; }
     public decimal Amount { get; set; } = 0.000001m;
     public bool IsPaid { get; set; } = false;
-    public string SelectedMethod { get; set; } = "Testnet";
+    public string SelectedMethod { get; set; } = "";
     [CascadingParameter] public Toast? ToastRef { get; set; }
-
     private const decimal MinBtcAmount = 0.000003m;
+    private bool isLoading = false;
+
 
     public string QRCodeValue =>
-        SelectedMethod == "Lightning" && Address.StartsWith("lnbc")
+        Address.StartsWith("lnbc")
             ? Address
             : $"bitcoin:{Address}?amount={Amount}";
 
+    private HubConnection? hubConnection;
+
     protected override async Task OnInitializedAsync()
     {
+        isLoading = true;
         product = await Db.Products.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == ProductId);
+        isLoading = false;
         if (product != null)
         {
             Amount = product.Price;
         }
+
+        var methods = PaymentFactory.GetAvailableMethods().ToList();
+        SelectedMethod = methods.Contains("BTCPayServer") ? "BTCPayServer" : methods.FirstOrDefault() ?? "";
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/paymentHub"))
+            .Build();
+
+        hubConnection.On<string>("PaymentConfirmed", async (paymentId) =>
+        {
+            if (paymentId == this.PaymentId)
+            {
+                await CheckPayment();
+                StateHasChanged();
+            }
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection != null)
+            await hubConnection.DisposeAsync();
     }
 
     private async Task GenerateAddress()
     {
         if (Amount < MinBtcAmount)
         {
+            await LogService.LogAsync(
+                $"Tentativa de pagamento abaixo do mínimo: {Amount} BTC.",
+                source: "Payment",
+                level: "Warning",
+                userId: product?.UserId
+            );
             ToastRef?.Show($"O valor mínimo para pagamento é {MinBtcAmount} BTC.", "warning");
             return;
         }
 
         try
         {
+            isLoading = true;
             var service = PaymentFactory.GetService(SelectedMethod);
             var (address, paymentId) = await service.GenerateAddressAsync(Amount, $"order-{ProductId}-{Guid.NewGuid()}");
             Address = address;
@@ -171,11 +217,30 @@
 
             Db.Payments.Add(payment);
             await Db.SaveChangesAsync();
+
+            await LogService.LogAsync(
+                $"Endereço/invoice gerado para produto {ProductId} via {SelectedMethod}.",
+                source: "Payment",
+                level: "Info",
+                userId: userId
+            );
+
             ToastRef?.Show("Endereço/Invoice de pagamento gerado!", "success");
         }
         catch (Exception ex)
         {
+            await LogService.LogAsync(
+                "Erro ao gerar endereço/invoice.",
+                source: "Payment",
+                level: "Error",
+                userId: product?.UserId,
+                ex: ex
+            );
             ToastRef?.Show($"Erro ao gerar endereço/invoice: {ex.Message}", "error");
+        }
+        finally
+        {
+            isLoading = false;
         }
     }
 
@@ -188,6 +253,13 @@
         {
             var service = PaymentFactory.GetService(SelectedMethod);
             var received = await service.GetReceivedAmountAsync(PaymentId ?? Address);
+
+            await LogService.LogAsync(
+                $"Verificação de pagamento para produto {ProductId} via {SelectedMethod}. Recebido: {received} BTC.",
+                source: "Payment",
+                level: "Info"
+            );
+
             ToastRef?.Show($"Recebido: {received} BTC", "info");
 
             if (received >= Amount)
@@ -200,6 +272,11 @@
                     payment.PaidAt = DateTime.UtcNow;
                     await Db.SaveChangesAsync();
                 }
+                await LogService.LogAsync(
+                    $"Pagamento confirmado para produto {ProductId} via {SelectedMethod}.",
+                    source: "Payment",
+                    level: "Info"
+                );
                 ToastRef?.Show("Pagamento confirmado com sucesso!", "success");
             }
             else
@@ -207,8 +284,14 @@
                 ToastRef?.Show("Pagamento ainda não recebido.", "warning");
             }
         }
-        catch
+        catch (Exception ex)
         {
+            await LogService.LogAsync(
+                "Erro ao verificar pagamento.",
+                source: "Payment",
+                level: "Error",
+                ex: ex
+            );
             ToastRef?.Show("Erro ao verificar pagamento.", "error");
         }
     }

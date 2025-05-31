@@ -44,6 +44,10 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kZXgucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[/home/freeza/Documents/Projects/DarkMarket/Pages/Logs.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTG9ncy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [/home/freeza/Documents/Projects/DarkMarket/Pages/Marketplace.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvTWFya2V0cGxhY2UucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 

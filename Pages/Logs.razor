@@ -1,0 +1,97 @@
+@page "/admin/logs"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using DarkMarket.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext Db
+
+<h2>Logs do Sistema</h2>
+
+<table class="log-table">
+    <thead>
+        <tr>
+            <th>Data/Hora</th>
+            <th>Nível</th>
+            <th>Fonte</th>
+            <th>Usuário</th>
+            <th>Mensagem</th>
+            <th>Exceção</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var log in logs)
+        {
+            <tr>
+                <td data-label="Data/Hora">@log.Timestamp.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</td>
+                <td data-label="Nível">
+                    @if (log.Level == "Error")
+                    {
+                        <span style="color:#e53935;font-weight:bold;">@log.Level</span>
+                    }
+                    else if (log.Level == "Warning")
+                    {
+                        <span style="color:#f9a825;font-weight:bold;">@log.Level</span>
+                    }
+                    else
+                    {
+                        <span style="color:#8ab4f8;font-weight:bold;">@log.Level</span>
+                    }
+                </td>
+                <td data-label="Fonte">@log.Source</td>
+                <td data-label="Usuário">@log.UserId</td>
+                <td data-label="Mensagem">@log.Message</td>
+                <td data-label="Exceção" style="max-width:300px;overflow-x:auto;white-space:pre-wrap;">@log.Exception</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<AppLog> logs = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        logs = await Db.Logs
+            .OrderByDescending(l => l.Timestamp)
+            .Take(200)
+            .ToListAsync();
+    }
+}
+
+<style>
+    .log-table {
+        width: 100%;
+        background: #23272b;
+        color: #f0f0f0;
+        border-radius: 8px;
+        margin-top: 2rem;
+        font-size: 0.98rem;
+    }
+    .log-table th, .log-table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #333;
+        text-align: left;
+        vertical-align: top;
+    }
+    .log-table th {
+        background: #181818;
+        color: #8ab4f8;
+        font-weight: bold;
+    }
+    .log-table tr:nth-child(even) {
+        background: #22262b;
+    }
+    .log-table tr:hover {
+        background: #2a2f36;
+    }
+    .log-table td {
+        word-break: break-word;
+    }
+    h2 {
+        color: #f9a825;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+</style>
