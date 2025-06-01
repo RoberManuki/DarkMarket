@@ -26,6 +26,7 @@ builder.Services.AddScoped<IBitcoinPaymentService, BtcPayServerPaymentService>()
 builder.Services.AddScoped<IBitcoinPaymentService, TestnetBitcoinPaymentService>();
 builder.Services.AddScoped<BitcoinPaymentFactory>();
 builder.Services.AddScoped<LogService>();
+builder.Services.AddScoped<GatewayService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -105,6 +106,19 @@ using (var scope = app.Services.CreateScope())
 //     }
 // }
 
-app.MapHub<PaymentHub>("/paymentHub");
 
+// using (var scope = app.Services.CreateScope())
+// {
+//     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+//     if (!db.Gateways.Any())
+//     {
+//         db.Gateways.AddRange(
+//             new GatewayInfo { Name = "BTCPayServer", Enabled = true },
+//             new GatewayInfo { Name = "TestNet", Enabled = false }
+//         );
+//         db.SaveChanges();
+//     }
+// }
+
+app.MapHub<PaymentHub>("/paymentHub");
 app.Run();

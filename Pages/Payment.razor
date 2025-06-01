@@ -10,6 +10,7 @@
 @inject AuthenticationStateProvider AuthProvider
 @inject LogService LogService
 @inject NavigationManager NavigationManager
+@inject GatewayService GatewayService
 
 <div class="payment-container">
     @if (product == null)
@@ -53,18 +54,30 @@
 
         @if (string.IsNullOrEmpty(Address))
         {
-            <div>
-                <label for="payment-method">Método de pagamento:</label>
-                <select id="payment-method" class="gateway-select" @bind="SelectedMethod">
-                    @foreach (var method in PaymentFactory.GetAvailableMethods())
-                    {
-                        <option value="@method">@method</option>
-                    }
-                </select>
-            </div>
-            <button class="payment-btn payment-btn-generate" @onclick="GenerateAddress">
-                Gerar endereço de pagamento
-            </button>
+            @if (!ActiveGateways.Any())
+            {
+                <div class="no-gateways">
+                    <b>Nenhum método de pagamento disponível no momento.</b>
+                    <div style="color:#aaa;font-size:0.95rem;margin-top:0.5rem;">
+                        Tente novamente mais tarde ou entre em contato com o suporte.
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div>
+                    <label for="payment-method">Método de pagamento:</label>
+                    <select id="payment-method" class="gateway-select" @bind="SelectedMethod">
+                        @foreach (var gateway in ActiveGateways)
+                        {
+                            <option value="@gateway.Name">@gateway.Name</option>
+                        }
+                    </select>
+                </div>
+                <button class="payment-btn payment-btn-generate" @onclick="GenerateAddress">
+                    Gerar endereço de pagamento
+                </button>
+            }
         }
         else
         {
@@ -142,18 +155,23 @@
 
     private HubConnection? hubConnection;
 
+    private List<GatewayInfo> ActiveGateways = new();
+
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
         product = await Db.Products.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == ProductId);
         isLoading = false;
+        
         if (product != null)
         {
             Amount = product.Price;
         }
 
-        var methods = PaymentFactory.GetAvailableMethods().ToList();
-        SelectedMethod = methods.Contains("BTCPayServer") ? "BTCPayServer" : methods.FirstOrDefault() ?? "";
+        ActiveGateways = (await GatewayService.GetAllAsync()).Where(g => g.Enabled).ToList();
+        SelectedMethod = ActiveGateways.Any(g => g.Name == "BTCPayServer")
+            ? "BTCPayServer"
+            : ActiveGateways.FirstOrDefault()?.Name ?? "";
 
         hubConnection = new HubConnectionBuilder()
             .WithUrl(NavigationManager.ToAbsoluteUri("/paymentHub"))
@@ -404,5 +422,14 @@
     .payment-status-wait {
         color: #f39c12;
         font-weight: bold;
+    }
+    .no-gateways {
+        background: #2c2f33;
+        color: #f39c12;
+        border-radius: 8px;
+        padding: 1.2rem;
+        margin: 1.5rem 0;
+        text-align: center;
+        font-size: 1.08rem;
     }
 </style>

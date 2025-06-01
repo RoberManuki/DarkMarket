@@ -2,12 +2,15 @@
 
 @attribute [Authorize(Roles = "admin")]
 
+@using DarkMarket.Shared
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.JSInterop
 
 @inject BitcoinPaymentFactory PaymentFactory
 @inject IJSRuntime JS
 @inject NavigationManager NavigationManager
+@inject GatewayService GatewayService
+@inject LogService LogService
 
 <h2>Gateways de Pagamento</h2>
 
@@ -16,33 +19,24 @@
         <tr>
             <th>Nome</th>
             <th>Status</th>
-            <th>Ações</th>
         </tr>
     </thead>
     <tbody>
     @foreach (var method in methods)
     {
         <tr>
-            <td data-label="Nome">@method.Name</td>
-            <td data-label="Status">
-                @if (method.Enabled)
-                {
-                    <span style="color:#4caf50;font-weight:bold;">Ativo</span>
-                }
-                else
-                {
-                    <span style="color:#e53935;font-weight:bold;">Desativado</span>
-                }
-            </td>
-            <td data-label="Ações">
-                @if (method.Enabled)
-                {
-                    <button class="danger" @onclick="() => ToggleGateway(method.Name, false)">Desativar</button>
-                }
-                else
-                {
-                    <button class="success-btn" @onclick="() => ToggleGateway(method.Name, true)">Ativar</button>
-                }
+            <td>@method.Name</td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox"
+                           @bind="method.Enabled"
+                           @bind:event="onchange"
+                           @bind:after="async () => await OnSwitchChanged(method)" />
+                    <span class="slider"></span>
+                </label>
+                <span style="margin-left:0.5rem;font-weight:bold;color:@(method.Enabled ? "#4caf50" : "#e53935")">
+                    @(method.Enabled ? "Ativo" : "Desativado")
+                </span>
             </td>
         </tr>
     }
@@ -53,33 +47,78 @@
 
 @code {
     private List<GatewayInfo> methods = new();
-
-    protected override void OnInitialized()
+    [CascadingParameter] public Toast ToastRef { get; set; } = default!;
+    
+    protected override async Task OnInitializedAsync()
     {
-        // Exemplo: adapte para buscar do seu serviço real
-        methods = PaymentFactory.GetAvailableMethods()
-            .Select(name => new GatewayInfo { Name = name, Enabled = true })
-            .ToList();
+        methods = await GatewayService.GetAllAsync();
     }
 
-    private async Task ToggleGateway(string name, bool enable)
+    private async Task OnSwitchChanged(GatewayInfo method)
     {
-        if (!enable)
+        var newValue = method.Enabled;
+
+        if (!newValue)
         {
-            var confirm = await JS.InvokeAsync<bool>("confirm", $"Tem certeza que deseja desativar o gateway '{name}'?");
+            var confirm = await JS.InvokeAsync<bool>("confirm", $"Tem certeza que deseja desativar o gateway '{method.Name}'?");
             if (!confirm)
+            {
+                // Reverte o valor visual do switch
+                method.Enabled = true;
+                StateHasChanged();
                 return;
+            }
         }
 
-        var method = methods.FirstOrDefault(m => m.Name == name);
-        if (method != null)
-            method.Enabled = enable;
-        // Salve o estado se necessário
-    }
-
-    public class GatewayInfo
-    {
-        public string Name { get; set; } = "";
-        public bool Enabled { get; set; }
+        var success = await GatewayService.SetStatusAsync(method.Name, newValue);
+        if (success)
+        {
+            await LogService.LogAsync(
+                $"Gateway '{method.Name}' {(newValue ? "ativado" : "desativado")}",
+                source: "Admin",
+                level: newValue ? "Info" : "Warning"
+            );
+            ToastRef?.Show($"Gateway '{method.Name}' {(newValue ? "ativado" : "desativado")}!", newValue ? "success" : "warning");
+        }
+        else
+        {
+            ToastRef?.Show("Gateway não encontrado ou erro ao salvar.", "error");
+            method.Enabled = !newValue;
+            StateHasChanged();
+        }
     }
 }
+
+<style>
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 44px;
+        height: 24px;
+        vertical-align: middle;
+    }
+    .switch input { display: none; }
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 24px;
+    }
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px; width: 18px;
+        left: 3px; bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+    input:checked + .slider {
+        background-color: #4caf50;
+    }
+    input:checked + .slider:before {
+        transform: translateX(20px);
+    }
+</style>

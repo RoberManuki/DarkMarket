@@ -11,5 +11,6 @@ namespace DarkMarket.Data
         public DbSet<Product> Products { get; set; }
         public DbSet<PaymentRecord> Payments { get; set; }
         public DbSet<AppLog> Logs { get; set; }
+        public DbSet<GatewayInfo> Gateways { get; set; }
     }
 }

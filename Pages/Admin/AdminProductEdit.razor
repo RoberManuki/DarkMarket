@@ -4,8 +4,10 @@
 
 @using DarkMarket.Models
 @using Microsoft.AspNetCore.Authorization
+@using DarkMarket.Shared
 
 @inject ProductService ProductService
+@inject LogService LogService
 
 <div class="form-card">
     <h2>Editar Produto</h2>
@@ -44,7 +46,7 @@
     private Product? product;
     private bool isLoading = true;
     private bool isSaving = false;
-
+    [CascadingParameter] public Toast? ToastRef { get; set; }
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
@@ -56,10 +58,22 @@
 
     private async Task Save()
     {
-        if (product == null) return;
+        if (product == null)
+        {
+            ToastRef?.Show("Produto não encontrado.", "error");
+            return;
+        }
+        
         isSaving = true;
         await ProductService.UpdateAsync(product, null);
         isSaving = false;
+
+        await LogService.LogAsync(
+            $"Produto editado (ID: {product.Id})",
+            source: "Admin",
+            level: "Info"
+        );
+        ToastRef?.Show("Produto atualizado com sucesso!", "success");
         NavigationManager.NavigateTo($"/admin/products/view/{product.Id}");
     }
 }

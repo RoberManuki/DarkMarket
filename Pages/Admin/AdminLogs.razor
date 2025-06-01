@@ -11,6 +11,10 @@
 
 <h2>Logs do Sistema</h2>
 
+<p style="margin-bottom:1rem;">
+    <b>Total de logs:</b> @totalLogs
+</p>
+
 <table class="log-table">
     <thead>
         <tr>
@@ -50,18 +54,56 @@
     </tbody>
 </table>
 
+<div class="pagination">
+    <button @onclick="PrevPage" disabled="@(!CanGoToPreviousPage)">Anterior</button>
+    <span class="pagination-info">Página @currentPage de @totalPages</span>
+    <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Próxima</button>
+</div>
+
 <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
 
 @code {
     private List<AppLog> logs = new();
+    private int totalLogs = 0;
+    private int pageSize = 10;
+    private int currentPage = 1;
+    private int totalPages => (int)Math.Ceiling((double)totalLogs / pageSize);
 
     protected override async Task OnInitializedAsync()
     {
+        await LoadLogs();
+    }
+
+    private async Task LoadLogs()
+    {
+        totalLogs = await Db.Logs.CountAsync();
         logs = await Db.Logs
             .OrderByDescending(l => l.Timestamp)
-            .Take(200)
+            .Skip((currentPage - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
     }
+
+    private async Task NextPage()
+    {
+        if (currentPage < totalPages)
+        {
+            currentPage++;
+            await LoadLogs();
+        }
+    }
+
+    private async Task PrevPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+            await LoadLogs();
+        }
+    }
+
+    private bool CanGoToNextPage => currentPage < totalPages;
+    private bool CanGoToPreviousPage => currentPage > 1;
 }
 
 <style>
@@ -97,5 +139,24 @@
         color: #f9a825;
         margin-bottom: 1.5rem;
         text-align: center;
+    }
+    .pagination {
+        display: flex;
+        justify-content: center;
+        margin-top: 1rem;
+    }
+    .pagination button {
+        background: #f9a825;
+        color: #23272b;
+        border: none;
+        border-radius: 4px;
+        padding: 0.5rem 1rem;
+        margin: 0 0.5rem;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    .pagination button:disabled {
+        background: #555;
+        cursor: not-allowed;
     }
 </style>

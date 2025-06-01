@@ -1,9 +1,12 @@
 @page "/admin/users"
 
+@using DarkMarket.Shared
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using DarkMarket.Models
 @using Microsoft.JSInterop
+
+@inject LogService LogService
 
 @attribute [Authorize(Roles = "admin")]
 
@@ -52,8 +55,8 @@ else
                     }
                 </td>
                 <td data-label="Ações">
+                    <button class="details-btn action-btn" @onclick="() => ViewUser(u.Id)">Detalhes</button>
                     <button class="edit-btn action-btn" @onclick="() => EditUser(u.Id)">Editar</button>
-                    <button class="view-btn action-btn" @onclick="() => ViewUser(u.Id)">Ver</button>
                     @if (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)
                     {
                         <button class="success-btn action-btn" @onclick="() => UnlockUser(u.Id)">Desbloquear</button>
@@ -76,6 +79,7 @@ else
     [Inject] public UserManager<ApplicationUser> UserManager { get; set; } = default!;
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
     [Inject] IJSRuntime JS { get; set; } = default!;
+    [CascadingParameter] public Toast? ToastRef { get; set; }
     private List<ApplicationUser>? users;
     private bool isLoading = true;
     private Dictionary<string, string> userRoles = new();
@@ -98,11 +102,24 @@ else
 
     private async Task LockUser(string userId)
     {
+        var confirm = await JS.InvokeAsync<bool>("confirm", "Tem certeza que deseja bloquear este usuário?");
+        if (!confirm)
+            return;
+
         var user = await UserManager.FindByIdAsync(userId);
         if (user != null)
         {
             await UserManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
+            await LogService.LogAsync($"Usuário bloqueado (ID: {userId})", 
+                                        source: "Admin", 
+                                        level: "Warning", 
+                                        userId: userId);
+            ToastRef?.Show("Usuário bloqueado!", "warning");
             await OnInitializedAsync();
+        }
+        else
+        {
+            ToastRef?.Show("Usuário não encontrado.", "error");
         }
     }
 
@@ -112,7 +129,16 @@ else
         if (user != null)
         {
             await UserManager.SetLockoutEndDateAsync(user, null);
+            await LogService.LogAsync($"Usuário desbloqueado (ID: {userId})", 
+                                        source: "Admin", 
+                                        level: "Info", 
+                                        userId: userId);
+            ToastRef?.Show("Usuário desbloqueado!", "success");
             await OnInitializedAsync();
+        }
+        else
+        {
+            ToastRef?.Show("Usuário não encontrado.", "error");
         }
     }
 
@@ -135,8 +161,24 @@ else
         var user = await UserManager.FindByIdAsync(userId);
         if (user != null)
         {
-            await UserManager.DeleteAsync(user);
+            var result = await UserManager.DeleteAsync(user);
+            if (result.Succeeded)
+            {
+                await LogService.LogAsync($"Usuário deletado (ID: {userId})", 
+                                                            source: "Admin", 
+                                                            level: "Warning", 
+                                                            userId: userId);
+                ToastRef?.Show("Usuário deletado!", "info");
+            }
+            else
+            {
+                ToastRef?.Show("Erro ao deletar usuário.", "error");
+            }
             await OnInitializedAsync();
+        }
+        else
+        {
+            ToastRef?.Show("Usuário não encontrado.", "error");
         }
     }
 }

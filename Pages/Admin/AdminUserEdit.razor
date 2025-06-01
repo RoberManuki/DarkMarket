@@ -1,5 +1,6 @@
 @page "/admin/users/edit/{UserId}"
 
+@using DarkMarket.Shared
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using DarkMarket.Models
@@ -11,6 +12,7 @@
 
 @inject UserManager<ApplicationUser> UserManager
 @inject NavigationManager NavigationManager
+@inject LogService LogService
 
 <div class="form-card">
     <h2>Editar Usuário</h2>
@@ -38,8 +40,8 @@
                 <InputDate class="input" @bind-Value="model.BirthDate" />
             </div>
             <div class="form-actions">
-                <button class="save-btn" type="submit" disabled="@isSaving">Salvar</button>
                 <button class="cancel-btn" type="button" @onclick='() => NavigationManager.NavigateTo($"/admin/users/view/{user.Id}")'>Cancelar</button>
+                <button class="save-btn" type="submit" disabled="@isSaving">Salvar</button>
             </div>
         </EditForm>
     }
@@ -50,7 +52,7 @@
     private ApplicationUser? user;
     private bool isLoading = true;
     private bool isSaving = false;
-
+    [CascadingParameter] public Toast? ToastRef { get; set; }
     private EditUserModel model = new();
 
     protected override async Task OnInitializedAsync()
@@ -69,12 +71,31 @@
 
     private async Task Save()
     {
-        if (user == null) return;
+        if (user == null)
+        {
+            ToastRef?.Show("Usuário não encontrado.", "error");
+            return;
+        }
         isSaving = true;
         user.FullName = model.FullName;
         user.BirthDate = model.BirthDate;
-        await UserManager.UpdateAsync(user);
+        var result = await UserManager.UpdateAsync(user);
         isSaving = false;
-        NavigationManager.NavigateTo($"/admin/users/view/{user.Id}");
+
+        if (result.Succeeded)
+        {
+            await LogService.LogAsync(
+                $"Usuário editado (ID: {user.Id})",
+                source: "Admin",
+                level: "Info",
+                userId: user.Id
+            );
+            ToastRef?.Show("Usuário atualizado com sucesso!", "success");
+            NavigationManager.NavigateTo($"/admin/users/view/{user.Id}");
+        }
+        else
+        {
+            ToastRef?.Show("Erro ao atualizar usuário.", "error");
+        }
     }
 }
