@@ -1,0 +1,84 @@
+@inject NavigationManager NavigationManager
+
+<nav class="breadcrumb-nav">
+    @foreach (var (segment, index) in Segments.Select((s, i) => (s, i)))
+    {
+        if (index < Segments.Count - 1)
+        {
+            <a href="@BuildUrl(index)">@segment</a>
+            <span class="breadcrumb-separator">/</span>
+        }
+        else
+        {
+            <span class="breadcrumb-current">@segment</span>
+        }
+    }
+</nav>
+
+@code {
+    private List<string> Segments = new();
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += OnLocationChanged;
+        UpdateSegments();
+    }
+
+    private void OnLocationChanged(object? sender, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        UpdateSegments();
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void UpdateSegments()
+    {
+        var uri = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        Segments = uri.Split('/', StringSplitOptions.RemoveEmptyEntries)
+            .Where(s => !IsIdSegment(s))
+            .Select(s => MapSegment(s))
+            .ToList();
+
+        if (Segments.Count == 0)
+            Segments.Add("Início");
+    }
+
+    private bool IsIdSegment(string s)
+    {
+        return Guid.TryParse(s, out _) || long.TryParse(s, out _) || int.TryParse(s, out _);
+    }
+
+    private string MapSegment(string s)
+    {
+        return s.ToLower() switch
+        {
+            "admin" => "Administração",
+            "users" => "Usuários",
+            "products" => "Produtos",
+            "payments" => "Pagamentos",
+            "logs" => "Logs",
+            "edit" => "Editar",
+            "view" => "Detalhes",
+            "buy" => "Comprar",
+            "my-products" => "Meus Produtos",
+            "payments-history" => "Histórico de Pagamentos",
+            "about" => "Sobre",
+            "contact" => "Contato",
+            _ => Capitalize(s)
+        };
+    }
+
+    private string Capitalize(string s)
+        => string.IsNullOrEmpty(s) ? s : char.ToUpper(s[0]) + s[1..];
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+
+    private string BuildUrl(int index)
+    {
+        if (index < 0) return "/";
+        var path = string.Join('/', Segments.Take(index + 1));
+        return "/" + path;
+    }
+}
