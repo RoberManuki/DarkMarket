@@ -663,3 +663,12 @@ table + .back-btn {
     color: #fff;
     font-weight: bold;
 }
+
+.page-title {
+    color: #f9a825;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    font-size: 2rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+}

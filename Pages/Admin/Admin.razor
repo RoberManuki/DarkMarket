@@ -4,13 +4,14 @@
 
 @attribute [Authorize(Roles = "admin")]
 
-<h2>Painel Administrativo</h2>
+<h2 class="page-title">Painel Administrativo</h2>
 <p>Bem-vindo, administrador!</p>
 
 <nav class="admin-nav">
     <a href="/admin/users">Usuários</a>
     <a href="/admin/products">Produtos</a>
     <a href="/admin/payments">Pagamentos</a>
+    <a href="/admin/orders">Pedidos</a>
     <a href="/admin/gateways">Gateways</a>
     <a href="/admin/logs">Logs</a>
 </nav>

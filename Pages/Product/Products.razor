@@ -1,10 +1,12 @@
-@page "/my-products"
+@page "/products"
 @using DarkMarket.Shared
 
 @inject ProductService ProductService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
 @inject LogService LogService
+
+<h2 class="page-title">Meus Produtos</h2>
 
 <button class="primary-btn" @onclick='() => Navigation.NavigateTo("/products/create")'>
     Novo Produto

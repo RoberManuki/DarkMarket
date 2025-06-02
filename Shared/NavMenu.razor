@@ -22,6 +22,23 @@
         </li>
 
         <AuthorizeView>
+            <Authorized>
+                <li>
+                    <NavLink href="/products">
+                        <span class="oi oi-box"></span> My Products
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink href="/payments" class="nav-link" Match="NavLinkMatch.All">
+                        <span class="oi oi-list"></span> Payments History
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink href="/orders">
+                        <span class="oi oi-list"></span> My Orders
+                    </NavLink>
+                </li>
+            </Authorized>
             <NotAuthorized>
                 <li>
                     <NavLink href="/Identity/Account/Login">
@@ -34,15 +51,13 @@
                     </NavLink>
                 </li>
             </NotAuthorized>
+        </AuthorizeView>
+        
+        <AuthorizeView Roles="admin">
             <Authorized>
                 <li>
-                    <NavLink href="/my-products">
-                        <span class="oi oi-box"></span> My Products
-                    </NavLink>
-                </li>
-                <li>
-                    <NavLink href="/payments-history" class="nav-link" Match="NavLinkMatch.All">
-                        <span class="oi oi-list"></span> Payments History
+                    <NavLink href="/admin">
+                        <span class="oi oi-lock"></span> Admin
                     </NavLink>
                 </li>
             </Authorized>
@@ -59,15 +74,6 @@
             </NavLink>
         </li>
 
-        <AuthorizeView Roles="admin">
-            <Authorized>
-                <li>
-                    <NavLink href="/admin">
-                        <span class="oi oi-lock"></span> Admin
-                    </NavLink>
-                </li>
-            </Authorized>
-        </AuthorizeView>
     </ul>
 </nav>
 

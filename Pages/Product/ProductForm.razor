@@ -10,7 +10,7 @@
 <PageTitle>@(Id == 0 ? "Novo Produto" : "Editar Produto")</PageTitle>
 
 <div class="form-card">
-    <h2>@(Id == 0 ? "Novo Produto" : "Editar Produto")</h2>
+    <h2 class="page-title">@(Id == 0 ? "Novo Produto" : "Editar Produto")</h2>
     <EditForm Model="product" OnValidSubmit="HandleValidSubmit">
         <DataAnnotationsValidator />
         <ValidationSummary />

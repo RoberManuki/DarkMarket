@@ -1,0 +1,92 @@
+@page "/orders"
+
+@attribute [Authorize]
+
+@using DarkMarket.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+
+@inject AppDbContext Db
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthProvider
+@inject NavigationManager NavigationManager
+
+<h2 class="page-title">Minhas Transações</h2>
+
+@if (isLoading)
+{
+    <div class="loading-spinner">Carregando...</div>
+}
+else if (orders == null || !orders.Any())
+{
+    <div class="alert alert-info">Nenhuma transação encontrada.</div>
+}
+else
+{
+    <table class="product-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Produto</th>
+                <th>Valor</th>
+                <th>Status</th>
+                <th>Data</th>
+                <th>Comprador/Vendedor</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in orders)
+            {
+                var otherParty = t.BuyerId == userId 
+                    ? t.Seller?.UserName ?? t.SellerId 
+                    : t.Buyer?.UserName ?? t.BuyerId;
+                <tr>
+                    <td>@t.Id</td>
+                    <td>@t.Product?.Name ?? t.ProductId.ToString()</td>
+                    <td>@t.Amount BTC</td>
+                    <td>
+                        <span style="color:@(t.IsPaid ? "#4caf50" : "#ff9800");font-weight:bold;">
+                            @(t.IsPaid ? "Pago" : "Pendente")
+                        </span>
+                    </td>
+                    <td>@t.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@otherParty</td>
+                    <td>
+                        <button class="details-btn action-btn" @onclick="() => GoToDetails(t.Id)">Detalhes</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private bool isLoading = true;
+    private List<OrderModel>? orders;
+    private string? userId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userId = UserManager.GetUserId(user);
+
+        orders = await Db.Orders
+            .Include(o => o.Product)
+            .Include(o => o.Buyer)
+            .Include(o => o.Seller)
+            .Where(t => t.BuyerId == userId || t.SellerId == userId)
+            .OrderByDescending(t => t.CreatedAt)
+            .ToListAsync();
+
+        isLoading = false;
+    }
+
+    private void GoToDetails(int id)
+    {
+        NavigationManager.NavigateTo($"/orders/{id}");
+    }
+}

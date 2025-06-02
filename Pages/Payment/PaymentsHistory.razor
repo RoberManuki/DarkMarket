@@ -1,4 +1,4 @@
-@page "/payments-history"
+@page "/payments"
 
 @using DarkMarket.Models
 @using DarkMarket.Shared
@@ -9,6 +9,8 @@
 @inject AuthenticationStateProvider AuthProvider
 @inject NavigationManager Navigation
 @inject LogService LogService
+
+<h2 class="page-title">Histórico de Pagamentos</h2>
 
 @if (payments == null)
 {

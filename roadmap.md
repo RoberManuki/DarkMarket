@@ -29,9 +29,9 @@
 
 ## Fase 4: Integração com Bitcoin
 - [x] Serviço para cotação do Bitcoin (exibir preço em BTC e BRL/USD)
-- [ ] Integração com gateway de pagamento Bitcoin (BTCPayServer, OpenNode, Blockonomics, etc)
+- [x] Integração com gateway de pagamento Bitcoin (BTCPayServer, OpenNode, Blockonomics, etc)
 - [x] Geração de QR Code para pagamento
-- [ ] Confirmação automática de pagamento
+- [x] Confirmação automática de pagamento
 
 ---
 
@@ -65,8 +65,3 @@
 - [ ] Integração com e-mail (confirmação, notificações)
 
 ---
-
-**Dica:**  
-- Marque as tarefas conforme for avançando.
-- Adapte o roteiro conforme novas necessidades surgirem.
-- Ao final, terá um projeto base pronto para reuso e expansão!

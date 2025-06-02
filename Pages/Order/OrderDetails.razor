@@ -1,0 +1,71 @@
+@page "/orders/{Id:int}"
+
+@attribute [Authorize]
+
+@using DarkMarket.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+
+@inject AppDbContext Db
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider AuthProvider
+@inject UserManager<ApplicationUser> UserManager
+
+<h2 class="page-title">Detalhes da Transação</h2>
+
+@if (isLoading)
+{
+    <div class="loading-spinner">Carregando...</div>
+}
+else if (order == null)
+{
+    <div class="alert alert-warning">Transação não encontrada ou acesso negado.</div>
+}
+else
+{
+    <div class="order-details-card">
+        <div><b>ID:</b> @order.Id</div>
+        <div><b>Produto:</b> @order.Product?.Name ?? order.ProductId.ToString()</div>
+        <div><b>Comprador:</b> @order.Buyer?.UserName ?? order.BuyerId</div>
+        <div><b>Vendedor:</b> @order.Seller?.UserName ?? order.SellerId</div>
+        <div><b>Valor:</b> @order.Amount BTC</div>
+        <div><b>Status:</b> @(order.IsPaid ? "Pago" : "Pendente")</div>
+        <div><b>Data:</b> @order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
+        <div><b>PaymentId:</b> @order.PaymentId</div>
+    </div>
+    <button class="back-btn" @onclick='GoBack'>Voltar</button>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private OrderModel? order;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        isLoading = true;
+        var authState = await AuthProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var userId = UserManager.GetUserId(user);
+        var isAdmin = user.IsInRole("admin");
+
+        order = await Db.Orders
+            .Include(o => o.Product)
+            .Include(o => o.Buyer)
+            .Include(o => o.Seller)
+            .FirstOrDefaultAsync(o => o.Id == Id);
+
+        if (order == null || (!isAdmin && order.BuyerId != userId && order.SellerId != userId))
+        {
+            order = null;
+        }
+
+        isLoading = false;
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/my-orders");
+    }
+}

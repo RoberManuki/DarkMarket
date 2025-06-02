@@ -1,22 +1,26 @@
 @inject NavigationManager NavigationManager
 
-<nav class="breadcrumb-nav">
-    @foreach (var (segment, index) in Segments.Select((s, i) => (s, i)))
-    {
-        if (index < Segments.Count - 1)
+@if (Segments.Count >= 2)
+{
+    <nav class="breadcrumb-nav">
+        @foreach (var (segment, index) in Segments.Select((s, i) => (s, i)))
         {
-            <a href="@BuildUrl(index)">@segment</a>
-            <span class="breadcrumb-separator">/</span>
+            if (index < Segments.Count - 1)
+            {
+                <a href="@BuildUrl(index)">@segment</a>
+                <span class="breadcrumb-separator">/</span>
+            }
+            else
+            {
+                <span class="breadcrumb-current">@segment</span>
+            }
         }
-        else
-        {
-            <span class="breadcrumb-current">@segment</span>
-        }
-    }
-</nav>
+    </nav>
+}
 
 @code {
     private List<string> Segments = new();
+    private List<string> OriginalSegments = new();
 
     protected override void OnInitialized()
     {
@@ -33,10 +37,12 @@
     private void UpdateSegments()
     {
         var uri = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-        Segments = uri.Split('/', StringSplitOptions.RemoveEmptyEntries)
+        var allSegments = uri.Split('/', StringSplitOptions.RemoveEmptyEntries)
             .Where(s => !IsIdSegment(s))
-            .Select(s => MapSegment(s))
             .ToList();
+
+        OriginalSegments = allSegments;
+        Segments = allSegments.Select(s => MapSegment(s)).ToList();
 
         if (Segments.Count == 0)
             Segments.Add("Início");
@@ -78,7 +84,7 @@
     private string BuildUrl(int index)
     {
         if (index < 0) return "/";
-        var path = string.Join('/', Segments.Take(index + 1));
+        var path = string.Join('/', OriginalSegments.Take(index + 1));
         return "/" + path;
     }
 }
