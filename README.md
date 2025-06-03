@@ -16,61 +16,94 @@ O projeto está sendo desenvolvido em etapas, com foco em boas práticas, extens
 - **.NET 8+**
 - **Blazor Server** (SPA com C#)
 - **ASP.NET Core Identity** (autenticação, registro, logout, roles)
-- **Entity Framework Core** (PostgreSQL)
+- **Entity Framework Core** (PostgreSQL, com navegação entre entidades e relacionamentos)
 - **Razor Pages** (para telas do Identity)
-- **Hot Reload** para desenvolvimento ágil
 - **CSS customizado** (tema escuro centralizado)
 - **Estrutura modular**: Pages, Shared, Services, Models, Data
 
 ---
 
-## 🔒 Autenticação
+## 🗄️ Modelagem de Dados
 
-- Utilizamos **ASP.NET Core Identity** para login, registro, logout e controle de sessão.
-- As telas de login/registro/logout usam Razor Pages do Identity, customizadas para combinar com o layout escuro do app.
-- O fluxo de logout é imediato e seguro, com redirecionamento automático para a home.
-- Proteção de páginas sensíveis via `[Authorize]` e controle de sessão por cookie.
+- O projeto utiliza **Entity Framework Core** para mapear e gerenciar o banco de dados relacional.
+- As entidades possuem **propriedades de navegação** (ex: `PaymentRecord.Product`) para facilitar consultas e exibição de dados relacionados, evitando redundância e mantendo o banco normalizado.
+- As queries utilizam `.Include()` para popular dados relacionados quando necessário.
+- Não há duplicação de informações como nome do produto em tabelas de pagamentos; tudo é resolvido via relacionamento.
 
 ---
 
 ## 📁 Estrutura do Projeto
 
-- `/Pages` — Páginas Blazor principais (Dashboard, etc)
-- `/Shared` — Layouts, NavMenu, componentes reutilizáveis
+- `/Pages` — Páginas Blazor principais (Marketplace, Dashboard, Admin, etc)
+- `/Shared` — Layouts, NavMenu, Breadcrumb, componentes reutilizáveis
 - `/Areas/Identity/Pages` — Telas de autenticação (login, registro, logout, layout customizado)
 - `/wwwroot/css/site.css` — CSS principal do app
-- `/wwwroot/Identity/css/site.css` — CSS específico para telas do Identity (opcional)
 - `/Data` — Contexto do Entity Framework e migrations
 - `/Services` — Serviços de domínio (ex: ProductService, UserService)
 - `/Models` — Modelos de domínio e ViewModels
 
 ---
 
-## 📝 Como rodar
-
-1. **Configure o banco de dados** no `appsettings.json` (PostgreSQL).
-2. **Restaure e rode:**
-   ```sh
-   dotnet restore
-   dotnet ef database update
-   dotnet watch run
-   ```
-3. Acesse `http://localhost:5000`
-
----
-
 ## 📅 Roadmap
 
-Veja o arquivo [`roadmap.md`](./roadmap.md) para acompanhar o progresso e as próximas etapas.
+Veja o arquivo [`roadmap.md`](./roadmap.md) para detalhes de progresso, próximos passos e prioridades.
 
 ---
 
-## 📚 Documentação e Boas Práticas
+## ⚠️ Limitações do Blazor e Componentização (MVP)
 
-- Código limpo, comentado e modularizado.
-- Estrutura pronta para expansão (novos módulos, integrações, etc).
-- Telas do Identity integradas visualmente ao tema do app.
-- Roadmap e documentação para facilitar reuso e contribuição.
+Durante o desenvolvimento, encontramos **limitações sérias do Blazor** ao tentar componentizar partes do sistema, especialmente:
+
+### 1. Filtros reutilizáveis (`FilterBar.razor`)
+
+- **Problema:** O two-way binding (`@bind-Name`, etc) entre pai e filho não dispara setters ou métodos no componente pai de forma confiável.
+- **Tentativas:** Usamos `[Parameter]`, `EventCallback<T>`, setters com lógica, eventos explícitos, debounce, etc.
+- **Resultado:** O filtro só funciona se o código for replicado diretamente na página, inviabilizando o DRY.
+
+### 2. Componente de Pagamento (`PaymentDisplay.razor`)
+
+- **Problema:** Botões no componente filho não conseguem disparar métodos do pai via `EventCallback` de forma consistente.
+- **Tentativas:** Mesmo padrão, mesmo resultado: só funciona se o botão estiver na página pai.
+
+#### O que já foi tentado
+
+- Uso correto de `[Parameter]` e `EventCallback<T>`
+- Propriedades com setter no pai
+- Teste com e sem `@bind-Value:event="oninput"`
+- Clean, rebuild, restart do projeto
+- Teste em página mínima isolada
+- Conferência de namespaces e imports
+- Teste de log no componente e na página
+
+#### Workaround MVP
+
+> **Para não travar o projeto, replicamos o código de filtro e pagamento nas páginas onde são usados.**
+
+#### Pós-MVP
+
+- Refatorar para componentes reutilizáveis assim que o Blazor corrigir essas limitações ou surgir um padrão confiável.
+- Revisitar este README para atualizar a estratégia.
+
+---
+
+## 🧩 Features a serem desacopladas para componentes (DRY)
+
+Devido às limitações acima, **as próximas features planejadas para serem componentizadas** (mas que, por ora, estão sendo replicadas nas páginas) são:
+
+1. **Paginação**  
+   - Idealmente um componente reutilizável para todas as listagens.
+2. **Filtros**  
+   - Já tentado, mas não viável no MVP por problemas de callback.
+3. **Exportações**  
+   - Exportar dados (CSV, PDF, etc) de qualquer listagem via componente.
+4. **Outros componentes de ação**  
+   - Ex: botões de ação em tabelas, toolbars, notificações customizadas, etc.
+
+> **Todas essas features seriam componentes DRY, caso o Blazor suportasse callbacks e binding de forma confiável entre pai e filho.**
+
+---
+
+**Se você é dev e conhece uma solução definitiva para esse cenário, por favor, abra uma issue ou PR!**
 
 ---
 
@@ -86,36 +119,3 @@ Veja o arquivo [`roadmap.md`](./roadmap.md) para acompanhar o progresso e as pr�
 Desenvolvido por Freeza e colaboradores.
 
 ---
-
-## Problema conhecido: EventCallback não funciona em componente Blazor
-
-Tentamos centralizar a lógica de exibição do pagamento em um componente (`PaymentDisplay.razor`), mas o botão de callback nunca chama o método na página pai, apesar de todas as tentativas de ajuste de tipo, rebuild, etc.
-
-**Workaround:**  
-Repetimos o código de exibição e botão nas telas `Payment.razor` e `ViewPayment.razor` até encontrar uma solução definitiva ou resposta da comunidade.
-
-Se você souber a solução, por favor, abra uma issue ou envie um PR!
-
-**Status:**  
-Projeto em desenvolvimento ativo — autenticação funcional, layout escuro, dashboard protegido e estrutura pronta para expansão.
-
----
-
-🚨 Documentação do Problema: EventCallback não funciona em componente Blazor
-Resumo do problema
-Criamos um componente Blazor chamado PaymentDisplay.razor para centralizar a exibição do endereço, valor e botão "Verificar pagamento".
-O botão "Verificar pagamento" chama um EventCallback para executar um método na página pai.
-O botão é renderizado, mas o clique nunca chama o método na página pai.
-Testamos todas as variações possíveis de EventCallback, tipos de parâmetro, chamadas, rebuild, clean, etc.
-O mesmo método funciona se chamado por um botão diretamente na página, mas não via componente.
-O que já foi tentado
-EventCallback e EventCallback<object?> com .InvokeAsync() e .InvokeAsync(null)
-Parâmetro obrigatório e opcional
-Teste em página mínima (Teste.razor)
-Remover dependências externas e markup comentado
-Clean, rebuild, restart do projeto
-Conferência de namespaces e imports
-Teste de log no componente e na página
-Conclusão
-O problema é específico do uso do componente, não do método nem do binding na página.
-Decidimos remover o componente e repetir o código nas telas, até encontrar uma solução definitiva ou resposta oficial da comunidade Blazor.

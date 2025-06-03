@@ -14,11 +14,26 @@
 
 <h2 class="page-title">Minhas Transações</h2>
 
+<div class="filter-bar">
+    <input type="number" placeholder="ID..." @bind="filterId" min="0" />
+    <input type="text" placeholder="Produto..." @bind="filterProduct" @bind:event="oninput" />
+    <input type="number" placeholder="Valor mínimo" @bind="filterMinAmount" min="0" />
+    <input type="number" placeholder="Valor máximo" @bind="filterMaxAmount" min="0" />
+    <select @bind="filterStatus">
+        <option value="">Todos os status</option>
+        <option value="Pago">Pago</option>
+        <option value="Pendente">Pendente</option>
+    </select>
+    <input type="date" @bind="filterDate" />
+    <button @onclick="ApplyFilters">Filtrar</button>
+    <button @onclick="ClearFilters">Limpar</button>
+</div>
+
 @if (isLoading)
 {
     <div class="loading-spinner">Carregando...</div>
 }
-else if (orders == null || !orders.Any())
+else if (filteredOrders == null || !filteredOrders.Any())
 {
     <div class="alert alert-info">Nenhuma transação encontrada.</div>
 }
@@ -37,7 +52,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var t in orders)
+            @foreach (var t in filteredOrders)
             {
                 var otherParty = t.BuyerId == userId 
                     ? t.Seller?.UserName ?? t.SellerId 
@@ -64,8 +79,15 @@ else
 
 @code {
     private bool isLoading = true;
-    private List<OrderModel>? orders;
+    private List<OrderModel>? allOrders;
+    private List<OrderModel>? filteredOrders;
     private string? userId;
+    private int? filterId;
+    private string filterProduct = "";
+    private decimal? filterMinAmount;
+    private decimal? filterMaxAmount;
+    private string filterStatus = "";
+    private DateTime? filterDate;
 
     protected override async Task OnInitializedAsync()
     {
@@ -74,7 +96,7 @@ else
         var user = authState.User;
         userId = UserManager.GetUserId(user);
 
-        orders = await Db.Orders
+        allOrders = await Db.Orders
             .Include(o => o.Product)
             .Include(o => o.Buyer)
             .Include(o => o.Seller)
@@ -82,11 +104,43 @@ else
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
 
+        ApplyFilters();
         isLoading = false;
     }
 
     private void GoToDetails(int id)
     {
         NavigationManager.NavigateTo($"/orders/{id}");
+    }
+
+    private void ApplyFilters()
+    {
+        isLoading = true;
+
+        filteredOrders = allOrders?
+            .Where(t =>
+                (!filterId.HasValue || t.Id == filterId.Value) &&
+                (string.IsNullOrWhiteSpace(filterProduct) || (t.Product?.Name?.Contains(filterProduct, StringComparison.OrdinalIgnoreCase) ?? false)) &&
+                (!filterMinAmount.HasValue || t.Amount >= filterMinAmount.Value) &&
+                (!filterMaxAmount.HasValue || t.Amount <= filterMaxAmount.Value) &&
+                (string.IsNullOrWhiteSpace(filterStatus) ||
+                    (filterStatus == "Pago" && t.IsPaid) ||
+                    (filterStatus == "Pendente" && !t.IsPaid)) &&
+                (!filterDate.HasValue || t.CreatedAt.Date == filterDate.Value.Date)
+            )
+            .ToList();
+
+        isLoading = false;
+    }
+
+    private void ClearFilters()
+    {
+        filterId = null;
+        filterProduct = "";
+        filterMinAmount = null;
+        filterMaxAmount = null;
+        filterStatus = "";
+        filterDate = null;
+        ApplyFilters();
     }
 }

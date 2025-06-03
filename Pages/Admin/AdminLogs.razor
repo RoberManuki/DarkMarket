@@ -15,6 +15,21 @@
     <b>Total de logs:</b> @totalLogs
 </p>
 
+<div class="filter-bar">
+    <input type="text" placeholder="Usuário..." @bind="filterUserId" @bind:event="oninput" />
+    <input type="text" placeholder="Fonte..." @bind="filterSource" @bind:event="oninput" />
+    <input type="text" placeholder="Mensagem..." @bind="filterMessage" @bind:event="oninput" />
+    <select @bind="filterLevel">
+        <option value="">Todos os níveis</option>
+        <option value="Error">Error</option>
+        <option value="Warning">Warning</option>
+        <option value="Info">Info</option>
+    </select>
+    <input type="date" @bind="filterDate" />
+    <button @onclick="ApplyFilters">Filtrar</button>
+    <button @onclick="ClearFilters">Limpar</button>
+</div>
+
 <table class="log-table">
     <thead>
         <tr>
@@ -60,7 +75,7 @@
     <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Próxima</button>
 </div>
 
-<button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
+<button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
 
 @code {
     private List<AppLog> logs = new();
@@ -69,19 +84,45 @@
     private int currentPage = 1;
     private int totalPages => (int)Math.Ceiling((double)totalLogs / pageSize);
 
+    // Filtros de log
+    private string filterUserId = "";
+    private string filterSource = "";
+    private string filterMessage = "";
+    private string filterLevel = "";
+    private DateTime? filterDate;
+
     protected override async Task OnInitializedAsync()
     {
-        await LoadLogs();
+        await ApplyFilters();
     }
 
     private async Task LoadLogs()
     {
-        totalLogs = await Db.Logs.CountAsync();
-        logs = await Db.Logs
+        var query = Db.Logs.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(filterUserId))
+            query = query.Where(log => log.UserId != null && log.UserId.Contains(filterUserId));
+        if (!string.IsNullOrWhiteSpace(filterSource))
+            query = query.Where(log => log.Source.Contains(filterSource));
+        if (!string.IsNullOrWhiteSpace(filterMessage))
+            query = query.Where(log => log.Message.Contains(filterMessage));
+        if (!string.IsNullOrWhiteSpace(filterLevel))
+            query = query.Where(log => log.Level == filterLevel);
+        if (filterDate.HasValue)
+            query = query.Where(log => log.Timestamp.Date == filterDate.Value.Date);
+
+        totalLogs = await query.CountAsync();
+        logs = await query
             .OrderByDescending(l => l.Timestamp)
             .Skip((currentPage - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
+    }
+
+    private async Task ApplyFilters()
+    {
+        currentPage = 1;
+        await LoadLogs();
     }
 
     private async Task NextPage()
@@ -100,6 +141,16 @@
             currentPage--;
             await LoadLogs();
         }
+    }
+
+    private async Task ClearFilters()
+    {
+        filterUserId = "";
+        filterSource = "";
+        filterMessage = "";
+        filterLevel = "";
+        filterDate = null;
+        await ApplyFilters();
     }
 
     private bool CanGoToNextPage => currentPage < totalPages;
@@ -154,4 +205,5 @@
         background: #555;
         cursor: not-allowed;
     }
+
 </style>

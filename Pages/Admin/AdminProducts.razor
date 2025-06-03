@@ -12,11 +12,21 @@
 
 <h2 class="page-title">Produtos</h2>
 
+<div class="filter-bar">
+    <input type="number" placeholder="ID..." @bind="filterId" min="0" />
+    <input type="text" placeholder="Nome..." @bind="filterName" @bind:event="oninput" />
+    <input type="text" placeholder="Usuário..." @bind="filterUserId" @bind:event="oninput" />
+    <input type="number" placeholder="Preço mínimo" @bind="filterMinPrice" min="0" />
+    <input type="number" placeholder="Preço máximo" @bind="filterMaxPrice" min="0" />
+    <button @onclick="ApplyFilters">Filtrar</button>
+    <button @onclick="ClearFilters">Limpar</button>
+</div>
+
 @if (isLoading)
 {
     <div class="loading-spinner">Carregando produtos...</div>
 }
-else if (products == null || !products.Any())
+else if (filteredProducts == null || !filteredProducts.Any())
 {
     <p>Nenhum produto encontrado.</p>
 }
@@ -34,7 +44,7 @@ else
             </tr>
         </thead>
         <tbody>
-        @foreach (var p in products)
+        @foreach (var p in filteredProducts)
         {
             <tr>
                 <td data-label="ID">@p.Id</td>
@@ -53,11 +63,19 @@ else
     </table>
 }
 
-<button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
+<button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
 
 @code {
-    private List<Product>? products;
+    private List<Product>? allProducts;
+    private List<Product>? filteredProducts;
     private bool isLoading = true;
+
+    private int? filterId;
+    private string filterName = "";
+    private string filterUserId = "";
+    private decimal? filterMinPrice;
+    private decimal? filterMaxPrice;
+
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
     [Inject] public IJSRuntime JS { get; set; } = default!;
     [CascadingParameter] public Toast? ToastRef { get; set; }
@@ -65,7 +83,8 @@ else
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
-        products = await ProductService.GetAllAsync();
+        allProducts = await ProductService.GetAllAsync();
+        ApplyFilters();
         isLoading = false;
     }
 
@@ -83,5 +102,28 @@ else
         );
         ToastRef?.Show("Produto deletado!", "info");
         await OnInitializedAsync();
+    }
+
+    private void ApplyFilters()
+    {
+        filteredProducts = allProducts?
+            .Where(p =>
+                (!filterId.HasValue || p.Id == filterId.Value) &&
+                (string.IsNullOrWhiteSpace(filterName) || p.Name.Contains(filterName, StringComparison.OrdinalIgnoreCase)) &&
+                (string.IsNullOrWhiteSpace(filterUserId) || (p.UserId?.Contains(filterUserId, StringComparison.OrdinalIgnoreCase) ?? false)) &&
+                (!filterMinPrice.HasValue || p.Price >= filterMinPrice.Value) &&
+                (!filterMaxPrice.HasValue || p.Price <= filterMaxPrice.Value)
+            )
+            .ToList();
+    }
+
+    private void ClearFilters()
+    {
+        filterId = null;
+        filterName = "";
+        filterUserId = "";
+        filterMinPrice = null;
+        filterMaxPrice = null;
+        ApplyFilters();
     }
 }

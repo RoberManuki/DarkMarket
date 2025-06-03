@@ -11,11 +11,28 @@
 
 <h2 class="page-title">Todas as Transações</h2>
 
+<div class="filter-bar">
+    <input type="number" placeholder="ID..." @bind="filterId" min="0" />
+    <input type="text" placeholder="Produto..." @bind="filterProduct" @bind:event="oninput" />
+    <input type="text" placeholder="Comprador..." @bind="filterBuyer" @bind:event="oninput" />
+    <input type="text" placeholder="Vendedor..." @bind="filterSeller" @bind:event="oninput" />
+    <input type="number" placeholder="Valor mínimo" @bind="filterMinAmount" min="0" />
+    <input type="number" placeholder="Valor máximo" @bind="filterMaxAmount" min="0" />
+    <select @bind="filterStatus">
+        <option value="">Todos os status</option>
+        <option value="Pago">Pago</option>
+        <option value="Pendente">Pendente</option>
+    </select>
+    <input type="date" @bind="filterDate" />
+    <button @onclick="ApplyFilters">Filtrar</button>
+    <button @onclick="ClearFilters">Limpar</button>
+</div>
+
 @if (isLoading)
 {
     <div class="loading-spinner">Carregando...</div>
 }
-else if (orders == null || !orders.Any())
+else if (filteredOrders == null || !filteredOrders.Any())
 {
     <div class="alert alert-info">Nenhuma transação encontrada.</div>
 }
@@ -35,7 +52,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var t in orders)
+            @foreach (var t in filteredOrders)
             {
                 <tr>
                     <td>@t.Id</td>
@@ -60,22 +77,65 @@ else
 
 @code {
     private bool isLoading = true;
-    private List<OrderModel>? orders;
+    private List<OrderModel>? allOrders;
+    private List<OrderModel>? filteredOrders;
+
+    // Filtros
+    private int? filterId;
+    private string filterProduct = "";
+    private string filterBuyer = "";
+    private string filterSeller = "";
+    private decimal? filterMinAmount;
+    private decimal? filterMaxAmount;
+    private string filterStatus = "";
+    private DateTime? filterDate;
 
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
-        orders = await Db.Orders
+        allOrders = await Db.Orders
             .Include(o => o.Product)
             .Include(o => o.Buyer)
             .Include(o => o.Seller)
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
+        ApplyFilters();
         isLoading = false;
+    }
+
+    private void ApplyFilters()
+    {
+        filteredOrders = allOrders?
+            .Where(t =>
+                (!filterId.HasValue || t.Id == filterId.Value) &&
+                (string.IsNullOrWhiteSpace(filterProduct) || (t.Product?.Name?.Contains(filterProduct, StringComparison.OrdinalIgnoreCase) ?? false)) &&
+                (string.IsNullOrWhiteSpace(filterBuyer) || (t.Buyer?.UserName?.Contains(filterBuyer, StringComparison.OrdinalIgnoreCase) ?? false) || (t.BuyerId?.Contains(filterBuyer, StringComparison.OrdinalIgnoreCase) ?? false)) &&
+                (string.IsNullOrWhiteSpace(filterSeller) || (t.Seller?.UserName?.Contains(filterSeller, StringComparison.OrdinalIgnoreCase) ?? false) || (t.SellerId?.Contains(filterSeller, StringComparison.OrdinalIgnoreCase) ?? false)) &&
+                (!filterMinAmount.HasValue || t.Amount >= filterMinAmount.Value) &&
+                (!filterMaxAmount.HasValue || t.Amount <= filterMaxAmount.Value) &&
+                (string.IsNullOrWhiteSpace(filterStatus) ||
+                    (filterStatus == "Pago" && t.IsPaid) ||
+                    (filterStatus == "Pendente" && !t.IsPaid)) &&
+                (!filterDate.HasValue || t.CreatedAt.Date == filterDate.Value.Date)
+            )
+            .ToList();
     }
 
     private void GoToDetails(int id)
     {
         NavigationManager.NavigateTo($"/orders/{id}");
+    }
+
+    private void ClearFilters()
+    {
+        filterId = null;
+        filterProduct = "";
+        filterBuyer = "";
+        filterSeller = "";
+        filterMinAmount = null;
+        filterMaxAmount = null;
+        filterStatus = "";
+        filterDate = null;
+        ApplyFilters();
     }
 }

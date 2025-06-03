@@ -12,11 +12,25 @@
 
 <h2 class="page-title">Histórico de Pagamentos</h2>
 
-@if (payments == null)
+<div class="filter-bar">
+    <input type="number" placeholder="Valor mínimo" @bind="filterMinAmount" min="0" />
+    <input type="number" placeholder="Valor máximo" @bind="filterMaxAmount" min="0" />
+    <select @bind="filterStatus">
+        <option value="">Todos os status</option>
+        <option value="Pago">Pago</option>
+        <option value="Pendente">Pendente</option>
+    </select>
+    <input type="text" placeholder="Gateway..." @bind="filterGateway" @bind:event="oninput" />
+    <input type="date" @bind="filterDate" />
+    <button @onclick="ApplyFilters">Filtrar</button>
+    <button @onclick="ClearFilters">Limpar</button>
+</div>
+
+@if (filteredPayments == null)
 {
     <p>Carregando...</p>
 }
-else if (!payments.Any())
+else if (!filteredPayments.Any())
 {
     <p>Você ainda não realizou nenhum pagamento.</p>
 }
@@ -35,7 +49,7 @@ else
             </tr>
         </thead>
         <tbody>
-        @foreach (var p in payments)
+        @foreach (var p in filteredPayments)
         {
             <tr>
                 <td data-label="Produto">@p.ProductId</td>
@@ -72,6 +86,12 @@ else
 
 @code {
     private List<PaymentRecord>? payments;
+    private List<PaymentRecord>? filteredPayments;
+    private decimal? filterMinAmount;
+    private decimal? filterMaxAmount;
+    private string filterStatus = "";
+    private string filterGateway = "";
+    private DateTime? filterDate;
     [CascadingParameter] public Toast? ToastRef { get; set; }
     private HubConnection? hubConnection;
 
@@ -83,6 +103,8 @@ else
             .Where(p => p.UserId == userId)
             .OrderByDescending(p => p.CreatedAt)
             .ToListAsync();
+
+        ApplyFilters();
 
         hubConnection = new HubConnectionBuilder()
             .WithUrl(Navigation.ToAbsoluteUri("/paymentHub"))
@@ -107,6 +129,31 @@ else
     {
         if (hubConnection != null)
             await hubConnection.DisposeAsync();
+    }
+
+    private void ApplyFilters()
+    {
+        filteredPayments = payments?
+            .Where(p =>
+                (!filterMinAmount.HasValue || p.Amount >= filterMinAmount.Value) &&
+                (!filterMaxAmount.HasValue || p.Amount <= filterMaxAmount.Value) &&
+                (string.IsNullOrWhiteSpace(filterStatus) ||
+                    (filterStatus == "Pago" && p.IsPaid) ||
+                    (filterStatus == "Pendente" && !p.IsPaid)) &&
+                (string.IsNullOrWhiteSpace(filterGateway) || (p.PaymentMethod?.Contains(filterGateway, StringComparison.OrdinalIgnoreCase) ?? false)) &&
+                (!filterDate.HasValue || p.CreatedAt.Date == filterDate.Value.Date)
+            )
+            .ToList();
+    }
+
+    private void ClearFilters()
+    {
+        filterMinAmount = null;
+        filterMaxAmount = null;
+        filterStatus = "";
+        filterGateway = "";
+        filterDate = null;
+        ApplyFilters();
     }
 
     private async Task CancelPayment(int paymentId)

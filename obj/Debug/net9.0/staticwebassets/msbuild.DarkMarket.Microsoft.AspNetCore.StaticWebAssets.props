@@ -12,8 +12,8 @@
       <RelatedAsset></RelatedAsset>
       <AssetTraitName></AssetTraitName>
       <AssetTraitValue></AssetTraitValue>
-      <Fingerprint>uqqfq9a5zc</Fingerprint>
-      <Integrity>JjMWrIoNX5ounWCOxOzNqWh6/SjxcdgxxmPBB1fPgPo=</Integrity>
+      <Fingerprint>3hz7yww3dt</Fingerprint>
+      <Integrity>V1FfRcapuXEOg4WQYrRLgYAClr1XG5d2oYuNAQMaVBg=</Integrity>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\site.css'))</OriginalItemSpec>
@@ -35,6 +35,24 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\favicon.ico'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\021c0ad0-de32-474c-b4f3-ca673979ea27.webp'))">
+      <SourceType>Package</SourceType>
+      <SourceId>DarkMarket</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/DarkMarket</BasePath>
+      <RelativePath>uploads/021c0ad0-de32-474c-b4f3-ca673979ea27.webp</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>cfbr89wo4f</Fingerprint>
+      <Integrity>mD6YLvX1OmsNLac5/PktEzj0G9w8szbjbDow1GVDUF0=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\021c0ad0-de32-474c-b4f3-ca673979ea27.webp'))</OriginalItemSpec>
     </StaticWebAsset>
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\039e1e68-c089-49ba-920a-054d6a432d45.webp'))">
       <SourceType>Package</SourceType>
@@ -71,6 +89,24 @@
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\19152efd-4440-44bd-848e-993c640bd6ff.webp'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\217e1593-57f1-46e6-9ad9-f01bd3403973.webp'))">
+      <SourceType>Package</SourceType>
+      <SourceId>DarkMarket</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/DarkMarket</BasePath>
+      <RelativePath>uploads/217e1593-57f1-46e6-9ad9-f01bd3403973.webp</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>a85wche2be</Fingerprint>
+      <Integrity>erKx0drdCYRD2evqICuy3GJupYDqtH+ynuF3qTq70d8=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\217e1593-57f1-46e6-9ad9-f01bd3403973.webp'))</OriginalItemSpec>
     </StaticWebAsset>
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\2c72729f-6fda-4f12-ad75-2885d68980b4.webp'))">
       <SourceType>Package</SourceType>

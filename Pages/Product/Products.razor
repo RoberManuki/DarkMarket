@@ -12,13 +12,22 @@
     Novo Produto
 </button>
 
-@if (products == null)
+<div class="filter-bar">
+    <input type="text" placeholder="Buscar por nome..." @bind="filterName" @bind:event="oninput" />
+    <input type="number" placeholder="Preço mínimo" @bind="filterMinPrice" min="0" />
+    <input type="number" placeholder="Preço máximo" @bind="filterMaxPrice" min="0" />
+    <button @onclick="ApplyFilters">Filtrar</button>
+    <button @onclick="ClearFilters">Limpar</button>
+</div>
+
+
+@if (filteredProducts == null)
 {
     <div class="loading-spinner">
         <span class="oi oi-reload spinning"></span> Carregando produtos...
     </div>
 }
-else if (!products.Any())
+else if (!filteredProducts.Any())
 {
     <p>Você ainda não cadastrou produtos.</p>
 }
@@ -35,7 +44,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var p in products)
+            @foreach (var p in filteredProducts)
             {
                 <tr>
                     <td data-label="Imagem">
@@ -57,8 +66,13 @@ else
     </table>
 }
 
+
 @code {
     private List<Product>? products;
+    private List<Product>? filteredProducts;
+    private string filterName = "";
+    private decimal? filterMinPrice;
+    private decimal? filterMaxPrice;
     [CascadingParameter] public Toast? ToastRef { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -66,6 +80,26 @@ else
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var userId = authState.User.FindFirst(c => c.Type == "sub" || c.Type.Contains("nameidentifier"))?.Value ?? "";
         products = await ProductService.GetByUserIdAsync(userId);
+        ApplyFilters();
+    }
+
+    private void ApplyFilters()
+    {
+        filteredProducts = products?
+            .Where(p =>
+                (string.IsNullOrWhiteSpace(filterName) || p.Name.Contains(filterName, StringComparison.OrdinalIgnoreCase)) &&
+                (!filterMinPrice.HasValue || p.Price >= filterMinPrice.Value) &&
+                (!filterMaxPrice.HasValue || p.Price <= filterMaxPrice.Value)
+            )
+            .ToList();
+    }
+
+    private void ClearFilters()
+    {
+        filterName = "";
+        filterMinPrice = null;
+        filterMaxPrice = null;
+        ApplyFilters();
     }
 
     private async Task Delete(int id)
@@ -73,15 +107,16 @@ else
         await ProductService.DeleteAsync(id);
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var userId = authState.User.FindFirst(c => c.Type == "sub" || c.Type.Contains("nameidentifier"))?.Value ?? "";
-        
+
         await LogService.LogAsync(
             $"Produto removido (ID: {id})",
             source: "Product",
             level: "Warning",
             userId: userId
         );
-        
+
         products = await ProductService.GetByUserIdAsync(userId);
+        ApplyFilters();
         ToastRef?.Show("Produto removido!", "info");
         StateHasChanged();
     }
@@ -161,7 +196,7 @@ else
         border: none;
         font-size: 1.1rem;
         cursor: pointer;
-        margin-bottom: 1rem;
+        margin-bottom: 2rem;
         box-shadow: 0 2px 8px #0004;
         display: inline-flex;
         align-items: center;

@@ -4,22 +4,33 @@
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthProvider
 
+@using Microsoft.AspNetCore.Components.Authorization
+
 <h2 class="page-title">Marketplace</h2>
 
-@if (products == null)
+<div class="filter-bar filter-marketplace">
+    <input type="text" placeholder="Buscar por nome..." @bind="filterName" @bind:event="oninput" />
+    <input type="number" placeholder="Preço mínimo" @bind="filterMinPrice" min="0" />
+    <input type="number" placeholder="Preço máximo" @bind="filterMaxPrice" min="0" />
+    <input type="text" placeholder="Vendedor..." @bind="filterSeller" @bind:event="oninput" />
+    <button @onclick="ApplyFilters">Filtrar</button>
+    <button @onclick="ClearFilters">Limpar</button>
+</div>
+
+@if (filteredProducts == null)
 {
     <div class="loading-spinner">
         <span class="oi oi-reload spinning"></span> Carregando produtos...
     </div>
 }
-else if (!products.Any())
+else if (!filteredProducts.Any())
 {
     <p>Nenhum produto disponível.</p>
 }
 else
 {
     <div class="product-list">
-        @foreach (var p in products)
+        @foreach (var p in filteredProducts)
         {
             <div class="product-card">
                 <!-- 1. Imagem -->
@@ -76,7 +87,13 @@ else
 
 @code {
     private List<Product>? products;
+    private List<Product>? filteredProducts;
     private string? userId;
+
+    private string filterName = "";
+    private decimal? filterMinPrice;
+    private decimal? filterMaxPrice;
+    private string filterSeller = "";
 
     protected override async Task OnInitializedAsync()
     {
@@ -84,6 +101,28 @@ else
         var user = authState.User;
         userId = user.FindFirst(c => c.Type == "sub" || c.Type.Contains("nameidentifier"))?.Value;
         products = await ProductService.GetAllAsync();
+        ApplyFilters();
+    }
+
+    private void ApplyFilters()
+    {
+        filteredProducts = products?
+            .Where(p =>
+                (string.IsNullOrWhiteSpace(filterName) || p.Name.Contains(filterName, StringComparison.OrdinalIgnoreCase)) &&
+                (!filterMinPrice.HasValue || p.Price >= filterMinPrice.Value) &&
+                (!filterMaxPrice.HasValue || p.Price <= filterMaxPrice.Value) &&
+                (string.IsNullOrWhiteSpace(filterSeller) || (p.User?.UserName?.Contains(filterSeller, StringComparison.OrdinalIgnoreCase) ?? false))
+            )
+            .ToList();
+    }
+
+    private void ClearFilters()
+    {
+        filterName = "";
+        filterMinPrice = null;
+        filterMaxPrice = null;
+        filterSeller = "";
+        ApplyFilters();
     }
 }
 
@@ -130,7 +169,7 @@ else
     .product-title {
         font-size: 1.3rem;
         font-weight: bold;
-        color: #8ab4f8;
+        color: #f9a825;
         margin-bottom: 0.3rem;
     }
     .product-price {
@@ -146,7 +185,7 @@ else
     }
     .label {
         font-size: 0.95rem;
-        color: #8ab4f8;
+        color: #f9a825;
         font-weight: bold;
         margin-bottom: 0.2rem;
     }

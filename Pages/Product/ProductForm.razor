@@ -44,7 +44,7 @@
                 }
             </div>
             <div class="form-actions">
-                <button class="cancel-btn" type="button" @onclick='() => Navigation.NavigateTo("/my-products")'>
+                <button class="cancel-btn" type="button" @onclick='() => Navigation.NavigateTo("/products")'>
                     Cancelar
                 </button>
 
@@ -105,7 +105,7 @@
             ToastRef?.Show("Produto atualizado com sucesso!", "success");
         }
 
-        Navigation.NavigateTo("/my-products");
+        Navigation.NavigateTo("/products");
         isLoading = false;
     }
 

@@ -10,11 +10,27 @@
 
 <h2 class="page-title">Pagamentos</h2>
 
+<div class="filter-bar">
+    <input type="number" placeholder="ID..." @bind="filterId" min="0" />
+    <input type="text" placeholder="Usuário..." @bind="filterUserId" @bind:event="oninput" />
+    <input type="text" placeholder="Produto..." @bind="filterProductId" @bind:event="oninput" />
+    <input type="number" placeholder="Valor mínimo" @bind="filterMinAmount" min="0" />
+    <input type="number" placeholder="Valor máximo" @bind="filterMaxAmount" min="0" />
+    <select @bind="filterStatus">
+        <option value="">Todos os status</option>
+        <option value="Pago">Pago</option>
+        <option value="Pendente">Pendente</option>
+    </select>
+    <input type="date" @bind="filterDate" />
+    <button @onclick="ApplyFilters">Filtrar</button>
+    <button @onclick="ClearFilters">Limpar</button>
+</div>
+
 @if (isLoading)
 {
     <div class="loading-spinner">Carregando pagamentos...</div>
 }
-else if (payments == null || !payments.Any())
+else if (filteredPayments == null || !filteredPayments.Any())
 {
     <p>Nenhum pagamento encontrado.</p>
 }
@@ -26,6 +42,7 @@ else
                 <th>ID</th>
                 <th>Usuário</th>
                 <th>Produto</th>
+                <th>Gateway</th>
                 <th>Valor</th>
                 <th>Status</th>
                 <th>Data</th>
@@ -33,12 +50,15 @@ else
             </tr>
         </thead>
         <tbody>
-        @foreach (var p in payments)
+        @foreach (var p in filteredPayments)
         {
             <tr>
                 <td data-label="ID">@p.Id</td>
                 <td data-label="Usuário">@p.UserId</td>
-                <td data-label="Produto">@p.ProductId</td>
+                <td data-label="Produto">
+                    @(p.Product?.Name ?? $"ID: {p.ProductId}")
+                </td>
+                <td data-label="Gateway">@p.PaymentMethod</td>
                 <td data-label="Valor">@p.Amount BTC</td>
                 <td data-label="Status">
                     @if (p.IsPaid)
@@ -60,10 +80,20 @@ else
     </table>
 }
 
-<button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
+<button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
 
 @code {
-    private List<PaymentRecord>? payments;
+    private List<PaymentRecord>? allPayments;
+    private List<PaymentRecord>? filteredPayments;
+
+    private int? filterId;
+    private string filterUserId = "";
+    private string filterProductId = "";
+    private decimal? filterMinAmount;
+    private decimal? filterMaxAmount;
+    private string filterStatus = "";
+    private DateTime? filterDate;
+
     private bool isLoading = true;
 
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
@@ -71,9 +101,45 @@ else
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
-        payments = await Db.Payments.OrderByDescending(p => p.CreatedAt).Take(200).ToListAsync();
+        allPayments = await Db.Payments
+            .Include(p => p.Product)
+            .OrderByDescending(p => p.CreatedAt)
+            .Take(200)
+            .ToListAsync();
+        ApplyFilters();
         isLoading = false;
     }
 
     private void ViewPayment(int id) => NavigationManager.NavigateTo($"/admin/payments/view/{id}");
+
+    private void ApplyFilters()
+    {
+        filteredPayments = allPayments?
+            .Where(p =>
+                (!filterId.HasValue || p.Id == filterId.Value) &&
+                (string.IsNullOrWhiteSpace(filterUserId) || (p.UserId?.Contains(filterUserId, StringComparison.OrdinalIgnoreCase) ?? false)) &&
+                (string.IsNullOrWhiteSpace(filterProductId) ||
+                    (p.Product?.Name?.Contains(filterProductId, StringComparison.OrdinalIgnoreCase) ?? false) ||
+                    p.ProductId.ToString().Contains(filterProductId, StringComparison.OrdinalIgnoreCase)) &&
+                (!filterMinAmount.HasValue || p.Amount >= filterMinAmount.Value) &&
+                (!filterMaxAmount.HasValue || p.Amount <= filterMaxAmount.Value) &&
+                (string.IsNullOrWhiteSpace(filterStatus) ||
+                    (filterStatus == "Pago" && p.IsPaid) ||
+                    (filterStatus == "Pendente" && !p.IsPaid)) &&
+                (!filterDate.HasValue || p.CreatedAt.Date == filterDate.Value.Date)
+            )
+            .ToList();
+    }
+
+    private void ClearFilters()
+    {
+        filterId = null;
+        filterUserId = "";
+        filterProductId = "";
+        filterMinAmount = null;
+        filterMaxAmount = null;
+        filterStatus = "";
+        filterDate = null;
+        ApplyFilters();
+    }
 }

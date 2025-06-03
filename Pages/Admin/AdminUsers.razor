@@ -12,11 +12,24 @@
 
 <h2 class="page-title">Usuários do Sistema</h2>
 
+<div class="filter-bar">
+    <input type="text" placeholder="Usuário..." @bind="filterUserName" @bind:event="oninput" />
+    <input type="text" placeholder="Email..." @bind="filterEmail" @bind:event="oninput" />
+    <input type="text" placeholder="Role..." @bind="filterRole" @bind:event="oninput" />
+    <select @bind="filterStatus">
+        <option value="">Todos</option>
+        <option value="Ativo">Ativo</option>
+        <option value="Bloqueado">Bloqueado</option>
+    </select>
+    <button @onclick="ApplyFilters">Filtrar</button>
+    <button @onclick="ClearFilters">Limpar</button>
+</div>
+
 @if (isLoading)
 {
     <div class="loading-spinner">Carregando usuários...</div>
 }
-else if (users == null || !users.Any())
+else if (filteredUsers == null || !filteredUsers.Any())
 {
     <p>Nenhum usuário encontrado.</p>
 }
@@ -34,7 +47,7 @@ else
             </tr>
         </thead>
         <tbody>
-        @foreach (var u in users)
+        @foreach (var u in filteredUsers)
         {
             <tr>
                 <td data-label="ID">@u.Id</td>
@@ -73,7 +86,7 @@ else
     </table>
 }
 
-<button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
+<button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
 
 @code {
     [Inject] public UserManager<ApplicationUser> UserManager { get; set; } = default!;
@@ -83,6 +96,13 @@ else
     private List<ApplicationUser>? users;
     private bool isLoading = true;
     private Dictionary<string, string> userRoles = new();
+
+    private string filterUserName = "";
+    private string filterEmail = "";
+    private string filterRole = "";
+    private string filterStatus = "";
+
+    private List<ApplicationUser>? filteredUsers;
 
     protected override async Task OnInitializedAsync()
     {
@@ -97,7 +117,22 @@ else
                 userRoles[user.Id] = roles.Any() ? string.Join(", ", roles) : "-";
             }
         }
+        ApplyFilters();
         isLoading = false;
+    }
+
+    private void ApplyFilters()
+    {
+        filteredUsers = users?
+            .Where(u =>
+                (string.IsNullOrWhiteSpace(filterUserName) || (u.UserName?.Contains(filterUserName, StringComparison.OrdinalIgnoreCase) ?? false)) &&
+                (string.IsNullOrWhiteSpace(filterEmail) || (u.Email?.Contains(filterEmail, StringComparison.OrdinalIgnoreCase) ?? false)) &&
+                (string.IsNullOrWhiteSpace(filterRole) || (userRoles.GetValueOrDefault(u.Id, "-").Contains(filterRole, StringComparison.OrdinalIgnoreCase))) &&
+                (string.IsNullOrWhiteSpace(filterStatus) ||
+                    (filterStatus == "Ativo" && (u.LockoutEnd == null || u.LockoutEnd <= DateTimeOffset.Now)) ||
+                    (filterStatus == "Bloqueado" && (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)))
+            )
+            .ToList();
     }
 
     private async Task LockUser(string userId)
@@ -115,7 +150,7 @@ else
                                         level: "Warning", 
                                         userId: userId);
             ToastRef?.Show("Usuário bloqueado!", "warning");
-            await OnInitializedAsync();
+            await LoadUsers();
         }
         else
         {
@@ -134,7 +169,7 @@ else
                                         level: "Info", 
                                         userId: userId);
             ToastRef?.Show("Usuário desbloqueado!", "success");
-            await OnInitializedAsync();
+            await LoadUsers();
         }
         else
         {
@@ -174,11 +209,38 @@ else
             {
                 ToastRef?.Show("Erro ao deletar usuário.", "error");
             }
-            await OnInitializedAsync();
+            await LoadUsers();
         }
         else
         {
             ToastRef?.Show("Usuário não encontrado.", "error");
         }
+    }
+
+    private void ClearFilters()
+    {
+        filterUserName = "";
+        filterEmail = "";
+        filterRole = "";
+        filterStatus = "";
+        ApplyFilters();
+    }
+
+    private async Task LoadUsers()
+    {
+        isLoading = true;
+        users = await Task.Run(() => UserManager.Users.ToList());
+        userRoles.Clear();
+        if (users != null)
+        {
+            foreach (var user in users)
+            {
+                var roles = await UserManager.GetRolesAsync(user);
+                userRoles[user.Id] = roles.Any() ? string.Join(", ", roles) : "-";
+            }
+        }
+        ApplyFilters();
+        isLoading = false;
+        StateHasChanged();
     }
 }
