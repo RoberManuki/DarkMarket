@@ -4,11 +4,13 @@
 @using DarkMarket.Shared
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.JSInterop
 
 @inject AppDbContext Db
 @inject AuthenticationStateProvider AuthProvider
 @inject NavigationManager Navigation
 @inject LogService LogService
+@inject IJSRuntime JS
 
 <h2 class="page-title">Histórico de Pagamentos</h2>
 
@@ -73,7 +75,7 @@ else
                         <button class="edit-btn" @onclick='() => Navigation.NavigateTo($"/payments/view/{p.Id}")'>
                             Visualizar
                         </button>
-                        <button class="danger" @onclick='() => CancelPayment(p.Id)'>
+                        <button class="danger" @onclick='() => ConfirmCancelPayment(p.Id)'>
                             Cancelar
                         </button>
                     }
@@ -187,10 +189,16 @@ else
                 level: "Warning",
                 userId: payment.UserId
             );
-            
-            StateHasChanged();
+
+            ApplyFilters();
             ToastRef?.Show("Pedido cancelado.", "info");
         }
+    }
+
+    private async Task ConfirmCancelPayment(int paymentId)
+    {
+        if (!await JS.InvokeAsync<bool>("confirm", "Tem certeza que deseja cancelar este pagamento?")) return;
+        await CancelPayment(paymentId);
     }
 
     private void NextPage()

@@ -37,8 +37,8 @@ else
                 <span style="color:#4caf50;font-weight:bold;">Ativo</span>
             }
         </p>
-        <button class="edit-btn" @onclick='() => NavigationManager.NavigateTo($"/admin/users/edit/{user.Id}")'>Editar</button>
         <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin/users")'>Voltar</button>
+        <button class="edit-btn" @onclick='() => NavigationManager.NavigateTo($"/admin/users/edit/{user.Id}")'>Editar</button>
     </div>
 }
 

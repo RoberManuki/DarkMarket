@@ -34,8 +34,8 @@
                 <InputNumber class="input" @bind-Value="product.Price" />
             </div>
             <div class="form-actions">
+                <button class="cancel-btn" type="button" @onclick='() => NavigationManager.NavigateTo($"/admin/products")'>Cancelar</button>
                 <button class="save-btn" type="submit" disabled="@isSaving">Salvar</button>
-                <button class="cancel-btn" type="button" @onclick='() => NavigationManager.NavigateTo($"/admin/products/view/{product.Id}")'>Cancelar</button>
             </div>
         </EditForm>
     }

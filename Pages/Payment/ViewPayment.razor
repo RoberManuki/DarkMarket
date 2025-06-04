@@ -19,7 +19,7 @@
     else
     {
         <div class="payment-card">
-            @if (payment.PaymentMethod != null && payment.Address.StartsWith("http"))
+            @if (payment.PaymentMethod == "BTCPayServer" && payment.Address.StartsWith("http"))
             {
                 <div class="payment-address-block">
                     <span class="label">Checkout:</span>

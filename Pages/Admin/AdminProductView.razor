@@ -25,8 +25,8 @@ else
         <p><b>Usuário:</b> @product.UserId</p>
         <p><b>Preço:</b> @product.Price.ToString("C")</p>
         <p><b>Criado em:</b> @product.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</p>
-        <button class="edit-btn" @onclick='() => NavigationManager.NavigateTo($"/admin/products/edit/{product.Id}")'>Editar</button>
         <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin/products")'>Voltar</button>
+        <button class="edit-btn" @onclick='() => NavigationManager.NavigateTo($"/admin/products/edit/{product.Id}")'>Editar</button>
     </div>
 }
 

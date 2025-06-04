@@ -66,7 +66,7 @@ else
                         <Authorized>
                             @if (p.UserId != userId)
                             {
-                                <button class="buy-btn" @onclick='() => Navigation.NavigateTo($"/products/buy/{p.Id}")'>
+                                <button class="buy-btn" @onclick='() => Navigation.NavigateTo($"/marketplace/buy/{p.Id}")'>
                                     Comprar
                                 </button>
                             }

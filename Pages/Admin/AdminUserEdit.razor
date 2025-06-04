@@ -40,7 +40,7 @@
                 <InputDate class="input" @bind-Value="model.BirthDate" />
             </div>
             <div class="form-actions">
-                <button class="cancel-btn" type="button" @onclick='() => NavigationManager.NavigateTo($"/admin/users/view/{user.Id}")'>Cancelar</button>
+                <button class="cancel-btn" type="button" @onclick='() => NavigationManager.NavigateTo($"/admin/users")'>Cancelar</button>
                 <button class="save-btn" type="submit" disabled="@isSaving">Salvar</button>
             </div>
         </EditForm>
