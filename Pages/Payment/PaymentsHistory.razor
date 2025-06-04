@@ -49,7 +49,7 @@ else
             </tr>
         </thead>
         <tbody>
-        @foreach (var p in filteredPayments)
+        @foreach (var p in filteredPayments?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<PaymentRecord>())
         {
             <tr>
                 <td data-label="Produto">@p.ProductId</td>
@@ -82,6 +82,12 @@ else
         }
         </tbody>
     </table>
+
+    <div class="pagination">
+        <button @onclick="PrevPage" disabled="@(!CanGoToPreviousPage)">Anterior</button>
+        <span class="pagination-info">Página @currentPage de @totalPages</span>
+        <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Próxima</button>
+    </div>
 }
 
 @code {
@@ -94,6 +100,13 @@ else
     private DateTime? filterDate;
     [CascadingParameter] public Toast? ToastRef { get; set; }
     private HubConnection? hubConnection;
+
+    private int pageSize = 10;
+    private int currentPage = 1;
+    private int totalPages => filteredPayments == null ? 1 : (int)Math.Ceiling((double)filteredPayments.Count / pageSize);
+
+    private bool CanGoToNextPage => currentPage < totalPages;
+    private bool CanGoToPreviousPage => currentPage > 1;
 
     protected override async Task OnInitializedAsync()
     {
@@ -133,6 +146,7 @@ else
 
     private void ApplyFilters()
     {
+        currentPage = 1;
         filteredPayments = payments?
             .Where(p =>
                 (!filterMinAmount.HasValue || p.Amount >= filterMinAmount.Value) &&
@@ -143,6 +157,8 @@ else
                 (string.IsNullOrWhiteSpace(filterGateway) || (p.PaymentMethod?.Contains(filterGateway, StringComparison.OrdinalIgnoreCase) ?? false)) &&
                 (!filterDate.HasValue || p.CreatedAt.Date == filterDate.Value.Date)
             )
+            .Skip((currentPage - 1) * pageSize)
+            .Take(pageSize)
             .ToList();
     }
 
@@ -175,5 +191,17 @@ else
             StateHasChanged();
             ToastRef?.Show("Pedido cancelado.", "info");
         }
+    }
+
+    private void NextPage()
+    {
+        if (CanGoToNextPage)
+            currentPage++;
+    }
+
+    private void PrevPage()
+    {
+        if (CanGoToPreviousPage)
+            currentPage--;
     }
 }

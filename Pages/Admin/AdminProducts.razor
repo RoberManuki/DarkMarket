@@ -44,7 +44,7 @@ else
             </tr>
         </thead>
         <tbody>
-        @foreach (var p in filteredProducts)
+        @foreach (var p in filteredProducts?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<Product>())
         {
             <tr>
                 <td data-label="ID">@p.Id</td>
@@ -61,6 +61,12 @@ else
         }
         </tbody>
     </table>
+
+    <div class="pagination">
+        <button @onclick="PrevPage" disabled="@(!CanGoToPreviousPage)">Anterior</button>
+        <span class="pagination-info">Página @currentPage de @totalPages</span>
+        <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Próxima</button>
+    </div>
 }
 
 <button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
@@ -75,6 +81,13 @@ else
     private string filterUserId = "";
     private decimal? filterMinPrice;
     private decimal? filterMaxPrice;
+
+    private int pageSize = 10;
+    private int currentPage = 1;
+    private int totalPages => filteredProducts == null ? 1 : (int)Math.Ceiling((double)filteredProducts.Count / pageSize);
+
+    private bool CanGoToNextPage => currentPage < totalPages;
+    private bool CanGoToPreviousPage => currentPage > 1;
 
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
     [Inject] public IJSRuntime JS { get; set; } = default!;
@@ -106,6 +119,7 @@ else
 
     private void ApplyFilters()
     {
+        currentPage = 1; 
         filteredProducts = allProducts?
             .Where(p =>
                 (!filterId.HasValue || p.Id == filterId.Value) &&
@@ -114,6 +128,8 @@ else
                 (!filterMinPrice.HasValue || p.Price >= filterMinPrice.Value) &&
                 (!filterMaxPrice.HasValue || p.Price <= filterMaxPrice.Value)
             )
+            .Skip((currentPage - 1) * pageSize)
+            .Take(pageSize)
             .ToList();
     }
 
@@ -125,5 +141,35 @@ else
         filterMinPrice = null;
         filterMaxPrice = null;
         ApplyFilters();
+    }
+
+    private void GoToNextPage()
+    {
+        if (CanGoToNextPage)
+        {
+            currentPage++;
+            ApplyFilters();
+        }
+    }
+
+    private void GoToPreviousPage()
+    {
+        if (CanGoToPreviousPage)
+        {
+            currentPage--;
+            ApplyFilters();
+        }
+    }
+
+    private void NextPage()
+    {
+        if (CanGoToNextPage)
+            currentPage++;
+    }
+
+    private void PrevPage()
+    {
+        if (CanGoToPreviousPage)
+            currentPage--;
     }
 }

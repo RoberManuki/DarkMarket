@@ -234,6 +234,24 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\b2258412-0c94-4e33-a8e6-85dfafeee630.webp'))</OriginalItemSpec>
     </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\ba6337db-4ee7-4be9-93ce-0c6e7b315ef9.jpeg'))">
+      <SourceType>Package</SourceType>
+      <SourceId>DarkMarket</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/DarkMarket</BasePath>
+      <RelativePath>uploads/ba6337db-4ee7-4be9-93ce-0c6e7b315ef9.jpeg</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>kx4hf1l1kg</Fingerprint>
+      <Integrity>ONaFQHL3mhEyvBzkEYJojFKWkbZBjEUA9AVaV+o5l7Y=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\ba6337db-4ee7-4be9-93ce-0c6e7b315ef9.jpeg'))</OriginalItemSpec>
+    </StaticWebAsset>
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\uploads\bc193dbd-4369-4dbb-aa4b-3f4aa8aa5502.webp'))">
       <SourceType>Package</SourceType>
       <SourceId>DarkMarket</SourceId>

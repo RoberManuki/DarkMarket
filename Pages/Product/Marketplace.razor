@@ -30,7 +30,7 @@ else if (!filteredProducts.Any())
 else
 {
     <div class="product-list">
-        @foreach (var p in filteredProducts)
+        @foreach (var p in filteredProducts?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<Product>())
         {
             <div class="product-card">
                 <!-- 1. Imagem -->
@@ -83,6 +83,12 @@ else
             </div>
         }
     </div>
+
+    <div class="pagination" style="margin-top:2rem;">
+        <button @onclick="PrevPage" disabled="@(!CanGoToPreviousPage)">Anterior</button>
+        <span class="pagination-info">Página @currentPage de @totalPages</span>
+        <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Próxima</button>
+    </div>
 }
 
 @code {
@@ -95,6 +101,13 @@ else
     private decimal? filterMaxPrice;
     private string filterSeller = "";
 
+    private int pageSize = 5;
+    private int currentPage = 1;
+    private int totalPages => filteredProducts == null ? 1 : (int)Math.Ceiling((double)filteredProducts.Count / pageSize);
+
+    private bool CanGoToNextPage => currentPage < totalPages;
+    private bool CanGoToPreviousPage => currentPage > 1;
+
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthProvider.GetAuthenticationStateAsync();
@@ -106,6 +119,7 @@ else
 
     private void ApplyFilters()
     {
+        currentPage = 1;
         filteredProducts = products?
             .Where(p =>
                 (string.IsNullOrWhiteSpace(filterName) || p.Name.Contains(filterName, StringComparison.OrdinalIgnoreCase)) &&
@@ -123,6 +137,18 @@ else
         filterMaxPrice = null;
         filterSeller = "";
         ApplyFilters();
+    }
+
+    private void NextPage()
+    {
+        if (CanGoToNextPage)
+            currentPage++;
+    }
+
+    private void PrevPage()
+    {
+        if (CanGoToPreviousPage)
+            currentPage--;
     }
 }
 

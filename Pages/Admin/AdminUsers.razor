@@ -47,7 +47,7 @@ else
             </tr>
         </thead>
         <tbody>
-        @foreach (var u in filteredUsers)
+        @foreach (var u in filteredUsers?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<ApplicationUser>())
         {
             <tr>
                 <td data-label="ID">@u.Id</td>
@@ -84,6 +84,12 @@ else
         }
         </tbody>
     </table>
+
+    <div class="pagination">
+        <button @onclick="PrevPage" disabled="@(!CanGoToPreviousPage)">Anterior</button>
+        <span class="pagination-info">Página @currentPage de @totalPages</span>
+        <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Próxima</button>
+    </div>
 }
 
 <button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
@@ -104,6 +110,13 @@ else
 
     private List<ApplicationUser>? filteredUsers;
 
+    private int pageSize = 10;
+    private int currentPage = 1;
+    private int totalPages => filteredUsers == null ? 1 : (int)Math.Ceiling((double)filteredUsers.Count / pageSize);
+
+    private bool CanGoToNextPage => currentPage < totalPages;
+    private bool CanGoToPreviousPage => currentPage > 1;
+
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
@@ -123,6 +136,7 @@ else
 
     private void ApplyFilters()
     {
+        currentPage = 1;
         filteredUsers = users?
             .Where(u =>
                 (string.IsNullOrWhiteSpace(filterUserName) || (u.UserName?.Contains(filterUserName, StringComparison.OrdinalIgnoreCase) ?? false)) &&
@@ -242,5 +256,21 @@ else
         ApplyFilters();
         isLoading = false;
         StateHasChanged();
+    }
+
+    private void NextPage()
+    {
+        if (CanGoToNextPage)
+        {
+            currentPage++;
+        }
+    }
+
+    private void PrevPage()
+    {
+        if (CanGoToPreviousPage)
+        {
+            currentPage--;
+        }
     }
 }

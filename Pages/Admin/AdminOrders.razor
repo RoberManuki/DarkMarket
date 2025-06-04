@@ -52,7 +52,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var t in filteredOrders)
+            @foreach (var t in filteredOrders?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<OrderModel>())
             {
                 <tr>
                     <td>@t.Id</td>
@@ -73,7 +73,15 @@ else
             }
         </tbody>
     </table>
+
+    <div class="pagination">
+        <button @onclick="PrevPage" disabled="@(!CanGoToPreviousPage)">Anterior</button>
+        <span class="pagination-info">Página @currentPage de @totalPages</span>
+        <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Próxima</button>
+    </div>
 }
+
+<button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
 
 @code {
     private bool isLoading = true;
@@ -90,6 +98,13 @@ else
     private string filterStatus = "";
     private DateTime? filterDate;
 
+    private int pageSize = 10;
+    private int currentPage = 1;
+    private int totalPages => filteredOrders == null ? 1 : (int)Math.Ceiling((double)filteredOrders.Count / pageSize);
+
+    private bool CanGoToNextPage => currentPage < totalPages;
+    private bool CanGoToPreviousPage => currentPage > 1;
+
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
@@ -105,6 +120,7 @@ else
 
     private void ApplyFilters()
     {
+        currentPage = 1;
         filteredOrders = allOrders?
             .Where(t =>
                 (!filterId.HasValue || t.Id == filterId.Value) &&
@@ -137,5 +153,17 @@ else
         filterStatus = "";
         filterDate = null;
         ApplyFilters();
+    }
+
+    private void NextPage()
+    {
+        if (CanGoToNextPage)
+            currentPage++;
+    }
+
+    private void PrevPage()
+    {
+        if (CanGoToPreviousPage)
+            currentPage--;
     }
 }
