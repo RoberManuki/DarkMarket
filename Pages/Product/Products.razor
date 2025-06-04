@@ -1,11 +1,13 @@
 @page "/products"
 
 @using DarkMarket.Shared
+@using Microsoft.JSInterop
 
 @inject ProductService ProductService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Navigation
 @inject LogService LogService
+@inject IJSRuntime JS
 
 <h2 class="page-title">Meus Produtos</h2>
 
@@ -59,7 +61,7 @@ else
                     <td data-label="Criado em">@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
                     <td data-label="Ações">
                         <button class="edit-btn" @onclick='() => Navigation.NavigateTo($"/products/edit/{p.Id}")'>Editar</button>
-                        <button class="danger" @onclick='() => Delete(p.Id)'>Remover</button>
+                        <button class="danger" @onclick='() => ConfirmDelete(p.Id)'>Remover</button>
                     </td>
                 </tr>
             }
@@ -135,6 +137,12 @@ else
         ApplyFilters();
         ToastRef?.Show("Produto removido!", "info");
         StateHasChanged();
+    }
+
+    private async Task ConfirmDelete(int id)
+    {
+        if (!await JS.InvokeAsync<bool>("confirm", "Tem certeza que deseja remover este produto?")) return;
+        await Delete(id);
     }
 
     private void GoToNextPage()

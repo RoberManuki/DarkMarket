@@ -1,5 +1,6 @@
 @page "/products/create"
 @page "/products/edit/{Id:int}"
+
 @using DarkMarket.Shared
 
 @inject ProductService ProductService
@@ -26,14 +27,17 @@
             <div class="form-group">
                 <label>Nome</label>
                 <InputText @bind-Value="product.Name" class="input" />
+                <ValidationMessage For="@(() => product.Name)" class="validation-message" />
             </div>
             <div class="form-group">
                 <label>Descrição</label>
                 <InputTextArea @bind-Value="product.Description" class="input" />
+                <ValidationMessage For="@(() => product.Description)" />
             </div>
             <div class="form-group">
                 <label>Preço</label>
                 <InputNumber @bind-Value="product.Price" class="input" />
+                <ValidationMessage For="@(() => product.Price)" />
             </div>
             <div class="form-group">
                 <label>Imagem</label>
@@ -48,7 +52,7 @@
                     Cancelar
                 </button>
 
-                <button class="save-btn" type="submit">
+                <button class="save-btn" type="submit" disabled="@isLoading">
                     Salvar
                 </button>
             </div>
@@ -105,8 +109,8 @@
             ToastRef?.Show("Produto atualizado com sucesso!", "success");
         }
 
-        Navigation.NavigateTo("/products");
         isLoading = false;
+        Navigation.NavigateTo("/products");
     }
 
     private void OnInputFileChange(InputFileChangeEventArgs e)

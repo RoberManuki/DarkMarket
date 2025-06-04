@@ -6,13 +6,16 @@ namespace DarkMarket.Models
     {
         public int Id { get; set; }
 
-        [Required, StringLength(100)]
+        [Required(ErrorMessage = "O nome é obrigatório.")]
+        [StringLength(100, ErrorMessage = "O nome deve ter até 100 caracteres.")]
         public string Name { get; set; } = string.Empty;
 
-        [StringLength(500)]
+        [Required(ErrorMessage = "A descrição é obrigatória.")]
+        [StringLength(500, ErrorMessage = "A descrição deve ter até 500 caracteres.")]
         public string? Description { get; set; }
 
-        [Required, Range(0.00001, double.MaxValue, ErrorMessage = "O preço deve ser no mínimo 0.00001.")]
+        [Required(ErrorMessage = "O preço é obrigatório.")]
+        [Range(0.00001, double.MaxValue, ErrorMessage = "O preço deve ser no mínimo 0.00001.")]
         public decimal Price { get; set; }
 
         public string? ImagePath { get; set; }

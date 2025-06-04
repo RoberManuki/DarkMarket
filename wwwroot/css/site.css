@@ -553,6 +553,16 @@ footer {
     font-size: 1rem;
 }
 
+.input:invalid, .input.input-validation-error {
+    border-color: #e53935;
+    background: #2a1818;
+}
+.validation-message {
+    color: #e53935;
+    font-size: 0.95em;
+    margin-top: 0.2em;
+}
+
 .form-actions {
     display: flex;
     justify-content: space-between;
