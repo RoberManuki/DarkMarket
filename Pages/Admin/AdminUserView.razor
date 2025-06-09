@@ -1,10 +1,10 @@
 @page "/admin/users/view/{UserId}"
 
+@attribute [Authorize(Roles = "admin")]
+
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using DarkMarket.Models
-
-@attribute [Authorize(Roles = "admin")]
 
 @inject UserManager<ApplicationUser> UserManager
 @inject NavigationManager NavigationManager

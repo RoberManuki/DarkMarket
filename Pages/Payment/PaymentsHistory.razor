@@ -1,7 +1,10 @@
 @page "/payments"
 
+@attribute [Authorize]
+
 @using DarkMarket.Models
 @using DarkMarket.Shared
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.SignalR.Client
 @using Microsoft.JSInterop
@@ -77,6 +80,12 @@ else
                         </button>
                         <button class="danger" @onclick='() => ConfirmCancelPayment(p.Id)'>
                             Cancelar
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="edit-btn" @onclick='() => Navigation.NavigateTo($"/payments/details/{p.Id}")'>
+                            Detalhes
                         </button>
                     }
                 </td>

@@ -9,13 +9,16 @@ namespace DarkMarket.Services
         public string Name => "BTCPayServer";
 
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly string _apiKey = "4ec8f17898b161f4f31e951a423c5e980999e871";
-        private readonly string _storeId = "93VJRUdSP8XfYu3cfvFMqsW7krnuYiyjr5FVSfBosZ7y";
-        private readonly string _btcpayUrl = "https://mainnet.demo.btcpayserver.org/";
+        private readonly string _apiKey;
+        private readonly string _storeId;
+        private readonly string _btcpayUrl;
 
-        public BtcPayServerPaymentService(IHttpClientFactory httpClientFactory)
+        public BtcPayServerPaymentService(IHttpClientFactory httpClientFactory, IConfiguration config)
         {
             _httpClientFactory = httpClientFactory;
+            _apiKey = config["BtcPay:ApiKey"] ?? "";
+            _storeId = config["BtcPay:StoreId"] ?? "";
+            _btcpayUrl = config["BtcPay:Url"] ?? "";
         }
 
         public async Task<(string Address, string? PaymentId)> GenerateAddressAsync(decimal amount, string? orderId = null)

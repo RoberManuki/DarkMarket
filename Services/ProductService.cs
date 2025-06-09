@@ -2,10 +2,12 @@ using DarkMarket.Models;
 using DarkMarket.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace DarkMarket.Services
 {
+    [Authorize]
     public class ProductService
     {
         private readonly AppDbContext _context;

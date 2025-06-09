@@ -1,7 +1,10 @@
 @page "/payments/view/{PaymentId:int}"
 
+@attribute [Authorize]
+
 @using DarkMarket.Shared
 @using DarkMarket.Models
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.SignalR.Client
 
@@ -121,6 +124,7 @@
         try
         {
             var service = PaymentFactory.GetService(payment.PaymentMethod ?? "Testnet");
+            Console.WriteLine("service: " + service.GetType().Name);
             var received = await service.GetReceivedAmountAsync(payment.PaymentId ?? payment.Address);
 
             if (received >= payment.Amount)

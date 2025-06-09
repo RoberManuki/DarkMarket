@@ -1,7 +1,10 @@
 @page "/products/create"
 @page "/products/edit/{Id:int}"
 
+@attribute [Authorize]
+
 @using DarkMarket.Shared
+@using Microsoft.AspNetCore.Authorization
 
 @inject ProductService ProductService
 @inject NavigationManager Navigation

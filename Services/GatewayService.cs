@@ -3,10 +3,12 @@ using System.Threading.Tasks;
 using DarkMarket.Data;
 using DarkMarket.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DarkMarket.Services
 {
-    public class GatewayService
+    public class GatewayService : ControllerBase
     {
         private readonly AppDbContext _db;
 

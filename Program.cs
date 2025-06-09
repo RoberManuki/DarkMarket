@@ -18,13 +18,14 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 builder.Services.AddHttpClient();
+
 builder.Services.AddSingleton<BitcoinQuoteService>();
 
-builder.Services.AddScoped<ProductService>();
-builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IBitcoinPaymentService, BtcPayServerPaymentService>();
 builder.Services.AddScoped<IBitcoinPaymentService, TestnetBitcoinPaymentService>();
 builder.Services.AddScoped<BitcoinPaymentFactory>();
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<LogService>();
 builder.Services.AddScoped<GatewayService>();
 
@@ -49,6 +50,20 @@ app.MapFallbackToPage("/_Host");
 
 app.MapPost("/api/btcpay/webhook", async (HttpContext context, AppDbContext db, LogService log) =>
 {
+    var config = context.RequestServices.GetRequiredService<IConfiguration>();
+    var expectedSecret = config["BtcPay:WebhookSecret"];
+    var receivedSecret = context.Request.Headers["X-BTCPay-Secret"].FirstOrDefault();
+
+    if (string.IsNullOrEmpty(expectedSecret) || receivedSecret != expectedSecret)
+    {
+        await log.LogAsync(
+            $"Tentativa de acesso negada ao webhook. Header recebido: '{receivedSecret ?? "null"}'. IP: {context.Connection.RemoteIpAddress}",
+            source: "Webhook",
+            level: "Warning"
+        );
+        return Results.Unauthorized();
+    }
+
     using var reader = new StreamReader(context.Request.Body);
     var body = await reader.ReadToEndAsync();
 
@@ -110,14 +125,16 @@ using (var scope = app.Services.CreateScope())
 // using (var scope = app.Services.CreateScope())
 // {
 //     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-//     if (!db.Gateways.Any())
-//     {
-//         db.Gateways.AddRange(
-//             new GatewayInfo { Name = "BTCPayServer", Enabled = true },
-//             new GatewayInfo { Name = "TestNet", Enabled = false }
-//         );
-//         db.SaveChanges();
-//     }
+//     // Limpa todos os gateways antigos
+//     db.Gateways.RemoveRange(db.Gateways);
+//     db.SaveChanges();
+
+//     // Adiciona os gateways padronizados
+//     db.Gateways.AddRange(
+//         new GatewayInfo { Name = "BTCPayServer", Enabled = true },
+//         new GatewayInfo { Name = "Testnet", Enabled = false }
+//     );
+//     db.SaveChanges();
 // }
 
 app.MapHub<PaymentHub>("/paymentHub");

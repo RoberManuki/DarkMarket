@@ -36,17 +36,17 @@
 ---
 
 ## Fase 5: Transações e Histórico
-- [ ] Registro de transações (compra/venda)
-- [ ] Página de histórico de transações do usuário
-- [ ] Detalhamento de cada transação
+- [x] Registro de transações (compra/venda)
+- [x] Página de histórico de transações do usuário
+- [x] Detalhamento de cada transação
 
 ---
 
 ## Fase 6: Experiência do Usuário
-- [ ] Sistema de notificações (toast/alertas)
-- [ ] Validação de formulários aprimorada
-- [ ] Feedback visual de carregamento
-- [ ] Responsividade mobile
+- [x] Sistema de notificações (toast/alertas)
+- [x] Validação de formulários aprimorada
+- [x] Feedback visual de carregamento
+- [x] Responsividade mobile
 
 ---
 

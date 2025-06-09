@@ -1,0 +1,155 @@
+@page "/payments/details/{PaymentId:int}"
+
+@attribute [Authorize]
+
+@using DarkMarket.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+
+@inject AppDbContext Db
+@inject NavigationManager Navigation
+
+<h2 class="page-title">Detalhes do Pagamento</h2>
+
+@if (payment == null)
+{
+    <p>Carregando...</p>
+}
+else
+{
+    <div class="payment-details-card">
+        <div class="details-row">
+            <span class="label">Produto:</span>
+            <span class="value">@payment.Product?.Name (@payment.ProductId)</span>
+        </div>
+        <div class="details-row">
+            <span class="label">Valor:</span>
+            <span class="value">@payment.Amount BTC</span>
+        </div>
+        <div class="details-row">
+            <span class="label">Status:</span>
+            <span class="value">
+                <span class="badge @(payment.IsPaid ? "paid" : "pending")">
+                    @(payment.IsPaid ? "Pago" : "Pendente")
+                </span>
+            </span>
+        </div>
+        <div class="details-row">
+            <span class="label">Gateway:</span>
+            <span class="value">@payment.PaymentMethod</span>
+        </div>
+        <div class="details-row">
+            <span class="label">Endereço:</span>
+            <span class="value address">@payment.Address</span>
+        </div>
+        <div class="details-row">
+            <span class="label">Data:</span>
+            <span class="value">@payment.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+        </div>
+        @if (payment.PaidAt != null)
+        {
+            <div class="details-row">
+                <span class="label">Pago em:</span>
+                <span class="value">@payment.PaidAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+            </div>
+        }
+        <div class="details-actions">
+            <button class="back-btn" @onclick="GoBack">Voltar</button>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public int PaymentId { get; set; }
+    public PaymentRecord? payment;
+
+    protected override async Task OnInitializedAsync()
+    {
+        payment = await Db.Payments
+            .Include(p => p.Product)
+            .FirstOrDefaultAsync(p => p.Id == PaymentId);
+    }
+
+    void GoBack() => Navigation.NavigateTo("/payments");
+}
+
+<style>
+    .payment-details-card {
+        background: #23272f;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px #0004;
+        padding: 2rem 2.5rem;
+        max-width: 480px;
+        margin: 2rem auto;
+        color: #f1f1f1;
+        font-size: 1.08rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1.1rem;
+        border: 1px solid #333a;
+    }
+
+    .details-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1.2rem;
+    }
+
+    .label {
+        font-weight: 600;
+        color: #b3b3b3;
+        min-width: 110px;
+    }
+
+    .value {
+        word-break: break-all;
+        font-family: inherit;
+    }
+
+    .address {
+        font-family: "Fira Mono", "Consolas", monospace;
+        background: #181c22;
+        padding: 0.2em 0.5em;
+        border-radius: 5px;
+        font-size: 0.98em;
+    }
+
+    .badge {
+        padding: 0.18em 0.9em;
+        border-radius: 1em;
+        font-size: 0.98em;
+        font-weight: 600;
+        letter-spacing: 0.03em;
+        display: inline-block;
+    }
+    .badge.paid {
+        background: #1eaa6f;
+        color: #fff;
+    }
+    .badge.pending {
+        background: #f1c40f;
+        color: #222;
+    }
+
+    .details-actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 1.5rem;
+    }
+
+    @@media (max-width: 600px) {
+        .payment-details-card {
+            padding: 1.2rem 0.7rem;
+            max-width: 98vw;
+        }
+        .details-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.2rem;
+        }
+        .details-actions {
+            justify-content: center;
+        }
+    }
+</style>

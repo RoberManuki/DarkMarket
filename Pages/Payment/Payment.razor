@@ -23,7 +23,7 @@
             <div class="product-img-block">
                 @if (!string.IsNullOrEmpty(product.ImagePath))
                 {
-                    <img src="@product.ImagePath" alt="Imagem" />
+                    <img src="@product.ImagePath" alt="Imagem do produto" />
                 }
             </div>
             <div class="product-main">
@@ -67,14 +67,14 @@
             {
                 <div>
                     <label for="payment-method">Método de pagamento:</label>
-                    <select id="payment-method" class="gateway-select" @bind="SelectedMethod">
+                    <select id="payment-method" class="gateway-select" @bind="SelectedMethod" aria-label="Selecionar método de pagamento">
                         @foreach (var gateway in ActiveGateways)
                         {
                             <option value="@gateway.Name">@gateway.Name</option>
                         }
                     </select>
                 </div>
-                <button class="payment-btn payment-btn-generate" @onclick="GenerateAddress">
+                <button class="payment-btn payment-btn-generate" @onclick="GenerateAddress" aria-label="Gerar endereço de pagamento">
                     Gerar endereço de pagamento
                 </button>
             }
@@ -87,7 +87,7 @@
                     <div class="payment-address-block">
                         <span class="label">Checkout:</span>
                         <div class="payment-address">
-                            <a href="@Address" target="_blank" class="payment-btn">
+                            <a href="@Address" target="_blank" class="payment-btn" aria-label="Abrir checkout do @SelectedMethod">
                                 Abrir checkout do @SelectedMethod
                             </a>
                         </div>
@@ -120,7 +120,9 @@
                     else
                     {
                         <span class="payment-status-wait">Aguardando pagamento...</span>
-                        <button class="payment-btn" @onclick="CheckPayment">Verificar pagamento</button>
+                        <button class="payment-btn" @onclick="CheckPayment" aria-label="Verificar pagamento">
+                            Verificar pagamento
+                        </button>
                     }
                 </div>
             </div>
@@ -146,7 +148,6 @@
     [CascadingParameter] public Toast? ToastRef { get; set; }
     private const decimal MinBtcAmount = 0.000003m;
     private bool isLoading = false;
-
 
     public string QRCodeValue =>
         Address.StartsWith("lnbc")
@@ -213,6 +214,7 @@
         {
             isLoading = true;
             var service = PaymentFactory.GetService(SelectedMethod);
+            Console.WriteLine("service: " + service.GetType().Name);
             var (address, paymentId) = await service.GenerateAddressAsync(Amount, $"order-{ProductId}-{Guid.NewGuid()}");
             Address = address;
             PaymentId = paymentId;

@@ -16,19 +16,97 @@ O projeto está sendo desenvolvido em etapas, com foco em boas práticas, extens
 - **.NET 8+**
 - **Blazor Server** (SPA com C#)
 - **ASP.NET Core Identity** (autenticação, registro, logout, roles)
-- **Entity Framework Core** (PostgreSQL, com navegação entre entidades e relacionamentos)
+- **Entity Framework Core** (PostgreSQL)
 - **Razor Pages** (para telas do Identity)
 - **CSS customizado** (tema escuro centralizado)
 - **Estrutura modular**: Pages, Shared, Services, Models, Data
 
 ---
 
-## 🗄️ Modelagem de Dados
+## ⚙️ Configuração e Publicação
 
-- O projeto utiliza **Entity Framework Core** para mapear e gerenciar o banco de dados relacional.
-- As entidades possuem **propriedades de navegação** (ex: `PaymentRecord.Product`) para facilitar consultas e exibição de dados relacionados, evitando redundância e mantendo o banco normalizado.
-- As queries utilizam `.Include()` para popular dados relacionados quando necessário.
-- Não há duplicação de informações como nome do produto em tabelas de pagamentos; tudo é resolvido via relacionamento.
+### 1. Pré-requisitos
+
+- [.NET 8 SDK](https://dotnet.microsoft.com/download)
+- [PostgreSQL](https://www.postgresql.org/download/)
+- (Opcional) [Docker](https://www.docker.com/) para publicação
+
+### 2. Configuração do Banco de Dados
+
+1. Crie um banco PostgreSQL e configure o usuário/senha.
+2. No arquivo `appsettings.json` ou `appsettings.Production.json`, configure a connection string:
+
+    ```json
+    "ConnectionStrings": {
+      "DefaultConnection": "Host=localhost;Port=5432;Database=darkmarket;Username=usuario;Password=senha"
+    }
+    ```
+
+3. Rode as migrations para criar as tabelas:
+
+    ```bash
+    dotnet ef database update
+    ```
+
+### 3. Configuração de Gateways e Secrets
+
+No `appsettings.json` ou via variáveis de ambiente, configure:
+
+```json
+"BtcPay": {
+  "ApiKey": "SUA_API_KEY",
+  "StoreId": "SEU_STORE_ID",
+  "Url": "https://mainnet.demo.btcpayserver.org"
+}
+```
+
+- Para Testnet, crie um gateway com o nome **Testnet** no admin.
+
+### 4. Rodando Localmente
+
+```bash
+dotnet restore
+dotnet build
+dotnet run
+```
+Acesse em [http://localhost:5000](http://localhost:5000)
+
+### 5. Publicação (Deploy)
+
+#### Docker (exemplo básico)
+
+Crie um arquivo `Dockerfile`:
+
+```dockerfile
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+WORKDIR /app
+COPY . .
+RUN dotnet publish -c Release -o out
+WORKDIR /app/out
+ENTRYPOINT ["dotnet", "DarkMarket.dll"]
+```
+
+Build e execute:
+
+```bash
+docker build -t darkmarket .
+docker run -e ASPNETCORE_ENVIRONMENT=Production -p 5000:80 darkmarket
+```
+
+#### Publicação manual
+
+```bash
+dotnet publish -c Release -o ./publish
+# Copie o conteúdo da pasta ./publish para seu servidor
+```
+
+### 6. Variáveis de Ambiente
+
+- `ASPNETCORE_ENVIRONMENT=Production`
+- `ConnectionStrings__DefaultConnection=...`
+- `BtcPay__ApiKey=...`
+- `BtcPay__StoreId=...`
+- `BtcPay__Url=...`
 
 ---
 
@@ -117,5 +195,3 @@ Devido às limitações acima, **as próximas features planejadas para serem com
 ## 👤 Autoria
 
 Desenvolvido por Freeza e colaboradores.
-
----

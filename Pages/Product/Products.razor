@@ -1,6 +1,9 @@
 @page "/products"
 
+@attribute [Authorize]
+
 @using DarkMarket.Shared
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.JSInterop
 
 @inject ProductService ProductService
