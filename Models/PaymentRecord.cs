@@ -15,6 +15,8 @@ namespace DarkMarket.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? PaidAt { get; set; }
 
+        public string? PrivateKey { get; set; }
+
         public Product? Product { get; set; }
     }
 }

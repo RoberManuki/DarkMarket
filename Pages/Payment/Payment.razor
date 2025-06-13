@@ -125,6 +125,16 @@
                         </button>
                     }
                 </div>
+
+                @if (SelectedMethod == "Testnet" && !string.IsNullOrEmpty(paymentRecord?.PrivateKey))
+                {
+                    <div class="alert alert-warning" style="margin-top:1rem;">
+                        <b>Chave privada do endereço:</b> <br />
+                        <code>@paymentRecord.PrivateKey</code>
+                        <br />
+                        <span style="color:red">Guarde esta chave! Sem ela, não será possível movimentar os testcoins deste endereço.</span>
+                    </div>
+                }
             </div>
         }
     }
@@ -148,6 +158,8 @@
     [CascadingParameter] public Toast? ToastRef { get; set; }
     private const decimal MinBtcAmount = 0.000003m;
     private bool isLoading = false;
+
+    private PaymentRecord? paymentRecord; // <-- Adicione este campo
 
     public string QRCodeValue =>
         Address.StartsWith("lnbc")
@@ -214,16 +226,28 @@
         {
             isLoading = true;
             var service = PaymentFactory.GetService(SelectedMethod);
-            Console.WriteLine("service: " + service.GetType().Name);
-            var (address, paymentId) = await service.GenerateAddressAsync(Amount, $"order-{ProductId}-{Guid.NewGuid()}");
-            Address = address;
-            PaymentId = paymentId;
+            string? privateKey = null;
+
+            if (SelectedMethod == "Testnet")
+            {
+                var (address, paymentId, privKey) = await ((TestnetBitcoinPaymentService)service)
+                    .GenerateAddressWithKeyAsync(Amount, $"order-{ProductId}-{Guid.NewGuid()}");
+                Address = address;
+                PaymentId = paymentId;
+                privateKey = privKey;
+            }
+            else
+            {
+                var (address, paymentId) = await service.GenerateAddressAsync(Amount, $"order-{ProductId}-{Guid.NewGuid()}");
+                Address = address;
+                PaymentId = paymentId;
+            }
             IsPaid = false;
 
             var authState = await AuthProvider.GetAuthenticationStateAsync();
-            var userId = authState.User.Identity?.Name;
+            var userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-            var payment = new PaymentRecord
+            paymentRecord = new PaymentRecord
             {
                 ProductId = ProductId,
                 UserId = userId,
@@ -232,10 +256,11 @@
                 Amount = Amount,
                 IsPaid = false,
                 CreatedAt = DateTime.UtcNow,
-                PaymentMethod = SelectedMethod
+                PaymentMethod = SelectedMethod,
+                PrivateKey = privateKey 
             };
 
-            Db.Payments.Add(payment);
+            Db.Payments.Add(paymentRecord);
             await Db.SaveChangesAsync();
 
             await LogService.LogAsync(
@@ -272,25 +297,34 @@
         try
         {
             var service = PaymentFactory.GetService(SelectedMethod);
-            var received = await service.GetReceivedAmountAsync(PaymentId ?? Address);
+            var param = SelectedMethod == "Testnet"
+                ? Address
+                : PaymentId ?? Address;
 
-            await LogService.LogAsync(
-                $"Verificação de pagamento para produto {ProductId} via {SelectedMethod}. Recebido: {received} BTC.",
-                source: "Payment",
-                level: "Info"
-            );
+            var received = await service.GetReceivedAmountAsync(param);
 
-            ToastRef?.Show($"Recebido: {received} BTC", "info");
+            var payment = Db.Payments.FirstOrDefault(p => p.Address == Address);
+
+            if (payment != null && payment.IsPaid)
+            {
+                IsPaid = true;
+                ToastRef?.Show("Pagamento já confirmado anteriormente!", "success");
+                return;
+            }
 
             if (received >= Amount)
             {
                 IsPaid = true;
-                var payment = Db.Payments.FirstOrDefault(p => p.Address == Address);
                 if (payment != null)
                 {
                     payment.IsPaid = true;
                     payment.PaidAt = DateTime.UtcNow;
                     await Db.SaveChangesAsync();
+
+                    if (service is TestnetBitcoinPaymentService testnetService && !string.IsNullOrEmpty(payment.PaymentId))
+                    {
+                        await testnetService.CheckAndMarkPaymentAsync(Db, LogService, payment.PaymentId);
+                    }
                 }
                 await LogService.LogAsync(
                     $"Pagamento confirmado para produto {ProductId} via {SelectedMethod}.",
@@ -301,7 +335,7 @@
             }
             else
             {
-                ToastRef?.Show("Pagamento ainda não recebido.", "warning");
+                ToastRef?.Show($"Pagamento ainda não recebido. Recebido: {received:0.########} BTC de {Amount:0.########} BTC.", "warning");
             }
         }
         catch (Exception ex)

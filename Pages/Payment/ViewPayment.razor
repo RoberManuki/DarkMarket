@@ -124,8 +124,19 @@
         try
         {
             var service = PaymentFactory.GetService(payment.PaymentMethod ?? "Testnet");
-            Console.WriteLine("service: " + service.GetType().Name);
-            var received = await service.GetReceivedAmountAsync(payment.PaymentId ?? payment.Address);
+            var param = payment.PaymentMethod == "Testnet"
+                ? payment.Address
+                : payment.PaymentId ?? payment.Address;
+
+            var dbPayment = await Db.Payments.FindAsync(payment.Id);
+            if (dbPayment != null && dbPayment.IsPaid)
+            {
+                payment.IsPaid = true;
+                ToastRef?.Show("Pagamento já confirmado anteriormente!", "success");
+                return;
+            }
+
+            var received = await service.GetReceivedAmountAsync(param);
 
             if (received >= payment.Amount)
             {
@@ -136,7 +147,7 @@
             }
             else
             {
-                ToastRef?.Show("Pagamento ainda não recebido.", "warning");
+                ToastRef?.Show($"Pagamento ainda não recebido. Recebido: {received:0.########} BTC de {payment.Amount:0.########} BTC.", "warning");
             }
         }
         catch

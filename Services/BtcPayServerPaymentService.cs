@@ -21,7 +21,7 @@ namespace DarkMarket.Services
             _btcpayUrl = config["BtcPay:Url"] ?? "";
         }
 
-        public async Task<(string Address, string? PaymentId)> GenerateAddressAsync(decimal amount, string? orderId = null)
+        public async Task<(string Address, string PaymentId)> GenerateAddressAsync(decimal amount, string? orderId = null)
         {
             var client = _httpClientFactory.CreateClient();
             client.BaseAddress = new Uri(_btcpayUrl);
@@ -40,10 +40,10 @@ namespace DarkMarket.Services
 
             var json = await response.Content.ReadAsStringAsync();
             using var doc = JsonDocument.Parse(json);
-            var invoiceId = doc.RootElement.GetProperty("id").GetString();
-            var paymentAddress = doc.RootElement.GetProperty("checkoutLink").GetString();
+            var invoiceId = doc.RootElement.GetProperty("id").GetString() ?? "";
+            var paymentAddress = doc.RootElement.GetProperty("checkoutLink").GetString() ?? "";
 
-            return (paymentAddress ?? "", invoiceId);
+            return (paymentAddress, invoiceId);
         }
 
         public async Task<decimal> GetReceivedAmountAsync(string invoiceId)
@@ -56,10 +56,27 @@ namespace DarkMarket.Services
             response.EnsureSuccessStatusCode();
 
             var json = await response.Content.ReadAsStringAsync();
-            using var doc = JsonDocument.Parse(json);
-            var amountPaid = doc.RootElement.GetProperty("amountPaid").GetDecimal();
 
-            return amountPaid;
+            using var doc = JsonDocument.Parse(json);
+            if (doc.RootElement.TryGetProperty("amountPaid", out var amountPaidProp))
+            {
+                // Pode ser decimal, int, ou string
+                decimal amountPaid = 0;
+                if (amountPaidProp.ValueKind == JsonValueKind.Number)
+                    amountPaid = amountPaidProp.GetDecimal();
+                else if (amountPaidProp.ValueKind == JsonValueKind.String && decimal.TryParse(amountPaidProp.GetString(), out var parsed))
+                    amountPaid = parsed;
+
+                return amountPaid;
+            }
+
+            return 0m;
+        }
+
+        public Task<(string Address, string PaymentId, string PrivateKey)> GenerateAddressWithKeyAsync(decimal amount, string? orderId = null)
+        {
+            // Não suportado para BTCPayServer, lance exceção ou implemente se necessário
+            throw new NotImplementedException("GenerateAddressWithKeyAsync não implementado para BtcPayServerPaymentService.");
         }
     }
 }

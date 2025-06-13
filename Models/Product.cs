@@ -25,5 +25,6 @@ namespace DarkMarket.Models
         // Relacionamento com usuário
         public string UserId { get; set; } = string.Empty;
         public ApplicationUser? User { get; set; }
+        
     }
 }

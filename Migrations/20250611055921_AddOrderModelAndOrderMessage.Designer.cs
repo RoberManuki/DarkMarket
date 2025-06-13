@@ -3,6 +3,7 @@ using System;
 using DarkMarket.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DarkMarket.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250611055921_AddOrderModelAndOrderMessage")]
+    partial class AddOrderModelAndOrderMessage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -167,9 +170,6 @@ namespace DarkMarket.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("PaymentMethod")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PrivateKey")
                         .HasColumnType("text");
 
                     b.Property<int>("ProductId")
@@ -364,6 +364,7 @@ namespace DarkMarket.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Content")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<int?>("OrderModelId")
@@ -376,6 +377,7 @@ namespace DarkMarket.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("SenderUserId")
+                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateTime>("SentAt")
