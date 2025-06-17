@@ -24,17 +24,48 @@ else if (order == null)
 }
 else
 {
-    <div class="order-details-card">
-        <div><b>ID:</b> @order.Id</div>
-        <div><b>Produto:</b> @order.Product?.Name ?? order.ProductId.ToString()</div>
-        <div><b>Comprador:</b> @order.Buyer?.UserName ?? order.BuyerId</div>
-        <div><b>Vendedor:</b> @order.Seller?.UserName ?? order.SellerId</div>
-        <div><b>Valor:</b> @order.Amount BTC</div>
-        <div><b>Status:</b> @(order.IsPaid ? "Pago" : "Pendente")</div>
-        <div><b>Data:</b> @order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</div>
-        <div><b>PaymentId:</b> @order.PaymentId</div>
+    <div class="details-container">
+        <div class="product-card">
+            <img class="product-img" src="@order.Product?.ImagePath" alt="@order.Product?.Name" />
+            <div class="product-info">
+                <div class="product-name">@order.Product?.Name</div>
+                <div class="product-price">@order.Amount BTC</div>
+            </div>
+        </div>
+        <div class="dashboard-card payment-details-card">
+            <div class="details-row">
+                <span class="label">ID:</span>
+                <span>@order.Id</span>
+            </div>
+            <div class="details-row">
+                <span class="label">Comprador:</span>
+                <span>@(order.Buyer?.UserName ?? order.BuyerId)</span>
+            </div>
+            <div class="details-row">
+                <span class="label">Vendedor:</span>
+                <span>@(order.Seller?.UserName ?? order.SellerId)</span>
+            </div>
+            <div class="details-row">
+                <span class="label">Status:</span>
+                <span>
+                    <span class="badge @(order.IsPaid ? "payment-status-ok" : "payment-status-wait")">
+                        @(order.IsPaid ? "Pago" : "Pendente")
+                    </span>
+                </span>
+            </div>
+            <div class="details-row">
+                <span class="label">Data:</span>
+                <span>@order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+            </div>
+            <div class="details-row">
+                <span class="label">PaymentId:</span>
+                <span class="payment-address">@order.PaymentId</span>
+            </div>
+            <div class="details-actions">
+                <button class="back-btn" @onclick='GoBack'>Voltar</button>
+            </div>
+        </div>
     </div>
-    <button class="back-btn mt-2" @onclick='GoBack'>Voltar</button>
 }
 
 @code {
@@ -66,6 +97,6 @@ else
 
     private void GoBack()
     {
-        NavigationManager.NavigateTo("/my-orders");
+        NavigationManager.NavigateTo("/orders");
     }
 }

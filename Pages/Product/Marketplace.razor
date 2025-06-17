@@ -32,7 +32,7 @@ else
     <div class="product-list">
         @foreach (var p in filteredProducts?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<Product>())
         {
-            <div class="product-card">
+            <div class="marketplace-product-card">
                 <!-- 1. Imagem -->
                 <div class="product-img-block">
                     @if (!string.IsNullOrEmpty(p.ImagePath))
@@ -161,7 +161,7 @@ else
         padding-left: 2rem;   /* Espaço à esquerda */
         padding-right: 2rem;  /* Espaço à direita */
     }
-    .product-card {
+    .marketplace-product-card {
         display: grid;
         grid-template-columns: 100px 1.2fr 1.5fr 1.2fr 140px;
         align-items: center;

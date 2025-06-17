@@ -84,7 +84,7 @@ else
                     }
                     else
                     {
-                        <button class="edit-btn" @onclick='() => Navigation.NavigateTo($"/payments/details/{p.Id}")'>
+                        <button class="details-btn action-btn" @onclick='() => Navigation.NavigateTo($"/payments/details/{p.Id}")'>
                             Detalhes
                         </button>
                     }
@@ -122,7 +122,8 @@ else
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthProvider.GetAuthenticationStateAsync();
-        var userId = authState.User.Identity?.Name;
+        var userId = authState.User.FindFirst("sub")?.Value
+          ?? authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
         payments = await Db.Payments
             .Where(p => p.UserId == userId)
             .OrderByDescending(p => p.CreatedAt)

@@ -21,6 +21,10 @@
       "PackagePath": "staticwebassets/uploads/19152efd-4440-44bd-848e-993c640bd6ff.webp"
     },
     {
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/1b2a9867-e587-44dc-a279-1bca4a8e43fa.webp",
+      "PackagePath": "staticwebassets/uploads/1b2a9867-e587-44dc-a279-1bca4a8e43fa.webp"
+    },
+    {
       "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/217e1593-57f1-46e6-9ad9-f01bd3403973.webp",
       "PackagePath": "staticwebassets/uploads/217e1593-57f1-46e6-9ad9-f01bd3403973.webp"
     },
@@ -39,6 +43,10 @@
     {
       "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/45b15cf5-651c-4d01-95d0-4a39a0d5d184.webp",
       "PackagePath": "staticwebassets/uploads/45b15cf5-651c-4d01-95d0-4a39a0d5d184.webp"
+    },
+    {
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/600946c0-8b09-4f6f-98db-80407ee24021.webp",
+      "PackagePath": "staticwebassets/uploads/600946c0-8b09-4f6f-98db-80407ee24021.webp"
     },
     {
       "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/653093a7-ff72-4cc6-9872-042f309f32b7.webp",
@@ -75,6 +83,10 @@
     {
       "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/e023cd88-65bd-4fd4-8f4b-64327c86a264.jpg",
       "PackagePath": "staticwebassets/uploads/e023cd88-65bd-4fd4-8f4b-64327c86a264.jpg"
+    },
+    {
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/uploads/f3dd792c-fab8-4752-9bd9-e48289c6d49e.jpeg",
+      "PackagePath": "staticwebassets/uploads/f3dd792c-fab8-4752-9bd9-e48289c6d49e.jpeg"
     },
     {
       "Id": "obj/Debug/net9.0/staticwebassets/msbuild.DarkMarket.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",

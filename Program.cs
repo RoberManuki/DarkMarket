@@ -142,6 +142,7 @@ app.MapPost("/api/btcpay/webhook", async (HttpContext context, AppDbContext db, 
     return Results.Ok();
 });
 
+// qual a melhor maneira de fazermos isso?
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
@@ -153,33 +154,34 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-// using (var scope = app.Services.CreateScope())
-// {
-//     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-//     var adminEmail = "teste6@teste6.com.br"; // coloque o email do usuário que deseja promover
-//     var user = await userManager.FindByEmailAsync(adminEmail);
-//     if (user != null && !await userManager.IsInRoleAsync(user, "admin"))
-//     {
-//         await userManager.AddToRoleAsync(user, "admin");
-//         Console.WriteLine($"Usuário {adminEmail} promovido a admin.");
-//     }
-// }
+// qual a melhor maneira de fazermos isso?
+using (var scope = app.Services.CreateScope())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    var adminEmail = "god@god.com"; // coloque o email do usuário que deseja promover
+    var user = await userManager.FindByEmailAsync(adminEmail);
+    if (user != null && !await userManager.IsInRoleAsync(user, "admin"))
+    {
+        await userManager.AddToRoleAsync(user, "admin");
+        Console.WriteLine($"Usuário {adminEmail} promovido a admin.");
+    }
+}
 
+// qual a melhor maneira de fazermos isso?
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    // Limpa todos os gateways antigos
+    db.Gateways.RemoveRange(db.Gateways);
+    db.SaveChanges();
 
-// using (var scope = app.Services.CreateScope())
-// {
-//     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-//     // Limpa todos os gateways antigos
-//     db.Gateways.RemoveRange(db.Gateways);
-//     db.SaveChanges();
-
-//     // Adiciona os gateways padronizados
-//     db.Gateways.AddRange(
-//         new GatewayInfo { Name = "BTCPayServer", Enabled = true },
-//         new GatewayInfo { Name = "Testnet", Enabled = false }
-//     );
-//     db.SaveChanges();
-// }
+    // Adiciona os gateways padronizados
+    db.Gateways.AddRange(
+        new GatewayInfo { Name = "BTCPayServer", Enabled = true },
+        new GatewayInfo { Name = "Testnet", Enabled = true }
+    );
+    db.SaveChanges();
+}
 
 app.MapHub<PaymentHub>("/paymentHub");
 app.Run();

@@ -59,7 +59,16 @@ else
                     : t.Buyer?.UserName ?? t.BuyerId;
                 <tr>
                     <td>@t.Id</td>
-                    <td>@t.Product?.Name ?? t.ProductId.ToString()</td>
+                    <td>
+                        @if (t.Product != null)
+                        {
+                            @t.Product.Name
+                        }
+                        else
+                        {
+                            <span class="text-warning">Produto não encontrado (ID: @t.ProductId)</span>
+                        }
+                    </td>
                     <td>@t.Amount BTC</td>
                     <td>
                         <span style="color:@(t.IsPaid ? "#4caf50" : "#ff9800");font-weight:bold;">
