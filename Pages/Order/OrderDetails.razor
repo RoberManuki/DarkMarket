@@ -6,11 +6,16 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.Forms
 
 @inject AppDbContext Db
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthProvider
 @inject UserManager<ApplicationUser> UserManager
+
+<nav class="breadcrumb">
+    <a href="/">Início</a> &gt; <a href="/orders">Pedidos</a> &gt; Detalhes
+</nav>
 
 <h2 class="page-title">Detalhes da Transação</h2>
 
@@ -30,13 +35,14 @@ else
             <div class="product-info">
                 <div class="product-name">@order.Product?.Name</div>
                 <div class="product-price">@order.Amount BTC</div>
+                <div class="product-desc">@order.Product?.ShortDescription</div>
+                @* <div class="product-meta">
+                    <span>Categoria: @order.Product?.Category</span><br />
+                    <span>Criado em: @order.Product?.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</span>
+                </div> *@
             </div>
         </div>
         <div class="dashboard-card payment-details-card">
-            <div class="details-row">
-                <span class="label">ID:</span>
-                <span>@order.Id</span>
-            </div>
             <div class="details-row">
                 <span class="label">Comprador:</span>
                 <span>@(order.Buyer?.UserName ?? order.BuyerId)</span>
@@ -58,12 +64,91 @@ else
                 <span>@order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
             </div>
             <div class="details-row">
-                <span class="label">PaymentId:</span>
-                <span class="payment-address">@order.PaymentId</span>
+                <span class="label">Pagamento:</span>
+                <span>
+                    <a class="payment-link" href="@($"/payments/details/{order.PaymentId}")" title="Ver pagamento">
+                        <span class="payment-address">@order.PaymentId</span>
+                    </a>
+                </span>
             </div>
+            @if (isBuyer && !order.IsDelivered)
+            {
+                <div class="details-actions">
+                    <button class="success-btn" @onclick="()=>showConfirmModal=true">Confirmar Recebimento</button>
+                </div>
+            }
+            else if (isSeller && !order.IsDelivered)
+            {
+                <div class="order-waiting-confirmation">
+                    <i class="fa fa-clock-o"></i>
+                    Aguardando confirmação do comprador...
+                </div>
+            }
+            else if (isAdmin && order.IsDelivered && !order.FundsReleased)
+            {
+                <div class="details-actions">
+                    <button class="success-btn" @onclick="ReleaseFunds">Repassar Fundos ao Vendedor</button>
+                </div>
+            }
+            else if (order.IsDelivered && order.FundsReleased)
+            {
+                <div class="details-row">
+                    <span class="label">Entrega confirmada e fundos repassados.</span>
+                </div>
+            }
             <div class="details-actions">
                 <button class="back-btn" @onclick='GoBack'>Voltar</button>
             </div>
+        </div>
+    </div>
+
+    @if (showConfirmModal)
+    {
+        <div class="modal-overlay">
+            <div class="modal-card">
+                <h4 class="modal-title">Confirmação de Recebimento</h4>
+                <div class="modal-content">
+                    @if (!string.IsNullOrEmpty(confirmError))
+                    {
+                        <div class="modal-error">@confirmError</div>
+                    }
+                    <label>Comprovante (foto ou documento):</label>
+                    <InputFile OnChange="OnFileSelected" />
+                    <label>Comentário/avaliação:</label>
+                    <textarea class="modal-textarea" @bind="confirmComment"></textarea>
+                    <label>Nota:</label>
+                    <select @bind="confirmRating">
+                        <option value="0">Selecione</option>
+                        <option value="1">1 estrela</option>
+                        <option value="2">2 estrelas</option>
+                        <option value="3">3 estrelas</option>
+                        <option value="4">4 estrelas</option>
+                        <option value="5">5 estrelas</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button class="success-btn" @onclick="ConfirmDelivery">Confirmar</button>
+                    <button class="back-btn" @onclick="()=>showConfirmModal=false">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    <div class="order-chat-card">
+        <h3>Chat da Transação</h3>
+        <div class="chat-messages">
+            @foreach (var msg in chatMessages)
+            {
+                <div class="chat-message @(msg.UserRole?.ToLower())">
+                    <span class="chat-user">@msg.UserRole:</span>
+                    <span class="chat-text">@msg.Text</span>
+                    <span class="chat-date">@msg.CreatedAt.ToLocalTime().ToString("dd/MM HH:mm")</span>
+                </div>
+            }
+        </div>
+        <div class="chat-input-row">
+            <input class="chat-input" @bind="newMessage" placeholder="Digite sua mensagem..." />
+            <button class="success-btn" @onclick="SendMessage">Enviar</button>
         </div>
     </div>
 }
@@ -72,6 +157,17 @@ else
     [Parameter] public int Id { get; set; }
     private OrderModel? order;
     private bool isLoading = true;
+    private bool isBuyer, isSeller, isAdmin;
+
+    private List<OrderMessage> chatMessages = new();
+    private string newMessage = "";
+
+    // Modal de confirmação de entrega
+    private bool showConfirmModal = false;
+    private string? confirmComment;
+    private int confirmRating = 0;
+    private IBrowserFile? confirmFile;
+    private string? confirmError;
 
     protected override async Task OnInitializedAsync()
     {
@@ -79,7 +175,7 @@ else
         var authState = await AuthProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         var userId = UserManager.GetUserId(user);
-        var isAdmin = user.IsInRole("admin");
+        isAdmin = user.IsInRole("admin");
 
         order = await Db.Orders
             .Include(o => o.Product)
@@ -90,9 +186,84 @@ else
         if (order == null || (!isAdmin && order.BuyerId != userId && order.SellerId != userId))
         {
             order = null;
+            isLoading = false;
+            return;
         }
 
+        isBuyer = order.BuyerId == userId;
+        isSeller = order.SellerId == userId;
+
+        chatMessages = await Db.OrderMessages
+            .Where(m => m.OrderId == order.Id)
+            .OrderBy(m => m.CreatedAt)
+            .ToListAsync();
+
         isLoading = false;
+    }
+
+    private void OnFileSelected(InputFileChangeEventArgs e)
+    {
+        confirmFile = e.File;
+    }
+
+    private async Task ConfirmDelivery()
+    {
+        confirmError = null;
+        if (confirmFile == null)
+        {
+            confirmError = "Anexe um comprovante.";
+            return;
+        }
+        if (string.IsNullOrWhiteSpace(confirmComment))
+        {
+            confirmError = "Preencha um comentário.";
+            return;
+        }
+        if (confirmRating < 1)
+        {
+            confirmError = "Selecione uma nota.";
+            return;
+        }
+        if (order != null)
+        {
+            order.IsDelivered = true;
+            order.DeliveryPendingApproval = true;
+            // Aqui você pode salvar o comprovante, comentário e nota conforme sua modelagem
+            await Db.SaveChangesAsync();
+            showConfirmModal = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task ReleaseFunds()
+    {
+        if (order != null)
+        {
+            order.FundsReleased = true;
+            await Db.SaveChangesAsync();
+            StateHasChanged();
+        }
+    }
+
+    private async Task SendMessage()
+    {
+        if (!string.IsNullOrWhiteSpace(newMessage) && order != null)
+        {
+            var user = await UserManager.GetUserAsync((await AuthProvider.GetAuthenticationStateAsync()).User);
+            var role = isAdmin ? "Admin" : isBuyer ? "Comprador" : isSeller ? "Vendedor" : "Outro";
+            var msg = new OrderMessage
+            {
+                OrderId = order.Id,
+                UserId = user.Id,
+                UserRole = role,
+                Text = newMessage,
+                CreatedAt = DateTime.UtcNow
+            };
+            Db.OrderMessages.Add(msg);
+            await Db.SaveChangesAsync();
+            chatMessages.Add(msg);
+            newMessage = "";
+        }
     }
 
     private void GoBack()

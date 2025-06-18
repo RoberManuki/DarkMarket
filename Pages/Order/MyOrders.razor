@@ -42,7 +42,6 @@ else
     <table class="product-table">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Produto</th>
                 <th>Valor</th>
                 <th>Status</th>
@@ -58,7 +57,6 @@ else
                     ? t.Seller?.UserName ?? t.SellerId 
                     : t.Buyer?.UserName ?? t.BuyerId;
                 <tr>
-                    <td>@t.Id</td>
                     <td>
                         @if (t.Product != null)
                         {
@@ -71,9 +69,18 @@ else
                     </td>
                     <td>@t.Amount BTC</td>
                     <td>
-                        <span style="color:@(t.IsPaid ? "#4caf50" : "#ff9800");font-weight:bold;">
-                            @(t.IsPaid ? "Pago" : "Pendente")
-                        </span>
+                        @if (t.IsDelivered && t.FundsReleased)
+                        {
+                            <span class="badge payment-status-ok">Finalizada</span>
+                        }
+                        else if (t.IsDelivered)
+                        {
+                            <span class="badge payment-status-wait">Aguardando repasse</span>
+                        }
+                        else
+                        {
+                            <span class="badge payment-status-wait">Aguardando entrega</span>
+                        }
                     </td>
                     <td>@t.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
                     <td>@otherParty</td>

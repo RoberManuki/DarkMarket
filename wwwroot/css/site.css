@@ -670,6 +670,19 @@ footer {
     font-weight: bold;
 }
 
+.breadcrumb {
+    margin-bottom: 1.2em;
+    font-size: 0.98em;
+    color: #aaa;
+}
+.breadcrumb a {
+    color: #f1c40f;
+    text-decoration: none;
+}
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
 .page-title {
     color: #f9a825;
     margin-bottom: 1.5rem;
@@ -895,14 +908,133 @@ footer {
     font-weight: 600;
     padding: 0.18em 0.9em;
 }
-@media (max-width: 900px) {
-    .details-container {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 1.5rem;
-    }
-    .product-card, .payment-details-card {
-        max-width: 98vw;
-        min-width: unset;
-    }
+.order-waiting-confirmation {
+    background: #f1c40f22;
+    color: #b38b00;
+    border-radius: 8px;
+    padding: 1em 1.2em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+    margin: 1em 0;
+}
+.order-waiting-confirmation i {
+    font-size: 1.2em;
+}
+
+.payment-link {
+    margin-left: 0.5em;
+    color: #f1c40f;
+    font-size: 1.1em;
+    vertical-align: middle;
+}
+.payment-link:hover {
+    color: #ffe066;
+}
+
+.product-desc {
+    margin: 0.7em 0;
+    color: #ccc;
+    font-size: 0.98em;
+}
+.product-meta {
+    font-size: 0.93em;
+    color: #aaa;
+}
+
+.modal-title {
+    color: #f1c40f;
+    text-align: center;
+    margin-bottom: 1em;
+    font-weight: 700;
+    font-size: 1.3em;
+}
+.modal-error {
+    color: #e74c3c;
+    margin-bottom: 0.7em;
+    font-weight: 600;
+}
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #000a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+.modal-card {
+    background: #23272f;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px #0008;
+    padding: 2rem 2.5rem;
+    min-width: 320px;
+    max-width: 98vw;
+    color: #fff;
+}
+.modal-content label {
+    font-weight: 600;
+    margin-top: 1em;
+    display: block;
+}
+.modal-textarea {
+    width: 100%;
+    min-height: 60px;
+    border-radius: 8px;
+    border: 1px solid #333a;
+    background: #181c22;
+    color: #fff;
+    margin-bottom: 1em;
+    padding: 0.7em 1em;
+}
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+.order-chat-card {
+    margin: 2rem auto 0 auto;
+    max-width: 900px;
+    background: #23272f;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px #0004;
+    border: 1px solid #333a;
+    padding: 2rem 2.5rem;
+}
+.chat-messages {
+    max-height: 260px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    background: #181c22;
+    border-radius: 8px;
+    padding: 1rem;
+}
+.chat-message.comprador { background: #1eaa6f33; color: #1eaa6f; }
+.chat-message.vendedor { background: #f1c40f33; color: #b38b00; }
+.chat-message.admin { background: #3498db33; color: #217dbb; }
+.chat-message {
+    border-radius: 12px;
+    margin-bottom: 0.7em;
+    padding: 0.7em 1.1em;
+    font-size: 1em;
+    box-shadow: 0 1px 4px #0002;
+    display: flex;
+    flex-direction: column;
+}
+.chat-user { font-weight: 700; margin-bottom: 0.2em; }
+.chat-date { font-size: 0.85em; color: #aaa; margin-top: 0.2em; align-self: flex-end; }
+.chat-input-row {
+    display: flex;
+    gap: 1rem;
+}
+.chat-input {
+    flex: 1;
+    border-radius: 8px;
+    border: 1px solid #333a;
+    padding: 0.7em 1em;
+    background: #181c22;
+    color: #fff;
 }

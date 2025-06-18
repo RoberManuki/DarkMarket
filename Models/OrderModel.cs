@@ -29,5 +29,10 @@ public class OrderModel
     public DateTime? DeliveredAt { get; set; }
     public DateTime? FinishedAt { get; set; }
 
+    public bool IsDelivered { get; set; } = false;
+    public bool FundsReleased { get; set; } = false;
+
+    public bool DeliveryPendingApproval { get; set; } = false;
+
     public List<OrderMessage> Messages { get; set; } = new();
 }

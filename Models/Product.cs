@@ -22,9 +22,10 @@ namespace DarkMarket.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        // Relacionamento com usuário
         public string UserId { get; set; } = string.Empty;
         public ApplicationUser? User { get; set; }
-        
+
+        public string? ShortDescription { get; set; }
+        public string? Category { get; set; }
     }
 }

@@ -4,10 +4,11 @@ using DarkMarket.Models;
 public class OrderMessage
 {
     public int Id { get; set; }
-    public int PaymentId { get; set; }
-    public PaymentRecord? Payment { get; set; }
-    public string? SenderUserId { get; set; }
-    public ApplicationUser? Sender { get; set; }
-    public string? Content { get; set; }
-    public DateTime SentAt { get; set; }
+    public int OrderId { get; set; }
+    public OrderModel? Order { get; set; }
+    public string? UserId { get; set; }
+    public ApplicationUser? User { get; set; }
+    public string? UserRole { get; set; }
+    public string? Text { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
