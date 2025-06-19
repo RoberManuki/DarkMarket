@@ -64,7 +64,7 @@ namespace DarkMarket.Services
             {
                 await log.LogAsync($"[Testnet] Pagamento já está marcado como pago para paymentId={paymentId}", source: "Testnet", level: "Info");
                 // Garante que a order existe
-                if (!db.Orders.Any(o => o.PaymentId == payment.PaymentId))
+                if (!db.Orders.Any(o => o.PaymentId == payment.Id))
                 {
                     await CreateOrderAsync(db, payment, log);
                 }
@@ -79,7 +79,7 @@ namespace DarkMarket.Services
             await log.LogAsync($"[Testnet] Pagamento marcado como pago para paymentId={paymentId}", source: "Testnet", level: "Info");
 
             // Cria order se não existir
-            if (!db.Orders.Any(o => o.PaymentId == payment.PaymentId))
+            if (!db.Orders.Any(o => o.PaymentId == payment.Id))
             {
                 await CreateOrderAsync(db, payment, log);
             }
@@ -99,7 +99,7 @@ namespace DarkMarket.Services
                 ProductId = payment.ProductId,
                 Amount = payment.Amount,
                 IsPaid = true,
-                PaymentId = payment.PaymentId, 
+                PaymentId = payment.Id,
                 Status = PaymentStatus.AguardandoEntrega,
                 CreatedAt = DateTime.UtcNow
             };

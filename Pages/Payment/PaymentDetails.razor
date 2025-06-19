@@ -55,6 +55,14 @@ else
                     <span>@payment.PaidAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
                 </div>
             }
+            @if (payment.Order != null)
+            {
+                <div class="details-actions">
+                    <a class="payment-link-btn" href="@($"/orders/{payment.Order.Id}")" title="Ver pedido">
+                        <span class="payment-link-text">Ver pedido</span>
+                    </a>
+                </div>
+            }
             <div class="details-actions">
                 <button class="back-btn" @onclick="GoBack">Voltar</button>
             </div>
@@ -70,6 +78,7 @@ else
     {
         payment = await Db.Payments
             .Include(p => p.Product)
+            .Include(p => p.Order)
             .FirstOrDefaultAsync(p => p.Id == PaymentId);
     }
 

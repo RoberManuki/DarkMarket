@@ -36,6 +36,12 @@ namespace DarkMarket.Data
                 .WithMany()
                 .HasForeignKey(o => o.ProductId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PaymentRecord>()
+                .HasOne(p => p.Order)
+                .WithOne(o => o.Payment)
+                .HasForeignKey<OrderModel>(o => o.PaymentId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

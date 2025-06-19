@@ -22,7 +22,7 @@ public class OrderModel
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public bool IsPaid { get; set; }
-    public string? PaymentId { get; set; }
+    public int? PaymentId { get; set; }
     public PaymentRecord? Payment { get; set; }
 
     public PaymentStatus Status { get; set; } = PaymentStatus.Pendente;

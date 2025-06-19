@@ -3,6 +3,7 @@
 @attribute [Authorize]
 
 @using DarkMarket.Models
+@using DarkMarket.Enums
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
@@ -17,7 +18,7 @@
     <a href="/">Início</a> &gt; <a href="/orders">Pedidos</a> &gt; Detalhes
 </nav>
 
-<h2 class="page-title">Detalhes da Transação</h2>
+<h2 class="page-title">Detalhes do Pedido</h2>
 
 @if (isLoading)
 {
@@ -42,7 +43,7 @@ else
                 </div> *@
             </div>
         </div>
-        <div class="dashboard-card payment-details-card">
+        <div class="payment-details-card wide-card">
             <div class="details-row">
                 <span class="label">Comprador:</span>
                 <span>@(order.Buyer?.UserName ?? order.BuyerId)</span>
@@ -63,40 +64,50 @@ else
                 <span class="label">Data:</span>
                 <span>@order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
             </div>
-            <div class="details-row">
-                <span class="label">Pagamento:</span>
-                <span>
-                    <a class="payment-link" href="@($"/payments/details/{order.PaymentId}")" title="Ver pagamento">
-                        <span class="payment-address">@order.PaymentId</span>
+            @if (order.Payment != null)
+            {
+                <div class="details-row">
+                    <span class="label">Pagamento:</span>
+                    <a class="payment-link-btn" href="@($"/payments/details/{order.Payment.Id}")" title="Ver pagamento">
+                        <span class="payment-address">@order.Payment.PaymentId</span>
+                        <span class="payment-link-text">Ver pagamento</span>
                     </a>
-                </span>
-            </div>
+                </div>
+            }
+            else
+            {
+                <div class="details-row">
+                    <span class="label">Pagamento:</span>
+                    <span class="text-danger">Não encontrado</span>
+                </div>
+            }
             @if (isBuyer && !order.IsDelivered)
             {
-                <div class="details-actions">
+                <div class="card-footer">
                     <button class="success-btn" @onclick="()=>showConfirmModal=true">Confirmar Recebimento</button>
                 </div>
             }
             else if (isSeller && !order.IsDelivered)
             {
-                <div class="order-waiting-confirmation">
+                <div class="order-waiting-confirmation card-footer">
                     <i class="fa fa-clock-o"></i>
                     Aguardando confirmação do comprador...
                 </div>
             }
             else if (isAdmin && order.IsDelivered && !order.FundsReleased)
             {
-                <div class="details-actions">
+                <div class="card-footer">
                     <button class="success-btn" @onclick="ReleaseFunds">Repassar Fundos ao Vendedor</button>
                 </div>
             }
             else if (order.IsDelivered && order.FundsReleased)
             {
-                <div class="details-row">
+                <div class="details-row card-footer">
                     <span class="label">Entrega confirmada e fundos repassados.</span>
                 </div>
             }
-            <div class="details-actions">
+
+            <div class="card-footer">
                 <button class="back-btn" @onclick='GoBack'>Voltar</button>
             </div>
         </div>
@@ -134,6 +145,16 @@ else
         </div>
     }
 
+    <div class="order-status-container">
+        <div class="order-status-card">
+            <span class="order-status-label">Status do pedido:</span>
+            <span class="order-status-badge @order.Status.ToString().ToLower()">
+                @OrderStatusHelper.GetStatusText(order.Status)
+            </span>
+        </div>
+    </div>
+
+    <!-- Chat da transação -->
     <div class="order-chat-card">
         <h3>Chat da Transação</h3>
         <div class="chat-messages">
@@ -181,6 +202,7 @@ else
             .Include(o => o.Product)
             .Include(o => o.Buyer)
             .Include(o => o.Seller)
+            .Include(o => o.Payment) 
             .FirstOrDefaultAsync(o => o.Id == Id);
 
         if (order == null || (!isAdmin && order.BuyerId != userId && order.SellerId != userId))

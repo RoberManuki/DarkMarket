@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DarkMarket.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250611174010_AddPrivateKeyToPaymentRecord")]
-    partial class AddPrivateKeyToPaymentRecord
+    [Migration("20250619044414_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -196,6 +196,9 @@ namespace DarkMarket.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Category")
+                        .HasColumnType("text");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -214,6 +217,9 @@ namespace DarkMarket.Migrations
 
                     b.Property<decimal>("Price")
                         .HasColumnType("numeric");
+
+                    b.Property<string>("ShortDescription")
+                        .HasColumnType("text");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -366,33 +372,28 @@ namespace DarkMarket.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Content")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("OrderModelId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("PaymentId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("SenderId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("SenderUserId")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("SentAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Text")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserRole")
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderModelId");
+                    b.HasIndex("OrderId");
 
-                    b.HasIndex("PaymentId");
+                    b.HasIndex("UserId");
 
-                    b.HasIndex("SenderId");
-
-                    b.ToTable("OrderMessage");
+                    b.ToTable("OrderMessages");
                 });
 
             modelBuilder.Entity("OrderModel", b =>
@@ -416,16 +417,22 @@ namespace DarkMarket.Migrations
                     b.Property<DateTime?>("DeliveredAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("DeliveryPendingApproval")
+                        .HasColumnType("boolean");
+
                     b.Property<DateTime?>("FinishedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("FundsReleased")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDelivered")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsPaid")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("PaymentId")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("PaymentId1")
+                    b.Property<int?>("PaymentId")
                         .HasColumnType("integer");
 
                     b.Property<int>("ProductId")
@@ -441,7 +448,8 @@ namespace DarkMarket.Migrations
 
                     b.HasIndex("BuyerId");
 
-                    b.HasIndex("PaymentId1");
+                    b.HasIndex("PaymentId")
+                        .IsUnique();
 
                     b.HasIndex("ProductId");
 
@@ -525,23 +533,19 @@ namespace DarkMarket.Migrations
 
             modelBuilder.Entity("OrderMessage", b =>
                 {
-                    b.HasOne("OrderModel", null)
+                    b.HasOne("OrderModel", "Order")
                         .WithMany("Messages")
-                        .HasForeignKey("OrderModelId");
-
-                    b.HasOne("DarkMarket.Models.PaymentRecord", "Payment")
-                        .WithMany()
-                        .HasForeignKey("PaymentId")
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DarkMarket.Models.ApplicationUser", "Sender")
+                    b.HasOne("DarkMarket.Models.ApplicationUser", "User")
                         .WithMany()
-                        .HasForeignKey("SenderId");
+                        .HasForeignKey("UserId");
 
-                    b.Navigation("Payment");
+                    b.Navigation("Order");
 
-                    b.Navigation("Sender");
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("OrderModel", b =>
@@ -553,8 +557,9 @@ namespace DarkMarket.Migrations
                         .IsRequired();
 
                     b.HasOne("DarkMarket.Models.PaymentRecord", "Payment")
-                        .WithMany()
-                        .HasForeignKey("PaymentId1");
+                        .WithMany("Orders")
+                        .HasForeignKey("PaymentId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("DarkMarket.Models.Product", "Product")
                         .WithMany()
@@ -574,6 +579,11 @@ namespace DarkMarket.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("Seller");
+                });
+
+            modelBuilder.Entity("DarkMarket.Models.PaymentRecord", b =>
+                {
+                    b.Navigation("Orders");
                 });
 
             modelBuilder.Entity("OrderModel", b =>

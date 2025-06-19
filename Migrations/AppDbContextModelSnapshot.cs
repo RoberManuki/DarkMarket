@@ -429,10 +429,7 @@ namespace DarkMarket.Migrations
                     b.Property<bool>("IsPaid")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("PaymentId")
-                        .HasColumnType("text");
-
-                    b.Property<int?>("PaymentId1")
+                    b.Property<int?>("PaymentId")
                         .HasColumnType("integer");
 
                     b.Property<int>("ProductId")
@@ -450,8 +447,6 @@ namespace DarkMarket.Migrations
 
                     b.HasIndex("PaymentId")
                         .IsUnique();
-
-                    b.HasIndex("PaymentId1");
 
                     b.HasIndex("ProductId");
 
@@ -559,8 +554,9 @@ namespace DarkMarket.Migrations
                         .IsRequired();
 
                     b.HasOne("DarkMarket.Models.PaymentRecord", "Payment")
-                        .WithMany()
-                        .HasForeignKey("PaymentId1");
+                        .WithOne("Order")
+                        .HasForeignKey("OrderModel", "PaymentId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("DarkMarket.Models.Product", "Product")
                         .WithMany()
@@ -580,6 +576,11 @@ namespace DarkMarket.Migrations
                     b.Navigation("Product");
 
                     b.Navigation("Seller");
+                });
+
+            modelBuilder.Entity("DarkMarket.Models.PaymentRecord", b =>
+                {
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("OrderModel", b =>

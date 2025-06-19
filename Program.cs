@@ -109,7 +109,7 @@ app.MapPost("/api/btcpay/webhook", async (HttpContext context, AppDbContext db, 
                 ProductId = payment.ProductId,
                 Amount = payment.Amount,
                 IsPaid = true,
-                PaymentId = payment.Id.ToString(),
+                PaymentId = payment.Id,
                 Status = PaymentStatus.AguardandoEntrega,
                 CreatedAt = DateTime.UtcNow
             };
@@ -158,7 +158,7 @@ using (var scope = app.Services.CreateScope())
 using (var scope = app.Services.CreateScope())
 {
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-    var adminEmail = "god@god.com"; // coloque o email do usuário que deseja promover
+    var adminEmail = "god@god"; // coloque o email do usuário que deseja promover
     var user = await userManager.FindByEmailAsync(adminEmail);
     if (user != null && !await userManager.IsInRoleAsync(user, "admin"))
     {

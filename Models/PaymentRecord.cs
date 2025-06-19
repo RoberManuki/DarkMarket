@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace DarkMarket.Models
 {
@@ -18,5 +19,6 @@ namespace DarkMarket.Models
         public string? PrivateKey { get; set; }
 
         public Product? Product { get; set; }
+        public OrderModel? Order { get; set; }
     }
 }

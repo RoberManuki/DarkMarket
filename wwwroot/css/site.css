@@ -805,12 +805,29 @@ footer {
 
 .details-container {
     display: flex;
-    gap: 2rem;
     justify-content: center;
-    align-items: flex-start;
-    margin: 2rem auto;
-    max-width: 900px;
+    align-items: stretch;
+    gap: 2.5rem;
+    margin-bottom: 2rem;
 }
+
+.product-card,
+.payment-details-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 320px;
+    max-width: 400px;
+    flex: 1 1 0;
+}
+
+.payment-details-card.wide-card {
+    min-width: 400px;
+    max-width: 520px; /* aumenta a largura do card da direita */
+    flex: 1.3 1 0;    /* faz ele ocupar mais espaço que o da esquerda */
+}
+
+/* Garante que ambos tenham a mesma altura */
 .details-container > * {
     align-self: stretch;
 }
@@ -865,6 +882,7 @@ footer {
     display: flex;
     flex-direction: column;
     gap: 1.2rem;
+    height: 100%;
 }
 .details-row {
     display: flex;
@@ -1037,4 +1055,130 @@ footer {
     padding: 0.7em 1em;
     background: #181c22;
     color: #fff;
+}
+
+.payment-link-btn {
+    display: inline-flex;
+    align-items: center;
+    background: #27ae60;
+    color: #fff;
+    border-radius: 6px;
+    padding: 0.45em 1.1em;
+    font-weight: 600;
+    text-decoration: none;
+    margin-left: 0.7em;
+    transition: background 0.2s, color 0.2s;
+    box-shadow: 0 2px 8px #0002;
+    border: none;
+    cursor: pointer;
+}
+.payment-link-btn:hover {
+    background: #219150;
+    color: #fff;
+}
+.payment-link-text {
+    margin-left: 0.7em;
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+}
+.payment-address {
+    font-family: monospace;
+    background: #23272f;
+    color: #27ae60;
+    border-radius: 4px;
+    padding: 0.2em 0.5em;
+    margin-right: 0.7em;
+    font-size: 0.97em;
+}
+
+.order-link-btn {
+    display: inline-flex;
+    align-items: center;
+    background: #2980b9;
+    color: #fff;
+    border-radius: 6px;
+    padding: 0.45em 1.1em;
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 0.7em;
+    margin-right: 0.7em;
+    transition: background 0.2s, color 0.2s;
+    box-shadow: 0 2px 8px #0002;
+    border: none;
+    cursor: pointer;
+}
+.order-link-btn:hover {
+    background: #1c5a85;
+    color: #fff;
+}
+.order-link-text {
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+}
+
+.order-status-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;   /* Centraliza o conteúdo horizontalmente */
+    background: #23272f;
+    border-radius: 10px;
+    padding: 1em 1.5em;
+    box-shadow: 0 2px 8px #0002;
+    font-size: 1.15em;
+    gap: 1em;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto 2rem auto;
+}
+.order-status-label {
+    font-weight: 700;
+    color: #aaa;
+}
+.order-status-badge {
+    padding: 0.4em 1.2em;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 1em;
+    letter-spacing: 0.02em;
+    box-shadow: 0 1px 4px #0001;
+    display: inline-block;
+    margin: 0.2em 0;
+}
+.order-status-badge.aguardandopagamento {
+    background: #f1c40f33;
+    color: #b38b00;
+}
+.order-status-badge.pago {
+    background: #27ae6033;
+    color: #219150;
+}
+.order-status-badge.aguardandoentrega {
+    background: #3498db33;
+    color: #217dbb;
+}
+.order-status-badge.entregue {
+    background: #2ecc4033;
+    color: #219150;
+}
+.order-status-badge.finalizado {
+    background: #8e44ad33;
+    color: #5e3370;
+}
+.order-status-badge.cancelado {
+    background: #e74c3c33;
+    color: #c0392b;
+}
+.order-status-badge.disputa {
+    background: #e67e2233;
+    color: #b35400;
+}
+.order-status-badge.outro {
+    background: #aaa;
+    color: #23272f;
+}
+
+.card-footer {
+    margin-top: auto;
 }

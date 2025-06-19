@@ -6,13 +6,14 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
+@using DarkMarket.Shared.Helpers
 
 @inject AppDbContext Db
 @inject UserManager<ApplicationUser> UserManager
 @inject AuthenticationStateProvider AuthProvider
 @inject NavigationManager NavigationManager
 
-<h2 class="page-title">Minhas Transações</h2>
+<h2 class="page-title">Meus Pedidos</h2>
 
 <div class="filter-bar">
     <input type="number" placeholder="ID..." @bind="filterId" min="0" />
@@ -69,18 +70,9 @@ else
                     </td>
                     <td>@t.Amount BTC</td>
                     <td>
-                        @if (t.IsDelivered && t.FundsReleased)
-                        {
-                            <span class="badge payment-status-ok">Finalizada</span>
-                        }
-                        else if (t.IsDelivered)
-                        {
-                            <span class="badge payment-status-wait">Aguardando repasse</span>
-                        }
-                        else
-                        {
-                            <span class="badge payment-status-wait">Aguardando entrega</span>
-                        }
+                        <span class="order-status-badge @t.Status.ToString().ToLower()">
+                            @OrderStatusHelper.GetStatusText(t.Status)
+                        </span>
                     </td>
                     <td>@t.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
                     <td>@otherParty</td>
