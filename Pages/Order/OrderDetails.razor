@@ -102,8 +102,9 @@ else
             }
             else if (order.IsDelivered && order.FundsReleased)
             {
-                <div class="details-row card-footer">
-                    <span class="label">Entrega confirmada e fundos repassados.</span>
+                <div class="order-success-message">
+                    <i class="fa fa-check-circle"></i>
+                    Entrega confirmada e fundos repassados.
                 </div>
             }
 
@@ -156,7 +157,10 @@ else
 
     <!-- Chat da transação -->
     <div class="order-chat-card">
-        <h3>Chat da Transação</h3>
+        <h3 class="chat-title">
+            <i class="fa fa-comments" aria-hidden="true"></i>
+            Chat da Transação
+        </h3>
         <div class="chat-messages">
             @foreach (var msg in chatMessages)
             {
@@ -250,6 +254,7 @@ else
         {
             order.IsDelivered = true;
             order.DeliveryPendingApproval = true;
+            order.Status = PaymentStatus.AguardandoRevisaoAdm;
             // Aqui você pode salvar o comprovante, comentário e nota conforme sua modelagem
             await Db.SaveChangesAsync();
             showConfirmModal = false;
@@ -262,6 +267,7 @@ else
         if (order != null)
         {
             order.FundsReleased = true;
+            order.Status = PaymentStatus.Finalizado;
             await Db.SaveChangesAsync();
             StateHasChanged();
         }

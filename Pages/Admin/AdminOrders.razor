@@ -5,6 +5,7 @@
 @using DarkMarket.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
+@using DarkMarket.Shared.Helpers
 
 @inject AppDbContext Db
 @inject NavigationManager NavigationManager
@@ -56,13 +57,40 @@ else
             {
                 <tr>
                     <td>@t.Id</td>
-                    <td>@t.Product?.Name ?? t.ProductId.ToString()</td>
-                    <td>@t.Buyer?.UserName ?? t.BuyerId</td>
-                    <td>@t.Seller?.UserName ?? t.SellerId</td>
-                    <td>@t.Amount BTC</td>
                     <td>
-                        <span style="color:@(t.IsPaid ? "#4caf50" : "#ff9800");font-weight:bold;">
-                            @(t.IsPaid ? "Pago" : "Pendente")
+                        @if (t.Product != null)
+                        {
+                            @t.Product.Name
+                        }
+                        else
+                        {
+                            <span class="text-danger">Removido (ID: @t.ProductId)</span>
+                        }
+                    </td>
+                    <td>
+                        @if (t.Buyer != null)
+                        {
+                            @t.Buyer.UserName
+                        }
+                        else
+                        {
+                            <span class="text-danger">Desconhecido (ID: @t.BuyerId)</span>
+                        }
+                    </td>
+                    <td>
+                        @if (t.Seller != null)
+                        {
+                            @t.Seller.UserName
+                        }
+                        else
+                        {
+                            <span class="text-danger">Desconhecido (ID: @t.SellerId)</span>
+                        }
+                    </td>
+                    <td>@t.Amount.ToString("0.#####") BTC</td>
+                    <td>
+                        <span class="order-status-badge @t.Status.ToString().ToLower()">
+                            @OrderStatusHelper.GetStatusText(t.Status)
                         </span>
                     </td>
                     <td>@t.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>

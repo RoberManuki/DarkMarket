@@ -1148,37 +1148,75 @@ footer {
 }
 .order-status-badge.aguardandopagamento {
     background: #f1c40f33;
-    color: #b38b00;
+    color: #ffe082; /* amarelo claro */
 }
 .order-status-badge.pago {
     background: #27ae6033;
-    color: #219150;
+    color: #b9ffdd; /* verde claro */
 }
 .order-status-badge.aguardandoentrega {
     background: #3498db33;
-    color: #217dbb;
+    color: #b3e5fc; /* azul claro */
 }
 .order-status-badge.entregue {
     background: #2ecc4033;
-    color: #219150;
+    color: #b9ffdd; /* verde claro */
 }
 .order-status-badge.finalizado {
     background: #8e44ad33;
-    color: #5e3370;
+    color: #d1aaff; /* lilás claro */
 }
 .order-status-badge.cancelado {
     background: #e74c3c33;
-    color: #c0392b;
+    color: #ffb3b3; /* vermelho claro */
 }
 .order-status-badge.disputa {
     background: #e67e2233;
-    color: #b35400;
+    color: #ffd180; /* laranja claro */
 }
 .order-status-badge.outro {
     background: #aaa;
-    color: #23272f;
+    color: #fff;
+}
+.order-status-badge.aguardandorevisaoadm {
+    background: #f39c1233;
+    color: #ffe082; /* amarelo claro */
 }
 
 .card-footer {
     margin-top: auto;
+}
+
+.order-success-message {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #23272f; /* cinza escuro, igual aos cards do sistema */
+    border: 2px solid #27ae60;
+    border-radius: 8px;
+    font-size: 1.15em;
+    font-weight: 600;
+    padding: 1em 1.5em;
+    margin: 1.5em 0 0.5em 0;
+    gap: 0.7em;
+}
+.order-success-message .fa-check-circle {
+    font-size: 1.5em;
+    color: #27ae60;
+}
+
+.chat-title {
+    text-align: center;
+    color: #f9a825; /* amarelo alaranjado do sistema */
+    font-weight: 700;
+    font-size: 1.3em;
+    margin-bottom: 1.2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6em;
+}
+.chat-title .fa-comments {
+    color: #f9a825;
+    font-size: 1.2em;
 }

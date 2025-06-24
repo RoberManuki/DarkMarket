@@ -15,6 +15,10 @@ namespace DarkMarket.Shared.Helpers
                 PaymentStatus.Finalizado => "Finalizada",
                 PaymentStatus.Cancelado => "Cancelado",
                 PaymentStatus.Disputa => "Em disputa",
+                PaymentStatus.AguardandoRevisaoAdm => "Aguardando revisão ADM",
+                PaymentStatus.Pendente => "Pendente",
+                PaymentStatus.Reembolsado => "Reembolsado",
+                PaymentStatus.Falha => "Falha",
                 _ => "Outro"
             };
         }

@@ -1,0 +1,103 @@
+@page "/admin/orders-review"
+
+@using DarkMarket.Enums
+@using DarkMarket.Models
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext Db
+
+<h2>Pedidos aguardando revisão do ADM</h2>
+
+@if (orders == null)
+{
+    <p>Loading...</p>
+}
+else if (!orders.Any())
+{
+    <p>Nenhum pedido aguardando revisão.</p>
+}
+else
+{
+    <table class="product-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Comprador</th>
+                <th>Produto</th>
+                <th>Status</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var order in orders)
+        {
+            <tr>
+                <td>@order.Id</td>
+                <td>@order.Buyer?.UserName</td>
+                <td>@order.Product?.Name</td>
+                <td>
+                    <span class="order-status-badge aguardandorevisaoadm">Aguardando revisão ADM</span>
+                </td>
+                <td>
+                    <a class="details-btn" href="@($"/orders/{order.Id}")">View Details</a>
+                    <button class="success-btn" @onclick="() => ShowReleaseModal(order.Id)">Release Funds</button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@if (showReleaseModal)
+{
+    <div class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-title">Confirm Release</div>
+            <p>Are you sure you want to release the funds and finalize this order?</p>
+            <div class="modal-actions">
+                <button class="success-btn" @onclick="ConfirmReleaseFunds">Yes, release</button>
+                <button class="cancel-btn" @onclick="() => showReleaseModal = false">Cancel</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    List<OrderModel> orders;
+    private bool showReleaseModal = false;
+    private int releaseOrderId;
+
+    protected override async Task OnInitializedAsync()
+    {
+        orders = await Db.Orders
+            .Include(o => o.Buyer)
+            .Include(o => o.Product)
+            .Where(o => o.Status == PaymentStatus.AguardandoRevisaoAdm)
+            .ToListAsync();
+    }
+
+    private void ShowReleaseModal(int orderId)
+    {
+        releaseOrderId = orderId;
+        showReleaseModal = true;
+    }
+
+    private async Task ConfirmReleaseFunds()
+    {
+        showReleaseModal = false;
+        await ReleaseFunds(releaseOrderId);
+    }
+
+    private async Task ReleaseFunds(int orderId)
+    {
+        var order = await Db.Orders.FindAsync(orderId);
+        if (order != null && order.Status == PaymentStatus.AguardandoRevisaoAdm)
+        {
+            order.Status = PaymentStatus.Finalizado;
+            order.FundsReleased = true;
+            // TODO: lógica de repasse de fundos
+            await Db.SaveChangesAsync();
+            orders.Remove(order);
+            StateHasChanged();
+        }
+    }
+}

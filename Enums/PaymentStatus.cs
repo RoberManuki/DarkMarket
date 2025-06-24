@@ -9,9 +9,11 @@ namespace DarkMarket.Enums
         Finalizado = 4,
         Cancelado = 5,
         Disputa = 6,
-        Pendente = 7,
-        Reembolsado = 8,
-        Falha = 9,
+
+        AguardandoRevisaoAdm = 7,
+        Pendente = 8,
+        Reembolsado = 9,
+        Falha = 10,
     }
 }
 
