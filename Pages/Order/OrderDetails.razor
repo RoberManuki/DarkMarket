@@ -97,7 +97,9 @@ else
             else if (isAdmin && order.IsDelivered && !order.FundsReleased)
             {
                 <div class="card-footer">
-                    <button class="success-btn" @onclick="ReleaseFunds">Repassar Fundos ao Vendedor</button>
+                    <button class="success-btn" @onclick="() => showReleaseModal = true">
+                        Repassar Fundos ao Vendedor
+                    </button>
                 </div>
             }
             else if (order.IsDelivered && order.FundsReleased)
@@ -141,6 +143,23 @@ else
                 <div class="modal-actions">
                     <button class="success-btn" @onclick="ConfirmDelivery">Confirmar</button>
                     <button class="back-btn" @onclick="()=>showConfirmModal=false">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (showReleaseModal)
+    {
+        <div class="modal-overlay">
+            <div class="modal-card">
+                <h4 class="modal-title">Confirmar repasse</h4>
+                <div class="modal-content">
+                    <i class="fa fa-exclamation-triangle" style="color:#f9a825; font-size:1.5em; margin-bottom:0.5em;"></i>
+                    <p>Tem certeza que deseja repassar os fundos e finalizar o pedido?</p>
+                </div>
+                <div class="modal-actions">
+                    <button class="success-btn" @onclick="ConfirmReleaseFunds">Sim, repassar</button>
+                    <button class="back-btn" @onclick="() => showReleaseModal = false">Cancelar</button>
                 </div>
             </div>
         </div>
@@ -193,6 +212,8 @@ else
     private int confirmRating = 0;
     private IBrowserFile? confirmFile;
     private string? confirmError;
+
+    private bool showReleaseModal = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -271,6 +292,12 @@ else
             await Db.SaveChangesAsync();
             StateHasChanged();
         }
+    }
+
+    private async Task ConfirmReleaseFunds()
+    {
+        showReleaseModal = false;
+        await ReleaseFunds();
     }
 
     private async Task SendMessage()
