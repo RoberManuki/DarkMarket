@@ -1283,3 +1283,44 @@ footer {
     background: #219150;
     color: #fff;
 }
+
+.evidence-section {
+    display: flex;
+    gap: 1.5em;
+    margin-top: 1em;
+    justify-content: center;
+}
+.evidence-card {
+    background: #23272f;
+    border-radius: 8px;
+    padding: 1em 1.2em;
+    min-width: 180px;
+    box-shadow: 0 2px 8px #0002;
+    text-align: left;
+    color: #ffe082;
+}
+.evidence-card i {
+    margin-right: 0.5em;
+    color: #f9a825;
+}
+.evidence-card a {
+    display: inline-block;
+    margin-top: 0.5em;
+    color: #27ae60;
+    text-decoration: none;
+}
+.evidence-card a:hover {
+    text-decoration: underline;
+}
+.text-muted {
+    color: #888;
+    font-size: 0.95em;
+}
+
+a.evidence-link {
+    color: #ffe082 !important;
+    text-decoration: none;
+}
+a.evidence-link:hover {
+    text-decoration: underline;
+}

@@ -51,17 +51,48 @@
 ---
 
 ## Fase 7: Finalização e Reuso
-- [ ] Documentação básica para reuso (README, comentários)
-- [ ] Separação de componentes genéricos
-- [ ] Preparação para deploy (Dockerfile, publish, etc)
-- [ ] Checklist de boas práticas
+- [x] Documentação básica para reuso (README, comentários)
+- [x] Separação de componentes genéricos (StatCard, Toast, Breadcrumb, etc)
+- [x] Preparação para deploy (Dockerfile, publish, etc)
+- [x] Checklist de boas práticas (segurança, roles, uploads, validação)
+
+---
+
+## Fase 8: Refino, Métricas e Segurança
+
+1. **Testes e Segurança**
+   - [ ] Implementar testes automatizados (unitários e integração) **[priorizar antes de grandes refatorações/componentização]**
+   - [ ] Adicionar logs em todo o sistema (ações críticas, auditoria)
+   - [ ] Revisar secrets, segurança geral e ajustes para deploy
+   - [ ] Revisão de permissões e segurança em endpoints sensíveis
+
+2. **Administração e Auditoria**
+   - [ ] Revisão de logs e auditoria para admins
+
+3. **Refatoração e UX**
+   - [ ] Componentizar trechos repetidos (DRY), documentando limitações do Blazor e callbacks
+   - [ ] Revisão geral de UX e responsividade
+   - [ ] Remover coluna ID das listagens
+
+4. **Métricas e Dashboard**
+   - [ ] Dashboard com estatísticas (usuários, vendas, volume, consultas, pendências)
+   - [ ] Contabilizar e exibir consultas de cotação BTC (dashboard/admin)
+
+5. **Funcionalidades para Usuário**
+   - [ ] Implementar tela de perfil do usuário (edição, resumo, avatar)
+   - [ ] Exibir valores em USD ao lado de BTC (helpers, formatação)
+   - [ ] Implementar telas de About e Contact
+
+6. **Aprimoramento de Fluxos**
+   - [ ] Modal de confirmação de repasse: exibir detalhes do pedido (nome/foto/valor do produto, quantidade, taxa, valor líquido, vendedor/comprador)
+   - [ ] Permitir configuração da taxa de operação pelo admin
 
 ---
 
 ## Extras/Opcional
-- [ ] Testes automatizados (unitários e de integração)
+
 - [ ] Internacionalização (i18n)
 - [ ] SEO básico para páginas públicas
 - [ ] Integração com e-mail (confirmação, notificações)
-
----
+- [ ] Exportação de logs/admin
+- [ ] Notificações em tempo real (SignalR)

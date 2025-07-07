@@ -37,10 +37,6 @@ else
                 <div class="product-name">@order.Product?.Name</div>
                 <div class="product-price">@order.Amount BTC</div>
                 <div class="product-desc">@order.Product?.ShortDescription</div>
-                @* <div class="product-meta">
-                    <span>Categoria: @order.Product?.Category</span><br />
-                    <span>Criado em: @order.Product?.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</span>
-                </div> *@
             </div>
         </div>
         <div class="payment-details-card wide-card">
@@ -81,17 +77,21 @@ else
                     <span class="text-danger">Não encontrado</span>
                 </div>
             }
-            @if (isBuyer && !order.IsDelivered)
+
+            @if (isBuyer && !order.FundsReleased)
             {
                 <div class="card-footer">
-                    <button class="success-btn" @onclick="()=>showConfirmModal=true">Confirmar Recebimento</button>
+                    <button class="success-btn" @onclick="()=>showConfirmModal=true">
+                        Evidência de Recebimento
+                    </button>
                 </div>
             }
-            else if (isSeller && !order.IsDelivered)
+            else if (isSeller && order.IsPaid && !order.FundsReleased)
             {
-                <div class="order-waiting-confirmation card-footer">
-                    <i class="fa fa-clock-o"></i>
-                    Aguardando confirmação do comprador...
+                <div class="card-footer">
+                    <button class="success-btn" @onclick="()=>showSellerEvidenceModal=true">
+                        Evidência de Envio
+                    </button>
                 </div>
             }
             else if (isAdmin && order.IsDelivered && !order.FundsReleased)
@@ -126,10 +126,18 @@ else
                     {
                         <div class="modal-error">@confirmError</div>
                     }
+                    @if (!string.IsNullOrEmpty(order.BuyerEvidencePath))
+                    {
+                        <div>
+                            <a class="evidence-link" href="@order.BuyerEvidencePath" target="_blank">
+                                <i class="fa fa-file-image"></i> Ver comprovante atual
+                            </a>
+                        </div>
+                    }
                     <label>Comprovante (foto ou documento):</label>
                     <InputFile OnChange="OnFileSelected" />
                     <label>Comentário/avaliação:</label>
-                    <textarea class="modal-textarea" @bind="confirmComment"></textarea>
+                    <textarea class="modal-textarea" @bind="confirmComment">@order.BuyerEvidenceComment</textarea>
                     <label>Nota:</label>
                     <select @bind="confirmRating">
                         <option value="0">Selecione</option>
@@ -141,8 +149,39 @@ else
                     </select>
                 </div>
                 <div class="modal-actions">
-                    <button class="success-btn" @onclick="ConfirmDelivery">Confirmar</button>
+                    <button class="success-btn" @onclick="ConfirmDelivery">Salvar</button>
                     <button class="back-btn" @onclick="()=>showConfirmModal=false">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (showSellerEvidenceModal)
+    {
+        <div class="modal-overlay">
+            <div class="modal-card">
+                <h4 class="modal-title">Evidência de Envio</h4>
+                <div class="modal-content">
+                    @if (!string.IsNullOrEmpty(sellerEvidenceError))
+                    {
+                        <div class="modal-error">@sellerEvidenceError</div>
+                    }
+                    @if (!string.IsNullOrEmpty(order.SellerEvidencePath))
+                    {
+                        <div>
+                            <a class="evidence-link" href="@order.SellerEvidencePath" target="_blank">
+                                <i class="fa fa-file-image"></i> Ver comprovante atual
+                            </a>
+                        </div>
+                    }
+                    <label>Comprovante (foto ou documento):</label>
+                    <InputFile OnChange="OnSellerFileSelected" />
+                    <label>Comentário:</label>
+                    <textarea class="modal-textarea" @bind="sellerEvidenceComment">@order.SellerEvidenceComment</textarea>
+                </div>
+                <div class="modal-actions">
+                    <button class="success-btn" @onclick="ConfirmSellerEvidence">Salvar</button>
+                    <button class="back-btn" @onclick="()=>showSellerEvidenceModal=false">Cancelar</button>
                 </div>
             </div>
         </div>
@@ -156,6 +195,36 @@ else
                 <div class="modal-content">
                     <i class="fa fa-exclamation-triangle" style="color:#f9a825; font-size:1.5em; margin-bottom:0.5em;"></i>
                     <p>Tem certeza que deseja repassar os fundos e finalizar o pedido?</p>
+                    <div class="evidence-section">
+                        <div class="evidence-card">
+                            <i class="fa fa-user"></i> <b>Comprador</b>
+                            @if (!string.IsNullOrEmpty(order.BuyerEvidencePath))
+                            {
+                                <div>Comentário: @order.BuyerEvidenceComment</div>
+                                <a href="@order.BuyerEvidencePath" target="_blank">
+                                    <i class="fa fa-file-image"></i> Ver comprovante
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="text-muted">Nenhuma evidência enviada.</div>
+                            }
+                        </div>
+                        <div class="evidence-card">
+                            <i class="fa fa-truck"></i> <b>Vendedor</b>
+                            @if (!string.IsNullOrEmpty(order.SellerEvidencePath))
+                            {
+                                <div>Comentário: @order.SellerEvidenceComment</div>
+                                <a href="@order.SellerEvidencePath" target="_blank">
+                                    <i class="fa fa-file-image"></i> Ver comprovante
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="text-muted">Nenhuma evidência enviada.</div>
+                            }
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-actions">
                     <button class="success-btn" @onclick="ConfirmReleaseFunds">Sim, repassar</button>
@@ -213,6 +282,12 @@ else
     private IBrowserFile? confirmFile;
     private string? confirmError;
 
+    // Modal de evidência de envio pelo vendedor
+    private bool showSellerEvidenceModal = false;
+    private IBrowserFile? sellerEvidenceFile;
+    private string? sellerEvidenceComment;
+    private string? sellerEvidenceError;
+
     private bool showReleaseModal = false;
 
     protected override async Task OnInitializedAsync()
@@ -245,6 +320,10 @@ else
             .OrderBy(m => m.CreatedAt)
             .ToListAsync();
 
+        // Preencher campos de edição de evidência
+        confirmComment = order.BuyerEvidenceComment;
+        sellerEvidenceComment = order.SellerEvidenceComment;
+
         isLoading = false;
     }
 
@@ -253,14 +332,14 @@ else
         confirmFile = e.File;
     }
 
+    private void OnSellerFileSelected(InputFileChangeEventArgs e)
+    {
+        sellerEvidenceFile = e.File;
+    }
+
     private async Task ConfirmDelivery()
     {
         confirmError = null;
-        if (confirmFile == null)
-        {
-            confirmError = "Anexe um comprovante.";
-            return;
-        }
         if (string.IsNullOrWhiteSpace(confirmComment))
         {
             confirmError = "Preencha um comentário.";
@@ -276,11 +355,56 @@ else
             order.IsDelivered = true;
             order.DeliveryPendingApproval = true;
             order.Status = PaymentStatus.AguardandoRevisaoAdm;
-            // Aqui você pode salvar o comprovante, comentário e nota conforme sua modelagem
+            order.BuyerEvidenceComment = confirmComment;
+            order.BuyerEvidenceAt = DateTime.UtcNow;
+            // Salvar arquivo se enviado
+            if (confirmFile != null)
+            {
+                var filePath = await SaveEvidenceFile(confirmFile, $"buyer_{order.Id}");
+                order.BuyerEvidencePath = filePath;
+            }
             await Db.SaveChangesAsync();
             showConfirmModal = false;
             StateHasChanged();
         }
+    }
+
+    private async Task ConfirmSellerEvidence()
+    {
+        sellerEvidenceError = null;
+        if (string.IsNullOrWhiteSpace(sellerEvidenceComment))
+        {
+            sellerEvidenceError = "Preencha um comentário.";
+            return;
+        }
+        if (order != null)
+        {
+            order.SellerEvidenceComment = sellerEvidenceComment;
+            order.SellerEvidenceAt = DateTime.UtcNow;
+            // Salvar arquivo se enviado
+            if (sellerEvidenceFile != null)
+            {
+                var filePath = await SaveEvidenceFile(sellerEvidenceFile, $"seller_{order.Id}");
+                order.SellerEvidencePath = filePath;
+            }
+            await Db.SaveChangesAsync();
+            showSellerEvidenceModal = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task<string> SaveEvidenceFile(IBrowserFile file, string prefix)
+    {
+        var uploads = Path.Combine("wwwroot", "evidences");
+        Directory.CreateDirectory(uploads);
+        var fileName = $"{prefix}_{DateTime.UtcNow.Ticks}{Path.GetExtension(file.Name)}";
+        var filePath = Path.Combine(uploads, fileName);
+
+        using (var stream = File.Create(filePath))
+        {
+            await file.OpenReadStream().CopyToAsync(stream);
+        }
+        return $"/evidences/{fileName}";
     }
 
     private async Task ReleaseFunds()

@@ -47,15 +47,48 @@ else
     </table>
 }
 
-@if (showReleaseModal)
+@if (showReleaseModal && selectedOrder != null)
 {
     <div class="modal-overlay">
         <div class="modal-card">
-            <div class="modal-title">Confirm Release</div>
-            <p>Are you sure you want to release the funds and finalize this order?</p>
+            <h4 class="modal-title">Confirmar repasse</h4>
+            <div class="modal-content">
+                <i class="fa fa-exclamation-triangle" style="color:#f9a825; font-size:1.5em; margin-bottom:0.5em;"></i>
+                <p>Tem certeza que deseja repassar os fundos e finalizar o pedido?</p>
+                <div class="evidence-section">
+                    <div class="evidence-card">
+                        <i class="fa fa-user"></i> <b>Comprador</b>
+                        @if (!string.IsNullOrEmpty(selectedOrder.BuyerEvidencePath))
+                        {
+                            <div>Comentário: @selectedOrder.BuyerEvidenceComment</div>
+                            <a href="@selectedOrder.BuyerEvidencePath" target="_blank">
+                                <i class="fa fa-file-image"></i> Ver comprovante
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="text-muted">Nenhuma evidência enviada.</div>
+                        }
+                    </div>
+                    <div class="evidence-card">
+                        <i class="fa fa-truck"></i> <b>Vendedor</b>
+                        @if (!string.IsNullOrEmpty(selectedOrder.SellerEvidencePath))
+                        {
+                            <div>Comentário: @selectedOrder.SellerEvidenceComment</div>
+                            <a href="@selectedOrder.SellerEvidencePath" target="_blank">
+                                <i class="fa fa-file-image"></i> Ver comprovante
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="text-muted">Nenhuma evidência enviada.</div>
+                        }
+                    </div>
+                </div>
+            </div>
             <div class="modal-actions">
-                <button class="success-btn" @onclick="ConfirmReleaseFunds">Yes, release</button>
-                <button class="cancel-btn" @onclick="() => showReleaseModal = false">Cancel</button>
+                <button class="success-btn" @onclick="ConfirmReleaseFunds">Sim, repassar</button>
+                <button class="back-btn" @onclick="() => showReleaseModal = false">Cancelar</button>
             </div>
         </div>
     </div>
@@ -65,6 +98,7 @@ else
     List<OrderModel> orders;
     private bool showReleaseModal = false;
     private int releaseOrderId;
+    private OrderModel selectedOrder;
 
     protected override async Task OnInitializedAsync()
     {
@@ -78,6 +112,7 @@ else
     private void ShowReleaseModal(int orderId)
     {
         releaseOrderId = orderId;
+        selectedOrder = orders.FirstOrDefault(o => o.Id == orderId);
         showReleaseModal = true;
     }
 

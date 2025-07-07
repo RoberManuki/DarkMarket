@@ -35,4 +35,14 @@ public class OrderModel
     public bool DeliveryPendingApproval { get; set; } = false;
 
     public List<OrderMessage> Messages { get; set; } = new();
+
+    // Evidências do comprador
+    public string? BuyerEvidencePath { get; set; }
+    public string? BuyerEvidenceComment { get; set; }
+    public DateTime? BuyerEvidenceAt { get; set; }
+
+    // Evidências do vendedor
+    public string? SellerEvidencePath { get; set; }
+    public string? SellerEvidenceComment { get; set; }
+    public DateTime? SellerEvidenceAt { get; set; }
 }

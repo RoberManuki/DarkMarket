@@ -5,6 +5,14 @@
       "PackagePath": "staticwebassets/css/site.css"
     },
     {
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/evidences/buyer_8_638874521234373900.jpeg",
+      "PackagePath": "staticwebassets/evidences/buyer_8_638874521234373900.jpeg"
+    },
+    {
+      "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/evidences/seller_8_638874515120579369.webp",
+      "PackagePath": "staticwebassets/evidences/seller_8_638874515120579369.webp"
+    },
+    {
       "Id": "/home/freeza/Documents/Projects/DarkMarket/wwwroot/favicon.ico",
       "PackagePath": "staticwebassets/favicon.ico"
     },
