@@ -38,7 +38,6 @@ else
     <table class="product-table">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Usuário</th>
                 <th>Email</th>
                 <th>Role</th>
@@ -50,7 +49,6 @@ else
         @foreach (var u in filteredUsers?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<ApplicationUser>())
         {
             <tr>
-                <td data-label="ID">@u.Id</td>
                 <td data-label="Usuário">@u.UserName</td>
                 <td data-label="Email">@u.Email</td>
                 <td data-label="Role">@userRoles.GetValueOrDefault(u.Id, "-")</td>
@@ -60,11 +58,11 @@ else
                 <td data-label="Ativo">
                     @if (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)
                     {
-                        <span style="color:#e53935;font-weight:bold;">Bloqueado</span>
+                        <span class="order-status-badge cancelado">Bloqueado</span>
                     }
                     else
                     {
-                        <span style="color:#4caf50;font-weight:bold;">Ativo</span>
+                        <span class="order-status-badge pago">Ativo</span>
                     }
                 </td>
                 <td data-label="Ações">

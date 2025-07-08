@@ -42,7 +42,6 @@ else
     <table class="product-table">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Produto</th>
                 <th>Comprador</th>
                 <th>Vendedor</th>
@@ -56,11 +55,12 @@ else
             @foreach (var t in filteredOrders?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<OrderModel>())
             {
                 <tr>
-                    <td>@t.Id</td>
                     <td>
                         @if (t.Product != null)
                         {
-                            @t.Product.Name
+                            <a class="evidence-link" href="@($"/admin/products/view/{t.ProductId}")">
+                                @t.Product.Name
+                            </a>
                         }
                         else
                         {
@@ -70,7 +70,9 @@ else
                     <td>
                         @if (t.Buyer != null)
                         {
-                            @t.Buyer.UserName
+                            <a class="evidence-link" href="@($"/admin/users/view/{t.BuyerId}")">
+                                @t.Buyer.UserName
+                            </a>
                         }
                         else
                         {
@@ -80,7 +82,9 @@ else
                     <td>
                         @if (t.Seller != null)
                         {
-                            @t.Seller.UserName
+                            <a class="evidence-link" href="@($"/admin/users/view/{t.SellerId}")">
+                                @t.Seller.UserName
+                            </a>
                         }
                         else
                         {
@@ -93,7 +97,7 @@ else
                             @OrderStatusHelper.GetStatusText(t.Status)
                         </span>
                     </td>
-                    <td>@t.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@t.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
                     <td>
                         <button class="details-btn action-btn" @onclick="() => GoToDetails(t.Id)">Detalhes</button>
                     </td>

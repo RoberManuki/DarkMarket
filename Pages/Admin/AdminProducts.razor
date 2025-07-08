@@ -35,7 +35,6 @@ else
     <table class="product-table">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Nome</th>
                 <th>Usuário</th>
                 <th>Preço</th>
@@ -47,11 +46,17 @@ else
         @foreach (var p in filteredProducts?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<Product>())
         {
             <tr>
-                <td data-label="ID">@p.Id</td>
                 <td data-label="Nome">@p.Name</td>
-                <td data-label="Usuário">@p.UserId</td>
-                <td data-label="Preço">@p.Price.ToString("C")</td>
-                <td data-label="Criado em">@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                <td data-label="Usuário">
+                    <a class="evidence-link" href="@($"/admin/users/view/{p.UserId}")">
+                        @p.User?.UserName
+                    </a>
+                </td>
+                <td data-label="Preço">
+                    @p.Price.ToString("F6") BTC
+                    @* <span class="price-usd">(@GetUsdValue(p.Price))</span> *@
+                </td>
+                <td data-label="Criado em">@p.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
                 <td data-label="Ações">
                     <button class="details-btn action-btn" @onclick="() => ViewProduct(p.Id)">Detalhes</button>
                     <button class="edit-btn action-btn" @onclick="() => EditProduct(p.Id)">Editar</button>

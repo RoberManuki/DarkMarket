@@ -11,7 +11,6 @@
 <h2 class="page-title">Pagamentos</h2>
 
 <div class="filter-bar">
-    <input type="number" placeholder="ID..." @bind="filterId" min="0" />
     <input type="text" placeholder="Usuário..." @bind="filterUserId" @bind:event="oninput" />
     <input type="text" placeholder="Produto..." @bind="filterProductId" @bind:event="oninput" />
     <input type="number" placeholder="Valor mínimo" @bind="filterMinAmount" min="0" />
@@ -39,9 +38,8 @@ else
     <table class="payments-table align-right">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Usuário</th>
                 <th>Produto</th>
+                <th>Usuário</th>
                 <th>Gateway</th>
                 <th>Valor</th>
                 <th>Status</th>
@@ -53,24 +51,43 @@ else
         @foreach (var p in filteredPayments?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<PaymentRecord>())
         {
             <tr>
-                <td data-label="ID">@p.Id</td>
-                <td data-label="Usuário">@p.UserId</td>
                 <td data-label="Produto">
-                    @(p.Product?.Name ?? $"ID: {p.ProductId}")
-                </td>
-                <td data-label="Gateway">@p.PaymentMethod</td>
-                <td data-label="Valor">@p.Amount BTC</td>
-                <td data-label="Status">
-                    @if (p.IsPaid)
+                    @if (p.Product != null)
                     {
-                        <span style="color:#4caf50;font-weight:bold;">Pago</span>
+                        <a class="evidence-link" href="@($"/admin/products/view/{p.ProductId}")">
+                            @p.Product.Name
+                        </a>
                     }
                     else
                     {
-                        <span style="color:#ff9800;font-weight:bold;">Pendente</span>
+                        <span class="text-muted">ID: @p.ProductId</span>
                     }
                 </td>
-                <td data-label="Data">@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                <td data-label="Usuário">
+                    @if (p.User != null)
+                    {
+                        <a class="evidence-link" href="@($"/admin/users/view/{p.UserId}")">
+                            @p.User.UserName
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="text-muted">ID: @p.UserId</span>
+                    }
+                </td>
+                <td data-label="Gateway">@p.PaymentMethod</td>
+                <td data-label="Valor">@p.Amount.ToString("F6") BTC</td>
+                <td data-label="Status">
+                    @if (p.IsPaid)
+                    {
+                        <span class="order-status-badge pago">Pago</span>
+                    }
+                    else
+                    {
+                        <span class="order-status-badge aguardandopagamento">Pendente</span>
+                    }
+                </td>
+                <td data-label="Data">@p.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
                 <td data-label="Ações">
                     <button class="details-btn action-btn" @onclick="() => ViewPayment(p.Id)">Detalhes</button>
                 </td>
@@ -116,6 +133,7 @@ else
         isLoading = true;
         allPayments = await Db.Payments
             .Include(p => p.Product)
+            .Include(p => p.User)
             .OrderByDescending(p => p.CreatedAt)
             .Take(200)
             .ToListAsync();

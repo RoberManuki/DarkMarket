@@ -1,16 +1,16 @@
 ﻿<Project>
   <ItemGroup>
-    <StaticWebAssetEndpoint Include="_content/DarkMarket/css/site.20xdw1xr3t.css">
-      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\site.css'))</AssetFile>
-      <Selectors><![CDATA[[]]]></Selectors>
-      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"20xdw1xr3t"},{"Name":"integrity","Value":"sha256-roNO0ha0m9Cw67i9z463YrFhvWhVEH7Jm5b1kBiS\u002BNM="},{"Name":"label","Value":"_content/DarkMarket/css/site.css"}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"25655"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022roNO0ha0m9Cw67i9z463YrFhvWhVEH7Jm5b1kBiS\u002BNM=\u0022"},{"Name":"Last-Modified","Value":"Mon, 07 Jul 2025 02:27:12 GMT"}]]]></ResponseHeaders>
-    </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/DarkMarket/css/site.css">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\site.css'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
-      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-roNO0ha0m9Cw67i9z463YrFhvWhVEH7Jm5b1kBiS\u002BNM="}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"25655"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022roNO0ha0m9Cw67i9z463YrFhvWhVEH7Jm5b1kBiS\u002BNM=\u0022"},{"Name":"Last-Modified","Value":"Mon, 07 Jul 2025 02:27:12 GMT"}]]]></ResponseHeaders>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-yErDC2cVZdFWNjg4SS6/93a79chWmGiq2eLWhK4IHkU="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"27473"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022yErDC2cVZdFWNjg4SS6/93a79chWmGiq2eLWhK4IHkU=\u0022"},{"Name":"Last-Modified","Value":"Tue, 08 Jul 2025 06:22:23 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/DarkMarket/css/site.sb6fpp4qrd.css">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\css\site.css'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"sb6fpp4qrd"},{"Name":"integrity","Value":"sha256-yErDC2cVZdFWNjg4SS6/93a79chWmGiq2eLWhK4IHkU="},{"Name":"label","Value":"_content/DarkMarket/css/site.css"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"27473"},{"Name":"Content-Type","Value":"text/css"},{"Name":"ETag","Value":"\u0022yErDC2cVZdFWNjg4SS6/93a79chWmGiq2eLWhK4IHkU=\u0022"},{"Name":"Last-Modified","Value":"Tue, 08 Jul 2025 06:22:23 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/DarkMarket/evidences/buyer_8_638874521234373900.jpeg">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\evidences\buyer_8_638874521234373900.jpeg'))</AssetFile>
@@ -23,6 +23,18 @@
       <Selectors><![CDATA[[]]]></Selectors>
       <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"kx4hf1l1kg"},{"Name":"integrity","Value":"sha256-ONaFQHL3mhEyvBzkEYJojFKWkbZBjEUA9AVaV\u002Bo5l7Y="},{"Name":"label","Value":"_content/DarkMarket/evidences/buyer_8_638874521234373900.jpeg"}]]]></EndpointProperties>
       <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"6685"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\u0022ONaFQHL3mhEyvBzkEYJojFKWkbZBjEUA9AVaV\u002Bo5l7Y=\u0022"},{"Name":"Last-Modified","Value":"Mon, 07 Jul 2025 02:28:43 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/DarkMarket/evidences/buyer_9_638874582964075407.jpeg">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\evidences\buyer_9_638874582964075407.jpeg'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-\u002BPXqcjOLFgOu8ob4PUG0AcNGX1U1ddcl8HX1/NQhlGE="}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=3600, must-revalidate"},{"Name":"Content-Length","Value":"9575"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\u0022\u002BPXqcjOLFgOu8ob4PUG0AcNGX1U1ddcl8HX1/NQhlGE=\u0022"},{"Name":"Last-Modified","Value":"Mon, 07 Jul 2025 04:11:36 GMT"}]]]></ResponseHeaders>
+    </StaticWebAssetEndpoint>
+    <StaticWebAssetEndpoint Include="_content/DarkMarket/evidences/buyer_9_638874582964075407.s3wu07l9c3.jpeg">
+      <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\evidences\buyer_9_638874582964075407.jpeg'))</AssetFile>
+      <Selectors><![CDATA[[]]]></Selectors>
+      <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"s3wu07l9c3"},{"Name":"integrity","Value":"sha256-\u002BPXqcjOLFgOu8ob4PUG0AcNGX1U1ddcl8HX1/NQhlGE="},{"Name":"label","Value":"_content/DarkMarket/evidences/buyer_9_638874582964075407.jpeg"}]]]></EndpointProperties>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"9575"},{"Name":"Content-Type","Value":"image/jpeg"},{"Name":"ETag","Value":"\u0022\u002BPXqcjOLFgOu8ob4PUG0AcNGX1U1ddcl8HX1/NQhlGE=\u0022"},{"Name":"Last-Modified","Value":"Mon, 07 Jul 2025 04:11:36 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/DarkMarket/evidences/seller_8_638874515120579369.6hoqacqjf4.webp">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\evidences\seller_8_638874515120579369.webp'))</AssetFile>

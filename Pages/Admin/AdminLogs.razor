@@ -45,7 +45,7 @@
         @foreach (var log in logs)
         {
             <tr>
-                <td data-label="Data/Hora">@log.Timestamp.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</td>
+                <td data-label="Data/Hora">@log.Timestamp.ToLocalTime().ToString("dd MMM yyyy, HH:mm:ss")</td>
                 <td data-label="Nível">
                     @if (log.Level == "Error")
                     {
@@ -61,7 +61,22 @@
                     }
                 </td>
                 <td data-label="Fonte">@log.Source</td>
-                <td data-label="Usuário">@log.UserId</td>
+                <td data-label="Usuário">
+                    @if (log.User != null)
+                    {
+                        <a class="evidence-link" href="@($"/admin/users/view/{log.User.Id}")">
+                            @log.User.UserName
+                        </a>
+                    }
+                    else if (!string.IsNullOrEmpty(log.UserId))
+                    {
+                        <span class="text-muted">ID: @log.UserId</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted">-</span>
+                    }
+                </td>
                 <td data-label="Mensagem">@log.Message</td>
                 <td data-label="Exceção" style="max-width:300px;overflow-x:auto;white-space:pre-wrap;">@log.Exception</td>
             </tr>
@@ -113,6 +128,7 @@
 
         totalLogs = await query.CountAsync();
         logs = await query
+            .Include(l => l.User)
             .OrderByDescending(l => l.Timestamp)
             .Skip((currentPage - 1) * pageSize)
             .Take(pageSize)
