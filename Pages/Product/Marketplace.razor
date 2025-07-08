@@ -56,7 +56,7 @@ else
                     <div class="product-user">
                         @if (p.User != null)
                         {
-                            <a href="@($"/profile/{p.User.Id}")">@p.User.UserName</a>
+                            <a class="evidence-link" href="@($"/profile/{p.User.Id}")">@p.User.UserName</a>
                         }
                     </div>
                 </div>
@@ -219,15 +219,6 @@ else
         color: #b0b0b0;
         font-size: 1rem;
         word-break: break-word;
-    }
-    .product-user a {
-        color: #f8f8f2;
-        text-decoration: underline;
-        font-weight: bold;
-        transition: color 0.2s;
-    }
-    .product-user a:hover {
-        color: #8ab4f8;
     }
     .product-actions {
         display: flex;

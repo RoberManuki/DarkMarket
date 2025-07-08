@@ -19,81 +19,68 @@
     }
     else
     {
-        <div class="product-summary">
-            <div class="product-img-block">
-                @if (!string.IsNullOrEmpty(product.ImagePath))
-                {
-                    <img src="@product.ImagePath" alt="Imagem do produto" />
-                }
-            </div>
-            <div class="product-main">
-                <div class="product-title">@product.Name</div>
-                <div class="product-price">@product.Price.ToString("C")</div>
-            </div>
-            <div class="product-desc-block">
-                <div class="label">Descrição:</div>
-                <div class="product-desc">@product.Description</div>
-            </div>
-            <div class="product-seller-block">
-                <div class="label">Vendedor:</div>
-                <div class="product-user">
-                    @if (product.User != null)
-                    {
-                        <a href="@($"/profile/{product.User.Id}")">@product.User.UserName</a>
-                    }
-                </div>
-            </div>
-            <div class="delivery-block">
-                <div class="label">Entrega:</div>
-                <div class="delivery-details">
-                    Entregador: <b>João da Entrega</b> <br />
-                    Previsão: <b>2 dias úteis</b>
-                </div>
-            </div>
-        </div>
-
-        @if (string.IsNullOrEmpty(Address))
-        {
-            @if (!ActiveGateways.Any())
-            {
-                <div class="no-gateways">
-                    <b>Nenhum método de pagamento disponível no momento.</b>
-                    <div style="color:#aaa;font-size:0.95rem;margin-top:0.5rem;">
-                        Tente novamente mais tarde ou entre em contato com o suporte.
+        <div class="payment-details-container">
+            <div class="payment-card">
+                <div class="card-content-center">
+                    <div class="product-img-block">
+                        @if (!string.IsNullOrEmpty(product.ImagePath))
+                        {
+                            <img src="@product.ImagePath" alt="Imagem do produto" />
+                        }
+                    </div>
+                    <div class="product-main">
+                        <div class="product-title">@product.Name</div>
+                    </div>
+                    <div class="product-desc-block">
+                        <div class="label">Descrição:</div>
+                        <div class="product-desc system-value">@product.Description</div>
+                    </div>
+                    <div class="product-seller-block">
+                        <div class="label">Vendedor:</div>
+                        <div class="product-user system-value">
+                            @if (product.User != null)
+                            {
+                                <a class="evidence-link" href="@($"/profile/{product.User.Id}")">@product.User.UserName</a>
+                            }
+                        </div>
+                    </div>
+                    <div class="delivery-block">
+                        <div class="label">Entrega:</div>
+                        <div class="delivery-details system-value">
+                            Entregador: <b>João da Entrega</b> <br />
+                            Previsão: <b>2 dias úteis</b>
+                        </div>
                     </div>
                 </div>
-            }
-            else
-            {
-                <div>
-                    <label for="payment-method">Método de pagamento:</label>
-                    <select id="payment-method" class="gateway-select" @bind="SelectedMethod" aria-label="Selecionar método de pagamento">
-                        @foreach (var gateway in ActiveGateways)
-                        {
-                            <option value="@gateway.Name">@gateway.Name</option>
-                        }
-                    </select>
-                </div>
-                <button class="payment-btn payment-btn-generate" @onclick="GenerateAddress" aria-label="Gerar endereço de pagamento">
-                    Gerar endereço de pagamento
-                </button>
-            }
-        }
-        else
-        {
+            </div>
+
             <div class="payment-card">
-                @if (SelectedMethod == "BTCPayServer" && Address.StartsWith("http"))
+                <div class="payment-title">Gerar Pagamento</div>
+                @if (!ActiveGateways.Any())
                 {
-                    <div class="payment-address-block">
-                        <span class="label">Checkout:</span>
-                        <div class="payment-address">
-                            <a href="@Address" target="_blank" class="payment-btn" aria-label="Abrir checkout do @SelectedMethod">
-                                Abrir checkout do @SelectedMethod
-                            </a>
+                    <div class="no-gateways">
+                        <b>Nenhum método de pagamento disponível no momento.</b>
+                        <div style="color:#aaa;font-size:0.95rem;margin-top:0.5rem;">
+                            Tente novamente mais tarde ou entre em contato com o suporte.
                         </div>
-                        <div>
-                            <small>O QR code de pagamento será exibido na página do @SelectedMethod.</small>
-                        </div>
+                    </div>
+                }
+                else if (string.IsNullOrEmpty(Address))
+                {
+                    <div class="generate-invoice-block">
+                        <label class="gateway-label" for="payment-method">Selecione o gateway:</label>
+                        <select id="payment-method" class="gateway-select" @bind="SelectedMethod" aria-label="Selecionar gateway de pagamento">
+                            @foreach (var gateway in ActiveGateways)
+                            {
+                                <option value="@gateway.Name">@gateway.Name</option>
+                            }
+                        </select>
+                        <button class="payment-btn payment-btn-generate big-btn" @onclick="GenerateAddress" aria-label="Gerar endereço de pagamento">
+                            Gerar endereço de pagamento
+                        </button>
+                        <button class="payment-btn payment-btn-history" @onclick="ShowPaymentHistory" aria-label="Ver histórico de pagamentos">
+                            <i class="fa fa-list"></i> Histórico de pagamentos
+                        </button>
                     </div>
                 }
                 else
@@ -105,53 +92,53 @@
                     <div class="payment-qrcode-block">
                         <QRCode Value="@QRCodeValue" />
                     </div>
-                }
 
-                <div class="payment-amount-block">
-                    <span class="label">Valor:</span>
-                    <span class="payment-amount">@Amount BTC (@SelectedMethod)</span>
-                </div>
-                <div class="payment-status-block">
-                    <span class="label">Status:</span>
-                    @if (IsPaid)
-                    {
-                        <span class="payment-status-ok">Pagamento recebido!</span>
-                    }
-                    else
-                    {
-                        <span class="payment-status-wait">Aguardando pagamento...</span>
-                        <button class="payment-btn" @onclick="CheckPayment" aria-label="Verificar pagamento">
-                            Verificar pagamento
-                        </button>
-                    }
-                </div>
-
-                @if (SelectedMethod == "Testnet" && !string.IsNullOrEmpty(paymentRecord?.PrivateKey))
-                {
-                    <div class="private-key-block">
-                        <div class="private-key-title">
-                            <i class="fa fa-key"></i>
-                            Chave privada do endereço:
-                        </div>
-                        <div class="private-key-value">
-                            <code>@paymentRecord.PrivateKey</code>
-                        </div>
-                        <div class="private-key-warning">
-                            <i class="fa fa-exclamation-triangle"></i>
-                            Guarde esta chave! Sem ela, não será possível movimentar os testcoins deste endereço.
-                        </div>
-                        @if (IsPaid && paymentRecord?.Order.Id != null)
+                    <div class="payment-amount-block">
+                        <span class="label">Valor:</span>
+                        <span class="system-value">@Amount BTC (@SelectedMethod)</span>
+                    </div>
+                    <div class="payment-status-block">
+                        <span class="label">Status:</span>
+                        @if (IsPaid)
                         {
-                            <div class="private-key-actions">
-                                <a class="payment-btn payment-btn-success" href="@($"/orders/{paymentRecord.Order.Id}")">
-                                    <i class="fa fa-exchange-alt"></i> Ver Pedido
-                                </a>
-                            </div>
+                            <span class="payment-status-ok">Pagamento recebido!</span>
+                        }
+                        else
+                        {
+                            <span class="payment-status-wait">Aguardando pagamento...</span>
+                            <button class="payment-btn" @onclick="CheckPayment" aria-label="Verificar pagamento">
+                                Verificar pagamento
+                            </button>
                         }
                     </div>
+
+                    @if (SelectedMethod == "Testnet" && !string.IsNullOrEmpty(paymentRecord?.PrivateKey))
+                    {
+                        <div class="private-key-block">
+                            <div class="private-key-title">
+                                <i class="fa fa-key"></i>
+                                Chave privada do endereço:
+                            </div>
+                            <div class="private-key-value">
+                                <code>@paymentRecord.PrivateKey</code>
+                            </div>
+                            <div class="private-key-warning">
+                                <i class="fa fa-exclamation-triangle"></i>
+                                Guarde esta chave! Sem ela, não será possível movimentar os testcoins deste endereço.
+                            </div>
+                            @if (IsPaid && paymentRecord?.Order.Id != null)
+                            {
+                                <div class="private-key-actions">
+                                    <a class="payment-btn payment-btn-success" href="@($"/orders/{paymentRecord.Order.Id}")">
+                                        <i class="fa fa-exchange-alt"></i> Ver Pedido
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    }
                 }
             </div>
-        }
+        </div>
     }
 
     @if (isLoading)
@@ -221,6 +208,11 @@
     {
         if (hubConnection != null)
             await hubConnection.DisposeAsync();
+    }
+
+    private void ShowPaymentHistory()
+    {
+        NavigationManager.NavigateTo("/payments");
     }
 
     private async Task GenerateAddress()
@@ -365,122 +357,3 @@
         }
     }
 }
-
-<style>
-    .payment-container {
-        max-width: 520px;
-        margin: 3rem auto;
-        background: #23272b;
-        color: #f0f0f0;
-        border-radius: 16px;
-        box-shadow: 0 2px 16px #000a;
-        padding: 2.5rem 2rem;
-        text-align: center;
-    }
-    .product-summary {
-        margin-bottom: 2.5rem;
-        background: #181818;
-        border-radius: 12px;
-        padding: 1.5rem 1rem;
-        box-shadow: 0 1px 8px #0006;
-    }
-    .product-img-block img {
-        max-width: 120px;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-    }
-    .product-title {
-        font-size: 1.3rem;
-        font-weight: bold;
-        margin-bottom: 0.2rem;
-    }
-    .product-price {
-        color: #8ab4f8;
-        font-size: 1.1rem;
-        margin-bottom: 0.7rem;
-    }
-    .label {
-        color: #8ab4f8;
-        font-weight: bold;
-        margin-bottom: 0.2rem;
-    }
-    .product-desc {
-        color: #b0b0b0;
-        font-size: 1rem;
-        word-break: break-word;
-        margin-bottom: 0.7rem;
-    }
-    .product-user a {
-        color: #f8f8f2;
-        text-decoration: underline;
-        font-weight: bold;
-        transition: color 0.2s;
-    }
-    .product-user a:hover {
-        color: #8ab4f8;
-    }
-    .delivery-block {
-        margin-top: 1rem;
-        font-size: 0.98rem;
-        color: #f0f0f0;
-    }
-    .payment-btn.payment-btn-generate {
-        background: #f9a825;
-        color: #181818;
-        font-weight: bold;
-        padding: 0.7rem 1.5rem;
-        border-radius: 8px;
-        border: none;
-        font-size: 1.1rem;
-        cursor: pointer;
-        margin-top: 1.2rem;
-        margin-bottom: 0.5rem;
-        box-shadow: 0 2px 8px #0004;
-        display: inline-flex;
-        align-items: center;
-        transition: background 0.2s;
-    }
-    .payment-btn.payment-btn-generate:hover {
-        background: #c17900;
-    }
-    .payment-card {
-        background: #2c2f33;
-        border-radius: 12px;
-        padding: 1.5rem 1rem;
-        box-shadow: 0 1px 8px #0006;
-        text-align: left;
-        margin-top: 1.5rem;
-    }
-    .payment-address-block,
-    .payment-qrcode-block,
-    .payment-amount-block,
-    .payment-status-block {
-        margin-bottom: 1.2rem;
-    }
-    .payment-address {
-        font-family: monospace;
-        word-break: break-all;
-        background: #23272b;
-        padding: 0.8rem;
-        border-radius: 8px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .payment-status-ok {
-        color: #2ecc71;
-        font-weight: bold;
-    }
-    .payment-status-wait {
-        color: #f39c12;
-        font-weight: bold;
-    }
-    .no-gateways {
-        background: #2c2f33;
-        color: #f39c12;
-        border-radius: 8px;
-        padding: 1.2rem;
-        margin: 1.5rem 0;
-        text-align: center;
-        font-size: 1.08rem;
-    }
-</style>
