@@ -20,6 +20,7 @@ namespace DarkMarket.Models
         public string? PrivateKey { get; set; }
 
         public Product? Product { get; set; }
+        public int? OrderId { get; set; }
         public OrderModel? Order { get; set; }
     }
 }

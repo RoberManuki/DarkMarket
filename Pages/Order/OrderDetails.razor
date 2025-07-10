@@ -8,11 +8,13 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.JSInterop
 
 @inject AppDbContext Db
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthProvider
 @inject UserManager<ApplicationUser> UserManager
+@inject IJSRuntime JS
 
 <nav class="breadcrumb">
     <a href="/">Início</a> &gt; <a href="/orders">Pedidos</a> &gt; Detalhes
@@ -42,11 +44,15 @@ else
         <div class="payment-details-card wide-card">
             <div class="details-row">
                 <span class="label">Comprador:</span>
-                <span>@(order.Buyer?.UserName ?? order.BuyerId)</span>
+                <span>
+                    <a class="evidence-link" href="@($"/profile/{order.BuyerId}")">@order.Buyer?.UserName</a>
+                </span>
             </div>
             <div class="details-row">
                 <span class="label">Vendedor:</span>
-                <span>@(order.Seller?.UserName ?? order.SellerId)</span>
+                <span>
+                    <a class="evidence-link" href="@($"/profile/{order.SellerId}")">@order.Seller?.UserName</a>
+                </span>
             </div>
             <div class="details-row">
                 <span class="label">Status:</span>
@@ -58,16 +64,43 @@ else
             </div>
             <div class="details-row">
                 <span class="label">Data:</span>
-                <span>@order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                <span class="system-value align-right">@order.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
             </div>
             @if (order.Payment != null)
             {
                 <div class="details-row">
                     <span class="label">Pagamento:</span>
-                    <a class="payment-link-btn" href="@($"/payments/details/{order.Payment.Id}")" title="Ver pagamento">
+                    <span class="payment-address-flex">
                         <span class="payment-address">@order.Payment.PaymentId</span>
-                        <span class="payment-link-text">Ver pagamento</span>
-                    </a>
+                        <button class="clipboard-btn" @onclick="() => CopyToClipboard(order.Payment.PaymentId)">
+                            <i class="fa fa-clipboard"></i>
+                        </button>
+                    </span>
+                </div>
+                <div class="details-row">
+                    <span class="label" style="visibility:hidden">Pagamento:</span>
+                    <span>
+                        <a class="payment-link-btn" href="@($"/payments/details/{order.Payment.Id}")" title="Ver pagamento">
+                            <span class="payment-link-text">Ver pagamento</span>
+                        </a>
+                    </span>
+                </div>
+                @if (isBuyer && !order.FundsReleased)
+                {
+                    <div class="details-row">
+                        <span class="label" style="visibility:hidden">Pagamento:</span>
+                        <span>
+                            <button class="evidence-btn" @onclick="()=>showConfirmModal=true">
+                                <i class="fa fa-upload"></i> Enviar evidência de recebimento
+                            </button>
+                        </span>
+                    </div>
+                }
+                <div class="details-row">
+                    <span class="label" style="visibility:hidden">Pagamento:</span>
+                    <span>
+                        <button class="back-btn" @onclick='GoBack'>Voltar</button>
+                    </span>
                 </div>
             }
             else
@@ -76,17 +109,15 @@ else
                     <span class="label">Pagamento:</span>
                     <span class="text-danger">Não encontrado</span>
                 </div>
-            }
-
-            @if (isBuyer && !order.FundsReleased)
-            {
-                <div class="card-footer">
-                    <button class="success-btn" @onclick="()=>showConfirmModal=true">
-                        Evidência de Recebimento
-                    </button>
+                <div class="details-row">
+                    <span class="label"></span>
+                    <span>
+                        <button class="back-btn" @onclick='GoBack'>Voltar</button>
+                    </span>
                 </div>
             }
-            else if (isSeller && order.IsPaid && !order.FundsReleased)
+
+            @if (isSeller && order.IsPaid && !order.FundsReleased)
             {
                 <div class="card-footer">
                     <button class="success-btn" @onclick="()=>showSellerEvidenceModal=true">
@@ -109,10 +140,6 @@ else
                     Entrega confirmada e fundos repassados.
                 </div>
             }
-
-            <div class="card-footer">
-                <button class="back-btn" @onclick='GoBack'>Voltar</button>
-            </div>
         </div>
     </div>
 
@@ -448,5 +475,11 @@ else
     private void GoBack()
     {
         NavigationManager.NavigateTo("/orders");
+    }
+
+    private async Task CopyToClipboard(string? value)
+    {
+        if (!string.IsNullOrEmpty(value))
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", value);
     }
 }

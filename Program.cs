@@ -116,7 +116,8 @@ app.MapPost("/api/btcpay/webhook", async (HttpContext context, AppDbContext db, 
 
             try
             {
-                db.Orders.Add(order);
+                payment.OrderId = order.Id;
+                db.Payments.Update(payment);
                 await db.SaveChangesAsync();
             }
             catch (Exception ex)
