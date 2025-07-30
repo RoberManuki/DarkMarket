@@ -5,21 +5,14 @@
 @using DarkMarket.Shared
 @using Microsoft.AspNetCore.Authorization
 
-@inject BitcoinQuoteService BitcoinQuoteService
 @inject AuthenticationStateProvider AuthenticationStateProvider
 
 <div class="dashboard-container">
     <h2 class="page-title">Dashboard</h2>
 
-    <BtcQuoteCard Quote="quote" Label="Cotação Atual" />
-    @if (quote == null)
-    {
-        <div class="btc-quote-error">
-            <span class="oi oi-warning"></span>
-            Não foi possível obter a cotação do Bitcoin no momento.<br />
-            <small>Tente novamente mais tarde.</small>
-        </div>
-    }
+    <BtcQuoteCard Label="Bitcoin" Currency="BTC" CryptoId="bitcoin" ImageSrc="https://assets.coingecko.com/coins/images/1/large/bitcoin.png" />
+    <BtcQuoteCard Label="Ethereum" Currency="ETH" CryptoId="ethereum" ImageSrc="https://assets.coingecko.com/coins/images/279/large/ethereum.png" />
+    <BtcQuoteCard Label="Solana" Currency="SOL" CryptoId="solana" ImageSrc="https://assets.coingecko.com/coins/images/4128/large/solana.png" />
 
     <div class="dashboard-cards">
         <StatCard Title="Perfil">
@@ -58,14 +51,11 @@
 </div>
 
 @code {
-    private BitcoinQuote? quote;
     private bool isAuthenticated;
     private string? userName;
 
     protected override async Task OnInitializedAsync()
     {
-        quote = await BitcoinQuoteService.GetQuoteAsync();
-
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 

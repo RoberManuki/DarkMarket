@@ -2,7 +2,6 @@
 
 @using DarkMarket.Shared
 
-@inject BitcoinQuoteService BitcoinQuoteService
 @inject UserService UserService
 @inject ProductService ProductService
 
@@ -11,15 +10,7 @@
 <div class="index-container">
     <h2 class="page-title">Bem-vindo ao DarkMarket!</h2>
 
-    <BtcQuoteCard Quote="quote" Label="Cotação Atual" />
-    @if (quote == null)
-    {
-        <div class="btc-quote-error">
-            <span class="oi oi-warning"></span>
-            Não foi possível obter a cotação do Bitcoin no momento.<br />
-            <small>Tente novamente mais tarde.</small>
-        </div>
-    }
+    <BtcQuoteCard Label="Bitcoin" Currency="BTC" CryptoId="bitcoin" ImageSrc="https://assets.coingecko.com/coins/images/1/large/bitcoin.png" />
 
     <div class="stats-row">
         <StatCard Title="Usuários">
@@ -35,14 +26,12 @@
 </div>
 
 @code {
-    private BitcoinQuote? quote;
     private int usersCount;
     private int productsCount;
     private int quoteViews = 0; // Implemente a lógica real se quiser
 
     protected override async Task OnInitializedAsync()
     {
-        quote = await BitcoinQuoteService.GetQuoteAsync();
         usersCount = await UserService.GetUsersCountAsync();
         productsCount = await ProductService.GetProductsCountAsync();
         quoteViews++; // Exemplo simples

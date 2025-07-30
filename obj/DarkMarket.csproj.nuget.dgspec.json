@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/freeza/Documents/Projects/DarkMarket/DarkMarket.csproj": {}
+    "/home/freeza/Projects/Blazor/DarkMarket/DarkMarket.csproj": {}
   },
   "projects": {
-    "/home/freeza/Documents/Projects/DarkMarket/DarkMarket.csproj": {
+    "/home/freeza/Projects/Blazor/DarkMarket/DarkMarket.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/freeza/Documents/Projects/DarkMarket/DarkMarket.csproj",
+        "projectUniqueName": "/home/freeza/Projects/Blazor/DarkMarket/DarkMarket.csproj",
         "projectName": "DarkMarket",
-        "projectPath": "/home/freeza/Documents/Projects/DarkMarket/DarkMarket.csproj",
+        "projectPath": "/home/freeza/Projects/Blazor/DarkMarket/DarkMarket.csproj",
         "packagesPath": "/home/freeza/.nuget/packages/",
-        "outputPath": "/home/freeza/Documents/Projects/DarkMarket/obj/",
+        "outputPath": "/home/freeza/Projects/Blazor/DarkMarket/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/home/freeza/.nuget/NuGet/NuGet.Config"
@@ -20,7 +20,6 @@
           "net9.0"
         ],
         "sources": {
-          "/usr/share/dotnet/library-packs": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {

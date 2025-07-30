@@ -1,40 +1,43 @@
 @using DarkMarket.Models
+@using DarkMarket.Services
 
-<div class="btc-quote-row">
-    <div class="btc-quote-label">
-        <span class="btc-label-text">@Label</span>
+@inject CryptoQuoteService CryptoQuoteService
+
+<div class="crypto-quote-row">
+    <div class="crypto-quote-label">
+        <span class="crypto-label-text">@Label</span>
     </div>
 
-    <div class="btc-quote-content">
-        <div class="btc-quote-col btc-img-col">
-            <img src="https://assets.coingecko.com/coins/images/1/large/bitcoin.png" alt="BTC" class="btc-img" />
-            <span class="btc-amount">1 BTC</span>
+    <div class="crypto-quote-content">
+        <div class="crypto-quote-col crypto-img-col">
+            <img src=@ImageSrc alt=@Currency class="crypto-img" />
+            <span class="crypto-amount">1 @Currency</span>
         </div>
 
-        <div class="btc-quote-col btc-usd-col">
-            <span class="btc-currency">USD</span>
-            <span class="btc-value">
-                @if (Quote == null)
+        <div class="crypto-quote-col crypto-usd-col">
+            <span class="crypto-currency">USD</span>
+            <span class="crypto-value">
+                @if (quote == null || isLoading)
                 {
                     <span>...</span>
                 }
                 else
                 {
-                    @Quote.btc_usd.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))
+                    @quote.PriceUsd.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-US"))
                 }
             </span>
         </div>
         
-        <div class="btc-quote-col btc-brl-col">
-            <span class="btc-currency">BRL</span>
-            <span class="btc-value">
-                @if (Quote == null)
+        <div class="crypto-quote-col crypto-brl-col">
+            <span class="crypto-currency">BRL</span>
+            <span class="crypto-value">
+                @if (quote == null || isLoading)
                 {
                     <span>...</span>
                 }
                 else
                 {
-                    @Quote.btc_brl.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"))
+                    @quote.PriceBrl.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("pt-BR"))
                 }
             </span>
         </div>
@@ -42,12 +45,40 @@
 </div>
 
 @code {
-    [Parameter] public BitcoinQuote? Quote { get; set; }
-    [Parameter] public string Label { get; set; } = "Cotação";
+    [Parameter] public string Label { get; set; } = "Bitcoin";
+    [Parameter] public string ImageSrc { get; set; } = "";
+    [Parameter] public string Currency { get; set; } = "BTC";
+    [Parameter] public string CryptoId { get; set; } = "bitcoin";
+
+    private CryptoQuote? quote;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadQuoteAsync();
+    }
+
+    private async Task LoadQuoteAsync()
+    {
+        isLoading = true;
+        try
+        {
+            quote = await CryptoQuoteService.GetQuoteAsync(CryptoId, Currency, Label);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading quote for {Currency}: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
 }
 
 <style>
-    .btc-quote-row {
+    .crypto-quote-row {
         display: flex;
         align-items: center;
         background: linear-gradient(90deg, #23272b 60%, #181c20 100%);
@@ -60,13 +91,13 @@
         gap: 2.5rem;
         box-sizing: border-box;
     }
-    .btc-quote-label {
+    .crypto-quote-label {
         min-width: 180px;
         display: flex;
         align-items: center;
         justify-content: flex-start;
     }
-    .btc-label-text {
+    .crypto-label-text {
         font-size: 2.1rem;
         font-weight: bold;
         color: #f9a825;
@@ -74,61 +105,61 @@
         text-shadow: 0 2px 12px #000a;
         text-transform: uppercase;
     }
-    .btc-quote-content {
+    .crypto-quote-content {
         display: flex;
         flex: 1;
         justify-content: space-evenly;
         align-items: center;
         gap: 2.5rem;
     }
-    .btc-quote-col {
+    .crypto-quote-col {
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         min-width: 120px;
     }
-    .btc-img-col {
+    .crypto-img-col {
         flex-direction: row;
         gap: 1rem;
     }
-    .btc-img {
+    .crypto-img {
         width: 64px;
         height: 64px;
         margin-right: 0.5rem;
         filter: drop-shadow(0 2px 8px #0008);
     }
-    .btc-amount {
+    .crypto-amount {
         font-size: 1.4rem;
         font-weight: bold;
         color: #f8f8f2;
         letter-spacing: 1px;
     }
-    .btc-currency {
+    .crypto-currency {
         font-size: 1.1rem;
         color: #b0b0b0;
         margin-bottom: 0.2rem;
         letter-spacing: 1px;
     }
-    .btc-value {
+    .crypto-value {
         font-size: 1.5rem;
         font-weight: bold;
         color: #8ab4f8;
         text-shadow: 0 2px 8px #0008;
     }
-    .btc-usd-col .btc-value {
+    .crypto-usd-col .crypto-value {
         color: #8ab4f8;
     }
-    .btc-brl-col .btc-value {
+    .crypto-brl-col .crypto-value {
         color: #4caf50;
     }
     @@media (max-width: 900px) {
-        .btc-quote-row {
+        .crypto-quote-row {
             flex-direction: column;
             gap: 1.2rem;
             padding: 1.2rem 1rem;
         }
-        .btc-quote-content {
+        .crypto-quote-content {
             flex-direction: column;
             gap: 1.2rem;
         }

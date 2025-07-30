@@ -21,6 +21,7 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddHttpClient();
 
 builder.Services.AddSingleton<BitcoinQuoteService>();
+builder.Services.AddSingleton<CryptoQuoteService>();
 
 builder.Services.AddScoped<IBitcoinPaymentService, BtcPayServerPaymentService>();
 builder.Services.AddScoped<IBitcoinPaymentService, TestnetBitcoinPaymentService>();

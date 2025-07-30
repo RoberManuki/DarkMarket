@@ -34,8 +34,8 @@ namespace DarkMarket.Services
 
                 _cachedQuote = new BitcoinQuote
                 {
-                    btc_brl = result.bitcoin.brl,
-                    btc_usd = result.bitcoin.usd
+                    btc_brl = result.bitcoin.Brl,
+                    btc_usd = result.bitcoin.Usd
                 };
 
                 _lastFetch = DateTime.Now;

@@ -23,14 +23,84 @@ DarkMarket é um marketplace descentralizado focado em transações com Bitcoin,
 
 ## Como rodar localmente
 
-1. Clone o repositório
-2. Configure o `appsettings.json` com as chaves dos gateways desejados
-3. Execute as migrações do banco de dados
-4. Rode o projeto:
+### Pré-requisitos
+- .NET 9.0 SDK
+- PostgreSQL instalado e rodando
+
+### Configuração do Ambiente
+
+1. **Clone o repositório**
    ```bash
-   dotnet run
+   git clone <url-do-repositorio>
+   cd DarkMarket
    ```
-5. Acesse `http://localhost:5000`
+
+2. **Configure o PostgreSQL**
+   
+   Verifique se o PostgreSQL está rodando:
+   ```bash
+   sudo systemctl status postgresql
+   ```
+   
+   Crie o usuário e banco de dados:
+   ```bash
+   # Criar usuário (substitua 'suasenha' pela senha desejada)
+   sudo -u postgres psql -c "CREATE USER freeza WITH PASSWORD 'theemperor';"
+   
+   # Criar banco de dados
+   sudo -u postgres psql -c "CREATE DATABASE darkmarket OWNER freeza;"
+   
+   # Conceder privilégios
+   sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE darkmarket TO freeza;"
+   ```
+
+3. **Configure o `appsettings.json`**
+   
+   Ajuste a string de conexão se necessário e configure as chaves dos gateways Bitcoin desejados.
+
+4. **Execute as migrações do banco de dados**
+   ```bash
+   dotnet ef database update
+   ```
+
+5. **Rode o projeto**
+   ```bash
+   dotnet watch run
+   ```
+
+6. **Acesse a aplicação**
+   
+   Abra o navegador em `http://localhost:5000`
+
+### Troubleshooting
+
+**Erro de autenticação PostgreSQL:**
+```
+password authentication failed for user "freeza"
+```
+- Verifique se o usuário foi criado corretamente
+- Confirme se a senha no `appsettings.json` está correta
+- Certifique-se que o PostgreSQL está rodando
+
+**Erro de conexão com banco:**
+```
+database "darkmarket" does not exist
+```
+- Execute os comandos de criação do banco listados acima
+- Verifique se o nome do banco no `appsettings.json` está correto
+
+**Para resetar o banco (se necessário):**
+```bash
+# Remover banco existente
+sudo -u postgres psql -c "DROP DATABASE IF EXISTS darkmarket;"
+
+# Recriar banco
+sudo -u postgres psql -c "CREATE DATABASE darkmarket OWNER freeza;"
+sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE darkmarket TO freeza;"
+
+# Executar migrações novamente
+dotnet ef database update
+```
 
 ---
 

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "DBMwbyJ6M/U=",
+  "dgSpecHash": "oQZM2+RDaZc=",
   "success": true,
-  "projectFilePath": "/home/freeza/Documents/Projects/DarkMarket/DarkMarket.csproj",
+  "projectFilePath": "/home/freeza/Projects/Blazor/DarkMarket/DarkMarket.csproj",
   "expectedPackageFiles": [
     "/home/freeza/.nuget/packages/castle.core/5.1.1/castle.core.5.1.1.nupkg.sha512",
     "/home/freeza/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",

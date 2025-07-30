@@ -1,6 +1,6 @@
 namespace DarkMarket.Models
 {
-    public class BitcoinData
+    public class CoinGeckoPrice
     {
         public decimal Brl { get; set; }
         public decimal Usd { get; set; }

@@ -17,201 +17,201 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = DarkMarket
 build_property.RootNamespace = DarkMarket
-build_property.ProjectDir = /home/freeza/Documents/Projects/DarkMarket/
+build_property.ProjectDir = /home/freeza/Projects/Blazor/DarkMarket/
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 9.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = /home/freeza/Documents/Projects/DarkMarket
+build_property.MSBuildProjectDirectory = /home/freeza/Projects/Blazor/DarkMarket
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
-[/home/freeza/Documents/Projects/DarkMarket/App.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/App.razor]
 build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/Admin.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Admin/Admin.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW4ucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminGateways.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Admin/AdminGateways.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5HYXRld2F5cy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminLogs.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Admin/AdminLogs.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5Mb2dzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminOrders.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Admin/AdminOrders.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5PcmRlcnMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminOrdersReview.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Admin/AdminOrdersReview.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5PcmRlcnNSZXZpZXcucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminPayments.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Admin/AdminPayments.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5QYXltZW50cy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminPaymentView.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Admin/AdminPaymentView.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5QYXltZW50Vmlldy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminProductEdit.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Admin/AdminProductEdit.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5Qcm9kdWN0RWRpdC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminProducts.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Admin/AdminProducts.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5Qcm9kdWN0cy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminProductView.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Admin/AdminProductView.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5Qcm9kdWN0Vmlldy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminUserEdit.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Admin/AdminUserEdit.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5Vc2VyRWRpdC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminUsers.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Admin/AdminUsers.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5Vc2Vycy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Admin/AdminUserView.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Admin/AdminUserView.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvQWRtaW4vQWRtaW5Vc2VyVmlldy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Dashboard.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Dashboard.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvRGFzaGJvYXJkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Index.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Index.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvSW5kZXgucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Order/MyOrders.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Order/MyOrders.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT3JkZXIvTXlPcmRlcnMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Order/OrderDetails.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Order/OrderDetails.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvT3JkZXIvT3JkZXJEZXRhaWxzLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Payment/Payment.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Payment/Payment.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGF5bWVudC9QYXltZW50LnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Payment/PaymentDetails.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Payment/PaymentDetails.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGF5bWVudC9QYXltZW50RGV0YWlscy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Payment/PaymentsHistory.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Payment/PaymentsHistory.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGF5bWVudC9QYXltZW50c0hpc3RvcnkucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Payment/ViewPayment.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Payment/ViewPayment.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUGF5bWVudC9WaWV3UGF5bWVudC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Product/Marketplace.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Product/Marketplace.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZHVjdC9NYXJrZXRwbGFjZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Product/ProductForm.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Product/ProductForm.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZHVjdC9Qcm9kdWN0Rm9ybS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Product/Products.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Product/Products.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZHVjdC9Qcm9kdWN0cy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Profile.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Profile.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvUHJvZmlsZS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/Users.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/Users.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvVXNlcnMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/_Imports.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/_Imports.razor]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvX0ltcG9ydHMucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Shared/Components/Breadcrumb.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Shared/Components/Breadcrumb.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0NvbXBvbmVudHMvQnJlYWRjcnVtYi5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Shared/Components/BtcQuoteCard.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Shared/Components/BtcQuoteCard.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0NvbXBvbmVudHMvQnRjUXVvdGVDYXJkLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Shared/Components/Footer.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Shared/Components/Footer.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0NvbXBvbmVudHMvRm9vdGVyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Shared/Components/Header.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Shared/Components/Header.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0NvbXBvbmVudHMvSGVhZGVyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Shared/Components/MainLayout.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Shared/Components/MainLayout.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0NvbXBvbmVudHMvTWFpbkxheW91dC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Shared/Components/NavMenu.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Shared/Components/NavMenu.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0NvbXBvbmVudHMvTmF2TWVudS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Shared/Components/QRCode.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Shared/Components/QRCode.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0NvbXBvbmVudHMvUVJDb2RlLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Shared/Components/Sidebar.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Shared/Components/Sidebar.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0NvbXBvbmVudHMvU2lkZWJhci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Shared/Components/StatCard.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Shared/Components/StatCard.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0NvbXBvbmVudHMvU3RhdENhcmQucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Shared/Components/Toast.razor]
+[/home/freeza/Projects/Blazor/DarkMarket/Shared/Components/Toast.razor]
 build_metadata.AdditionalFiles.TargetPath = U2hhcmVkL0NvbXBvbmVudHMvVG9hc3QucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Areas/Identity/Pages/Account/Login.cshtml]
+[/home/freeza/Projects/Blazor/DarkMarket/Areas/Identity/Pages/Account/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9Mb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Areas/Identity/Pages/Account/Logout.cshtml]
+[/home/freeza/Projects/Blazor/DarkMarket/Areas/Identity/Pages/Account/Logout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9Mb2dvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Areas/Identity/Pages/Account/Register.cshtml]
+[/home/freeza/Projects/Blazor/DarkMarket/Areas/Identity/Pages/Account/Register.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvQWNjb3VudC9SZWdpc3Rlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Areas/Identity/Pages/Shared/_LoginPartial.cshtml]
+[/home/freeza/Projects/Blazor/DarkMarket/Areas/Identity/Pages/Shared/_LoginPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvU2hhcmVkL19Mb2dpblBhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Areas/Identity/Pages/Shared/_ValidationScriptsPartial.cshtml]
+[/home/freeza/Projects/Blazor/DarkMarket/Areas/Identity/Pages/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvU2hhcmVkL19WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Areas/Identity/Pages/_Layout.cshtml]
+[/home/freeza/Projects/Blazor/DarkMarket/Areas/Identity/Pages/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvX0xheW91dC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Areas/Identity/Pages/_ViewImports.cshtml]
+[/home/freeza/Projects/Blazor/DarkMarket/Areas/Identity/Pages/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Areas/Identity/Pages/_ViewStart.cshtml]
+[/home/freeza/Projects/Blazor/DarkMarket/Areas/Identity/Pages/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = QXJlYXMvSWRlbnRpdHkvUGFnZXMvX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[/home/freeza/Documents/Projects/DarkMarket/Pages/_Host.cshtml]
+[/home/freeza/Projects/Blazor/DarkMarket/Pages/_Host.cshtml]
 build_metadata.AdditionalFiles.TargetPath = UGFnZXMvX0hvc3QuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
