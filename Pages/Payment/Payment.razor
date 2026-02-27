@@ -11,6 +11,7 @@
 @inject LogService LogService
 @inject NavigationManager NavigationManager
 @inject GatewayService GatewayService
+@inject PaymentConfirmationService PaymentConfirmationService
 
 <div class="payment-container">
     @if (product == null)
@@ -220,7 +221,7 @@
         if (Amount < MinBtcAmount)
         {
             await LogService.LogAsync(
-                $"Tentativa de pagamento abaixo do mínimo: {Amount} BTC.",
+                message: $"Tentativa de pagamento abaixo do mínimo: {Amount} BTC.",
                 source: "Payment",
                 level: "Warning",
                 userId: product?.UserId
@@ -232,13 +233,13 @@
         try
         {
             isLoading = true;
-            var service = PaymentFactory.GetService(SelectedMethod);
+            IBitcoinPaymentService? service = PaymentFactory.GetService(SelectedMethod);
             string? privateKey = null;
 
             if (SelectedMethod == "Testnet")
             {
                 var (address, paymentId, privKey) = await ((TestnetBitcoinPaymentService)service)
-                    .GenerateAddressWithKeyAsync(Amount, $"order-{ProductId}-{Guid.NewGuid()}");
+                    .GenerateAddressWithKeyAsync(Amount, orderId: $"order-{ProductId}-{Guid.NewGuid()}");
                 Address = address;
                 PaymentId = paymentId;
                 privateKey = privKey;
@@ -251,8 +252,8 @@
             }
             IsPaid = false;
 
-            var authState = await AuthProvider.GetAuthenticationStateAsync();
-            var userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            AuthenticationState? authState = await AuthProvider.GetAuthenticationStateAsync();
+            string? userId = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
             paymentRecord = new PaymentRecord
             {
@@ -303,46 +304,30 @@
 
         try
         {
-            var service = PaymentFactory.GetService(SelectedMethod);
-            var param = SelectedMethod == "Testnet"
-                ? Address
-                : PaymentId ?? Address;
+            PaymentRecord? payment = Db.Payments.FirstOrDefault(p => p.Address == Address);
+            if (payment == null)
+            {
+                ToastRef?.Show("Pagamento não encontrado para o endereço informado.", "error");
+                return;
+            }
 
-            var received = await service.GetReceivedAmountAsync(param);
+            (bool Confirmed, bool AlreadyPaid, decimal ReceivedAmount) result = await PaymentConfirmationService.ConfirmAsync(payment);
 
-            var payment = Db.Payments.FirstOrDefault(p => p.Address == Address);
-
-            if (payment != null && payment.IsPaid)
+            if (result.AlreadyPaid)
             {
                 IsPaid = true;
                 ToastRef?.Show("Pagamento já confirmado anteriormente!", "success");
                 return;
             }
 
-            if (received >= Amount)
+            if (result.Confirmed)
             {
                 IsPaid = true;
-                if (payment != null)
-                {
-                    payment.IsPaid = true;
-                    payment.PaidAt = DateTime.UtcNow;
-                    await Db.SaveChangesAsync();
-
-                    if (service is TestnetBitcoinPaymentService testnetService && !string.IsNullOrEmpty(payment.PaymentId))
-                    {
-                        await testnetService.CheckAndMarkPaymentAsync(Db, LogService, payment.PaymentId);
-                    }
-                }
-                await LogService.LogAsync(
-                    $"Pagamento confirmado para produto {ProductId} via {SelectedMethod}.",
-                    source: "Payment",
-                    level: "Info"
-                );
                 ToastRef?.Show("Pagamento confirmado com sucesso!", "success");
             }
             else
             {
-                ToastRef?.Show($"Pagamento ainda não recebido. Recebido: {received:0.########} BTC de {Amount:0.########} BTC.", "warning");
+                ToastRef?.Show($"Pagamento ainda não recebido. Recebido: {result.ReceivedAmount:0.########} BTC de {Amount:0.########} BTC.", "warning");
             }
         }
         catch (Exception ex)

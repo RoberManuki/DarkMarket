@@ -41,6 +41,7 @@ builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<LogService>();
 builder.Services.AddScoped<GatewayService>();
+builder.Services.AddScoped<PaymentConfirmationService>();
 
 var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrWhiteSpace(defaultConnection) || defaultConnection.Contains("__SET_VIA_USER_SECRETS__"))
