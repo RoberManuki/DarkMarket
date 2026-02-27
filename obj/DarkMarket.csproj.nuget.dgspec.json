@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/home/freeza/Projects/Blazor/DarkMarket/DarkMarket.csproj": {}
+    "C:\\FreezaSSD\\Dev\\DarkMarket\\DarkMarket.csproj": {}
   },
   "projects": {
-    "/home/freeza/Projects/Blazor/DarkMarket/DarkMarket.csproj": {
+    "C:\\FreezaSSD\\Dev\\DarkMarket\\DarkMarket.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/freeza/Projects/Blazor/DarkMarket/DarkMarket.csproj",
+        "projectUniqueName": "C:\\FreezaSSD\\Dev\\DarkMarket\\DarkMarket.csproj",
         "projectName": "DarkMarket",
-        "projectPath": "/home/freeza/Projects/Blazor/DarkMarket/DarkMarket.csproj",
-        "packagesPath": "/home/freeza/.nuget/packages/",
-        "outputPath": "/home/freeza/Projects/Blazor/DarkMarket/obj/",
+        "projectPath": "C:\\FreezaSSD\\Dev\\DarkMarket\\DarkMarket.csproj",
+        "packagesPath": "C:\\Users\\FreezaPC\\.nuget\\packages\\",
+        "outputPath": "C:\\FreezaSSD\\Dev\\DarkMarket\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/freeza/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\FreezaPC\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -38,7 +38,7 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.200"
+        "SdkAnalysisLevel": "10.0.100"
       },
       "frameworks": {
         "net9.0": {
@@ -110,6 +110,24 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.12, 9.0.12]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[9.0.12, 9.0.12]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.12, 9.0.12]"
+            },
+            {
+              "name": "Microsoft.WindowsDesktop.App.Ref",
+              "version": "[9.0.12, 9.0.12]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -118,7 +136,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.203/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

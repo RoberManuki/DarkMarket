@@ -14,6 +14,17 @@ using Microsoft.AspNetCore.SignalR;
 using DarkMarket.Enums;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddUserSecrets<Program>(optional: true);
+
+var userSecretsPath = Path.Combine(
+    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+    "Microsoft",
+    "UserSecrets",
+    "55e5ddc6-76ae-4a68-aee1-b6f0e240e1d5",
+    "secrets.json"
+);
+
+builder.Configuration.AddJsonFile(userSecretsPath, optional: true, reloadOnChange: true);
 
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
@@ -31,8 +42,16 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<LogService>();
 builder.Services.AddScoped<GatewayService>();
 
+var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrWhiteSpace(defaultConnection) || defaultConnection.Contains("__SET_VIA_USER_SECRETS__"))
+{
+    throw new InvalidOperationException(
+        "DefaultConnection não configurada. Defina em User Secrets com: dotnet user-secrets set \"ConnectionStrings:DefaultConnection\" \"Host=localhost;Port=5432;Database=darkmarket;Username=freeza;Password=...\" --project .\\DarkMarket.csproj"
+    );
+}
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(defaultConnection));
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<AppDbContext>();
@@ -144,27 +163,50 @@ app.MapPost("/api/btcpay/webhook", async (HttpContext context, AppDbContext db, 
     return Results.Ok();
 });
 
-// qual a melhor maneira de fazermos isso?
 using (var scope = app.Services.CreateScope())
 {
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+    var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
     string[] roles = new[] { "admin", "user" };
     foreach (var role in roles)
     {
         if (!await roleManager.RoleExistsAsync(role))
             await roleManager.CreateAsync(new IdentityRole(role));
     }
-}
 
-// qual a melhor maneira de fazermos isso?
-using (var scope = app.Services.CreateScope())
-{
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-    var adminEmail = "god@god"; // coloque o email do usuário que deseja promover
-    var user = await userManager.FindByEmailAsync(adminEmail);
-    if (user != null && !await userManager.IsInRoleAsync(user, "admin"))
+    var adminEmail = config["AdminSeed:Email"] ?? "god@god";
+    var adminPassword = config["AdminSeed:Password"];
+    var adminFullName = config["AdminSeed:FullName"] ?? "Administrator";
+
+    var adminUser = await userManager.FindByEmailAsync(adminEmail);
+    if (adminUser == null && !string.IsNullOrWhiteSpace(adminPassword))
     {
-        await userManager.AddToRoleAsync(user, "admin");
+        adminUser = new ApplicationUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            EmailConfirmed = true,
+            FullName = adminFullName
+        };
+
+        var createAdminResult = await userManager.CreateAsync(adminUser, adminPassword);
+        if (!createAdminResult.Succeeded)
+        {
+            var errors = string.Join("; ", createAdminResult.Errors.Select(e => e.Description));
+            Console.WriteLine($"Falha ao criar usuário admin seed ({adminEmail}): {errors}");
+            adminUser = null;
+        }
+        else
+        {
+            Console.WriteLine($"Usuário admin seed criado: {adminEmail}");
+        }
+    }
+
+    if (adminUser != null && !await userManager.IsInRoleAsync(adminUser, "admin"))
+    {
+        await userManager.AddToRoleAsync(adminUser, "admin");
         Console.WriteLine($"Usuário {adminEmail} promovido a admin.");
     }
 }

@@ -11,6 +11,7 @@
 @inject AppDbContext Db
 @inject BitcoinPaymentFactory PaymentFactory
 @inject NavigationManager NavigationManager
+@inject LogService LogService
 
 <div class="payment-container">
     <h2 class="payment-title">Detalhes do Pagamento</h2>
@@ -145,9 +146,20 @@
 
             if (received >= payment.Amount)
             {
+                if (dbPayment != null)
+                {
+                    dbPayment.IsPaid = true;
+                    dbPayment.PaidAt = DateTime.UtcNow;
+                    await Db.SaveChangesAsync();
+
+                    if (service is TestnetBitcoinPaymentService testnetService && !string.IsNullOrEmpty(dbPayment.PaymentId))
+                    {
+                        await testnetService.CheckAndMarkPaymentAsync(Db, LogService, dbPayment.PaymentId);
+                    }
+                }
+
                 payment.IsPaid = true;
                 payment.PaidAt = DateTime.UtcNow;
-                await Db.SaveChangesAsync();
                 ToastRef?.Show("Pagamento confirmado com sucesso!", "success");
             }
             else

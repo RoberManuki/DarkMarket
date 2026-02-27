@@ -1,5 +1,7 @@
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Net.Http.Headers;
+using Microsoft.Extensions.Configuration;
 using DarkMarket.Models;
 
 namespace DarkMarket.Services
@@ -8,32 +10,59 @@ namespace DarkMarket.Services
     {
         private readonly HttpClient _http;
         private readonly Dictionary<string, (CryptoQuote? quote, DateTime lastFetch)> _cache;
+        private readonly Dictionary<string, DateTime> _lastErrorLogAt;
         private readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(2);
+        private readonly TimeSpan _errorLogCooldown = TimeSpan.FromMinutes(5);
+        private readonly string? _coinGeckoApiKey;
+        private readonly string _coinGeckoApiHeaderName;
 
-        public CryptoQuoteService(IHttpClientFactory httpClientFactory)
+        public CryptoQuoteService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _http = httpClientFactory.CreateClient();
+            _http.DefaultRequestHeaders.UserAgent.ParseAdd("DarkMarket/1.0 (+https://localhost)");
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            _coinGeckoApiKey = configuration["CoinGecko:ApiKey"];
+            _coinGeckoApiHeaderName = configuration["CoinGecko:ApiHeaderName"] ?? "x-cg-demo-api-key";
+
             _cache = new Dictionary<string, (CryptoQuote?, DateTime)>();
+            _lastErrorLogAt = new Dictionary<string, DateTime>();
         }
 
         public async Task<CryptoQuote?> GetQuoteAsync(string cryptoId, string symbol, string name)
         {
-            if (_cache.TryGetValue(cryptoId, out var cached) && 
+            if (string.IsNullOrWhiteSpace(cryptoId))
+                return null;
+
+            var normalizedCryptoId = cryptoId.Trim().ToLowerInvariant();
+
+            if (_cache.TryGetValue(normalizedCryptoId, out var cached) && 
                 cached.quote != null && 
-                DateTime.Now - cached.lastFetch < _cacheDuration)
+                DateTime.UtcNow - cached.lastFetch < _cacheDuration)
             {
                 return cached.quote;
             }
 
             try
             {
-                var url = $"https://api.coingecko.com/api/v3/simple/price?ids={cryptoId}&vs_currencies=brl,usd";
-                var result = await _http.GetFromJsonAsync<Dictionary<string, CoinGeckoPrice>>(url);
+                var encodedId = Uri.EscapeDataString(normalizedCryptoId);
+                var url = $"https://api.coingecko.com/api/v3/simple/price?ids={encodedId}&vs_currencies=brl,usd";
 
-                if (result == null || !result.ContainsKey(cryptoId))
-                    return GetCachedQuote(cryptoId);
+                Dictionary<string, CoinGeckoPrice>? result;
 
-                var priceData = result[cryptoId];
+                try
+                {
+                    result = await GetPricesAsync(url, includeApiKey: false);
+                }
+                catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Forbidden && !string.IsNullOrWhiteSpace(_coinGeckoApiKey))
+                {
+                    result = await GetPricesAsync(url, includeApiKey: true);
+                }
+
+                if (result == null || !result.TryGetValue(normalizedCryptoId, out var priceData))
+                    return GetCachedQuote(normalizedCryptoId);
+
                 var quote = new CryptoQuote
                 {
                     PriceBrl = priceData.Brl,
@@ -42,14 +71,41 @@ namespace DarkMarket.Services
                     Name = name
                 };
 
-                _cache[cryptoId] = (quote, DateTime.Now);
+                _cache[normalizedCryptoId] = (quote, DateTime.UtcNow);
 
                 return quote;
             }
-            catch
+            catch (Exception ex)
             {
-                return GetCachedQuote(cryptoId);
+                LogErrorThrottled(normalizedCryptoId, ex);
+                return GetCachedQuote(normalizedCryptoId);
             }
+        }
+
+        private async Task<Dictionary<string, CoinGeckoPrice>?> GetPricesAsync(string url, bool includeApiKey)
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Referrer = new Uri("https://www.coingecko.com/");
+
+            if (includeApiKey && !string.IsNullOrWhiteSpace(_coinGeckoApiKey))
+            {
+                request.Headers.Remove(_coinGeckoApiHeaderName);
+                request.Headers.Add(_coinGeckoApiHeaderName, _coinGeckoApiKey);
+            }
+
+            using var response = await _http.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadFromJsonAsync<Dictionary<string, CoinGeckoPrice>>();
+        }
+
+        private void LogErrorThrottled(string cryptoId, Exception ex)
+        {
+            if (_lastErrorLogAt.TryGetValue(cryptoId, out var lastLogAt) && DateTime.UtcNow - lastLogAt < _errorLogCooldown)
+                return;
+
+            _lastErrorLogAt[cryptoId] = DateTime.UtcNow;
+            Console.WriteLine($"Error loading quote from CoinGecko for '{cryptoId}': {ex.Message}");
         }
 
         private CryptoQuote? GetCachedQuote(string cryptoId)

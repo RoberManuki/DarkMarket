@@ -11,6 +11,12 @@ namespace DarkMarket.Services
     public class TestnetBitcoinPaymentService : IBitcoinPaymentService
     {
         public string Name => "Testnet";
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        public TestnetBitcoinPaymentService(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
 
         public Task<(string Address, string PaymentId, string PrivateKey)> GenerateAddressWithKeyAsync(decimal amount, string? orderId = null)
         {
@@ -35,20 +41,60 @@ namespace DarkMarket.Services
 
         public async Task<decimal> GetReceivedAmountAsync(string address)
         {
+            if (string.IsNullOrWhiteSpace(address))
+                return 0m;
+
+            var normalizedAddress = address.Trim();
+
             try
             {
-                using var http = new HttpClient();
-                var url = $"https://api.blockcypher.com/v1/btc/test3/addrs/{address}/balance";
-                var json = await http.GetStringAsync(url);
-                using var doc = JsonDocument.Parse(json);
-                var received = doc.RootElement.GetProperty("total_received").GetInt64();
+                var receivedFromBlockCypher = await GetReceivedFromBlockCypherAsync(normalizedAddress);
+                if (receivedFromBlockCypher > 0m)
+                    return receivedFromBlockCypher;
 
-                return received / 100_000_000m;
+                return await GetReceivedFromBlockstreamAsync(normalizedAddress);
             }
             catch
             {
                 return 0m;
             }
+        }
+
+        private async Task<decimal> GetReceivedFromBlockCypherAsync(string address)
+        {
+            var http = _httpClientFactory.CreateClient();
+            var url = $"https://api.blockcypher.com/v1/btc/test3/addrs/{address}/balance";
+            var json = await http.GetStringAsync(url);
+            using var doc = JsonDocument.Parse(json);
+
+            if (!doc.RootElement.TryGetProperty("total_received", out var totalReceivedProp))
+                return 0m;
+
+            var received = totalReceivedProp.GetInt64();
+            return received / 100_000_000m;
+        }
+
+        private async Task<decimal> GetReceivedFromBlockstreamAsync(string address)
+        {
+            var http = _httpClientFactory.CreateClient();
+            var url = $"https://blockstream.info/testnet/api/address/{address}";
+            var json = await http.GetStringAsync(url);
+            using var doc = JsonDocument.Parse(json);
+
+            if (!doc.RootElement.TryGetProperty("chain_stats", out var chainStats))
+                return 0m;
+
+            var funded = chainStats.TryGetProperty("funded_txo_sum", out var fundedProp)
+                ? fundedProp.GetInt64()
+                : 0L;
+
+            var spent = chainStats.TryGetProperty("spent_txo_sum", out var spentProp)
+                ? spentProp.GetInt64()
+                : 0L;
+
+            var received = Math.Max(0L, funded - spent);
+
+            return received / 100_000_000m;
         }
 
         public async Task<bool> CheckAndMarkPaymentAsync(AppDbContext db, LogService log, string paymentId)
