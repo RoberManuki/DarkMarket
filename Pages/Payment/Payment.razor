@@ -127,10 +127,10 @@
                                 <i class="fa fa-exclamation-triangle"></i>
                                 Guarde esta chave! Sem ela, não será possível movimentar os testcoins deste endereço.
                             </div>
-                            @if (IsPaid && paymentRecord?.Order.Id != null)
+                            @if (IsPaid && paymentRecord?.Order?.Id is int orderId)
                             {
                                 <div class="private-key-actions">
-                                    <a class="payment-btn payment-btn-success" href="@($"/orders/{paymentRecord.Order.Id}")">
+                                    <a class="payment-btn payment-btn-success" href="@($"/orders/{orderId}")">
                                         <i class="fa fa-exchange-alt"></i> Ver Pedido
                                     </a>
                                 </div>
