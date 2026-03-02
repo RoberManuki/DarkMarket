@@ -456,6 +456,9 @@ else
         if (!string.IsNullOrWhiteSpace(newMessage) && order != null)
         {
             var user = await UserManager.GetUserAsync((await AuthProvider.GetAuthenticationStateAsync()).User);
+            if (user == null)
+                return;
+
             var role = isAdmin ? "Admin" : isBuyer ? "Comprador" : isSeller ? "Vendedor" : "Outro";
             var msg = new OrderMessage
             {

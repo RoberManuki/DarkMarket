@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <DefaultItemExcludes>$(DefaultItemExcludes);DarkMarket.Tests\**</DefaultItemExcludes>
     <UserSecretsId>55e5ddc6-76ae-4a68-aee1-b6f0e240e1d5</UserSecretsId>
   </PropertyGroup>
 
@@ -20,11 +22,16 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.6" />
-    <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="NBitcoin" Version="8.0.13" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="QRCoder" Version="1.6.0" />
-    <PackageReference Include="xunit" Version="2.9.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="DarkMarket.Tests/**" />
+    <EmbeddedResource Remove="DarkMarket.Tests/**" />
+    <Content Remove="DarkMarket.Tests/**" />
+    <None Remove="DarkMarket.Tests/**" />
   </ItemGroup>
 
 </Project>

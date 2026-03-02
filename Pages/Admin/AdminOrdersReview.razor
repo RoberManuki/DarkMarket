@@ -95,10 +95,10 @@ else
 }
 
 @code {
-    List<OrderModel> orders;
+    List<OrderModel> orders = new();
     private bool showReleaseModal = false;
     private int releaseOrderId;
-    private OrderModel selectedOrder;
+    private OrderModel? selectedOrder;
 
     protected override async Task OnInitializedAsync()
     {
@@ -113,7 +113,7 @@ else
     {
         releaseOrderId = orderId;
         selectedOrder = orders.FirstOrDefault(o => o.Id == orderId);
-        showReleaseModal = true;
+        showReleaseModal = selectedOrder != null;
     }
 
     private async Task ConfirmReleaseFunds()

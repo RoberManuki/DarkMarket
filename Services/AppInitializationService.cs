@@ -1,6 +1,7 @@
 using DarkMarket.Data;
 using DarkMarket.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace DarkMarket.Services
 {
@@ -10,17 +11,20 @@ namespace DarkMarket.Services
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
         private readonly AppDbContext _db;
+        private readonly ILogger<AppInitializationService> _logger;
 
         public AppInitializationService(
             RoleManager<IdentityRole> roleManager,
             UserManager<ApplicationUser> userManager,
             IConfiguration configuration,
-            AppDbContext db)
+            AppDbContext db,
+            ILogger<AppInitializationService> logger)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _configuration = configuration;
             _db = db;
+            _logger = logger;
         }
 
         public async Task SeedAsync()
@@ -57,19 +61,19 @@ namespace DarkMarket.Services
                 if (!createAdminResult.Succeeded)
                 {
                     var errors = string.Join("; ", createAdminResult.Errors.Select(e => e.Description));
-                    Console.WriteLine($"Falha ao criar usuário admin seed ({adminEmail}): {errors}");
+                    _logger.LogError("Falha ao criar usuário admin seed ({AdminEmail}): {Errors}", adminEmail, errors);
                     adminUser = null;
                 }
                 else
                 {
-                    Console.WriteLine($"Usuário admin seed criado: {adminEmail}");
+                    _logger.LogInformation("Usuário admin seed criado: {AdminEmail}", adminEmail);
                 }
             }
 
             if (adminUser != null && !await _userManager.IsInRoleAsync(adminUser, "admin"))
             {
                 await _userManager.AddToRoleAsync(adminUser, "admin");
-                Console.WriteLine($"Usuário {adminEmail} promovido a admin.");
+                _logger.LogInformation("Usuário {AdminEmail} promovido a admin.", adminEmail);
             }
         }
 
