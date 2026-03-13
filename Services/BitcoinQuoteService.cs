@@ -1,6 +1,8 @@
 using System.Net.Http.Json;
 using System.Net.Http.Headers;
+using DarkMarket.Data;
 using DarkMarket.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DarkMarket.Services
 {
@@ -9,8 +11,9 @@ namespace DarkMarket.Services
         private readonly HttpClient _http;
         private readonly string? _coinGeckoApiKey;
         private readonly string _coinGeckoApiHeaderName;
+        private readonly IServiceScopeFactory? _scopeFactory;
 
-        public BitcoinQuoteService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public BitcoinQuoteService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IServiceScopeFactory? scopeFactory = null)
         {
             _http = httpClientFactory.CreateClient();
             _http.DefaultRequestHeaders.UserAgent.ParseAdd("DarkMarket/1.0 (+https://localhost)");
@@ -19,6 +22,7 @@ namespace DarkMarket.Services
 
             _coinGeckoApiKey = configuration["CoinGecko:ApiKey"];
             _coinGeckoApiHeaderName = configuration["CoinGecko:ApiHeaderName"] ?? "x-cg-demo-api-key";
+            _scopeFactory = scopeFactory;
         }
 
         private BitcoinQuote? _cachedQuote;
@@ -32,6 +36,8 @@ namespace DarkMarket.Services
 
             try
             {
+                await TrackQuoteQueryAsync("CoinGecko", "BTC");
+
                 var url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl,usd";
 
                 CoinGeckoResponse? result;
@@ -77,6 +83,32 @@ namespace DarkMarket.Services
             using var response = await _http.SendAsync(request);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadFromJsonAsync<CoinGeckoResponse>();
+        }
+
+        private async Task TrackQuoteQueryAsync(string provider, string asset)
+        {
+            if (_scopeFactory is null)
+                return;
+
+            try
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var db = scope.ServiceProvider.GetService<AppDbContext>();
+                if (db is null)
+                    return;
+
+                db.Logs.Add(new AppLog
+                {
+                    Source = "QuoteQuery",
+                    Level = "Info",
+                    Message = $"{provider}:{asset}"
+                });
+
+                await db.SaveChangesAsync();
+            }
+            catch
+            {
+            }
         }
     }
 }

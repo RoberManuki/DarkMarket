@@ -1,5 +1,8 @@
 using System.Net;
+using DarkMarket.Data;
 using DarkMarket.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DarkMarket.Tests;
 
@@ -64,5 +67,30 @@ public class CryptoQuoteServiceTests
         Assert.Equal(200m, quote!.PriceBrl);
         Assert.Equal(40m, quote.PriceUsd);
         Assert.Equal(2, calls);
+    }
+
+    [Fact]
+    public async Task GetQuoteAsync_TracksExternalQuoteQuery_OnlyWhenFetchingLiveData()
+    {
+        var databaseName = Guid.NewGuid().ToString();
+        var serviceProvider = new ServiceCollection()
+            .AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase(databaseName))
+            .BuildServiceProvider();
+
+        var scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
+
+        var service = new CryptoQuoteService(
+            new StubHttpClientFactory(_ => HttpTestResponses.Json("{\"bitcoin\":{\"brl\":100,\"usd\":20}}")),
+            TestConfigurationFactory.Create(),
+            scopeFactory);
+
+        await service.GetQuoteAsync("bitcoin", "BTC", "Bitcoin");
+        await service.GetQuoteAsync("bitcoin", "BTC", "Bitcoin");
+
+        using var db = new AppDbContext(new DbContextOptionsBuilder<AppDbContext>()
+            .UseInMemoryDatabase(databaseName)
+            .Options);
+
+        Assert.Equal(1, db.Logs.Count(log => log.Source == "QuoteQuery"));
     }
 }

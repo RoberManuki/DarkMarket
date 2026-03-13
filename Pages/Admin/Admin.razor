@@ -6,19 +6,11 @@
 @attribute [Authorize(Roles = "admin")]
 
 @inject CurrencyPreferenceService CurrencyPreferenceService
+@inject DashboardMetricsService DashboardMetricsService
 @inject IJSRuntime JSRuntime
 
 <h2 class="page-title">Painel Administrativo</h2>
 <p>Bem-vindo, administrador!</p>
-
-<div class="admin-settings-card">
-    <label for="fiat-select"><b>Moeda de cotação padrão:</b></label>
-    <select id="fiat-select" class="fiat-select" @bind="selectedFiat" @bind:after="ApplyCurrencyPreferenceAsync">
-        <option value="USD">USD</option>
-        <option value="BRL">BRL</option>
-    </select>
-    <small>Preferência salva no navegador.</small>
-</div>
 
 <nav class="admin-nav">
     <a href="/admin/users">Usuários</a>
@@ -30,12 +22,27 @@
     <a href="/admin/logs">Logs</a>
 </nav>
 
+<div class="admin-settings-card">
+    <label for="fiat-select"><b>Moeda de cotação padrão:</b></label>
+    <select id="fiat-select" class="fiat-select" @bind="selectedFiat" @bind:after="ApplyCurrencyPreferenceAsync">
+        <option value="USD">USD</option>
+        <option value="BRL">BRL</option>
+    </select>
+</div>
+
+<div class="admin-settings-card">
+    <span><b>Consultas de cotação (total):</b> @quoteQueriesCount</span>
+</div>
+
 @code {
     private string selectedFiat = "USD";
+    private int quoteQueriesCount;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         selectedFiat = CurrencyPreferenceService.SelectedFiatCurrency;
+        var snapshot = await DashboardMetricsService.GetSnapshotAsync();
+        quoteQueriesCount = snapshot.QuoteQueriesCount;
     }
 
     private async Task ApplyCurrencyPreferenceAsync()

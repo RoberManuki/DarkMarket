@@ -2,6 +2,8 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Net.Http.Headers;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using DarkMarket.Data;
 using DarkMarket.Models;
 
 namespace DarkMarket.Services
@@ -15,8 +17,9 @@ namespace DarkMarket.Services
         private readonly TimeSpan _errorLogCooldown = TimeSpan.FromMinutes(5);
         private readonly string? _coinGeckoApiKey;
         private readonly string _coinGeckoApiHeaderName;
+        private readonly IServiceScopeFactory? _scopeFactory;
 
-        public CryptoQuoteService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        public CryptoQuoteService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IServiceScopeFactory? scopeFactory = null)
         {
             _http = httpClientFactory.CreateClient();
             _http.DefaultRequestHeaders.UserAgent.ParseAdd("DarkMarket/1.0 (+https://localhost)");
@@ -25,6 +28,7 @@ namespace DarkMarket.Services
 
             _coinGeckoApiKey = configuration["CoinGecko:ApiKey"];
             _coinGeckoApiHeaderName = configuration["CoinGecko:ApiHeaderName"] ?? "x-cg-demo-api-key";
+            _scopeFactory = scopeFactory;
 
             _cache = new Dictionary<string, (CryptoQuote?, DateTime)>();
             _lastErrorLogAt = new Dictionary<string, DateTime>();
@@ -46,6 +50,8 @@ namespace DarkMarket.Services
 
             try
             {
+                await TrackQuoteQueryAsync("CoinGecko", normalizedCryptoId);
+
                 var encodedId = Uri.EscapeDataString(normalizedCryptoId);
                 var url = $"https://api.coingecko.com/api/v3/simple/price?ids={encodedId}&vs_currencies=brl,usd";
 
@@ -111,6 +117,32 @@ namespace DarkMarket.Services
         private CryptoQuote? GetCachedQuote(string cryptoId)
         {
             return _cache.TryGetValue(cryptoId, out var cached) ? cached.quote : null;
+        }
+
+        private async Task TrackQuoteQueryAsync(string provider, string asset)
+        {
+            if (_scopeFactory is null)
+                return;
+
+            try
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var db = scope.ServiceProvider.GetService<AppDbContext>();
+                if (db is null)
+                    return;
+
+                db.Logs.Add(new AppLog
+                {
+                    Source = "QuoteQuery",
+                    Level = "Info",
+                    Message = $"{provider}:{asset}"
+                });
+
+                await db.SaveChangesAsync();
+            }
+            catch
+            {
+            }
         }
     }
 }

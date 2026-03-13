@@ -3,9 +3,13 @@
 @attribute [Authorize]
 
 @using DarkMarket.Shared
+@using DarkMarket.Shared.Helpers
 @using Microsoft.AspNetCore.Authorization
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject DashboardMetricsService DashboardMetricsService
+@inject BitcoinQuoteService BitcoinQuoteService
+@inject CurrencyPreferenceService CurrencyPreferenceService
 
 <div class="dashboard-container">
     <h2 class="page-title">Dashboard</h2>
@@ -14,45 +18,54 @@
     <BtcQuoteCard Label="Ethereum" Currency="ETH" CryptoId="ethereum" ImageSrc="https://assets.coingecko.com/coins/images/279/large/ethereum.png" />
     <BtcQuoteCard Label="Solana" Currency="SOL" CryptoId="solana" ImageSrc="https://assets.coingecko.com/coins/images/4128/large/solana.png" />
 
-    <div class="dashboard-cards">
-        <StatCard Title="Perfil">
-            @if (isAuthenticated)
-            {
-                <span>Bem-vindo, @userName!</span>
-            }
-            else
-            {
-                <span>Faça login para ver seu perfil.</span>
-            }
-        </StatCard>
+    @if (isLoading)
+    {
+        <div class="loading-spinner">Carregando métricas...</div>
+    }
+    else
+    {
+        <div class="dashboard-cards">
+            <StatCard Title="Perfil">
+                @if (isAuthenticated)
+                {
+                    <span>Bem-vindo, @userName!</span>
+                }
+                else
+                {
+                    <span>Faça login para ver seu perfil.</span>
+                }
+            </StatCard>
 
-        <StatCard Title="Resumo">
-            @if (isAuthenticated)
-            {
-                <span>Seu resumo aparecerá aqui.</span>
-            }
-            else
-            {
-                <span>Faça login para ver seu resumo.</span>
-            }
-        </StatCard>
-        
-        <StatCard Title="Notificações">
-            @if (isAuthenticated)
-            {
-                <span>Suas notificações aparecerão aqui.</span>
-            }
-            else
-            {
-                <span>Faça login para ver suas notificações.</span>
-            }
-        </StatCard>
-    </div>
+            <StatCard Title="Usuários">
+                <span>@metrics.UsersCount</span>
+            </StatCard>
+
+            <StatCard Title="Vendas Pagas">
+                <span>@metrics.PaidSalesCount</span>
+            </StatCard>
+
+            <StatCard Title="Volume (BTC/Fiat)">
+                <span>@FormatBtcWithFiat(metrics.PaidSalesVolumeBtc)</span>
+            </StatCard>
+
+            <StatCard Title="Pendências">
+                <span>@metrics.PendingOrdersCount</span>
+            </StatCard>
+
+            <StatCard Title="Consultas de Cotação">
+                <span>@metrics.QuoteQueriesCount</span>
+            </StatCard>
+        </div>
+    }
 </div>
 
 @code {
     private bool isAuthenticated;
     private string? userName;
+    private bool isLoading = true;
+    private DashboardMetricsSnapshot metrics = new();
+    private decimal? btcUsdRate;
+    private decimal? btcBrlRate;
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,5 +74,17 @@
 
         isAuthenticated = user.Identity?.IsAuthenticated ?? false;
         userName = user.Identity?.Name;
+
+        var quote = await BitcoinQuoteService.GetQuoteAsync();
+        btcUsdRate = quote?.btc_usd;
+        btcBrlRate = quote?.btc_brl;
+
+        metrics = await DashboardMetricsService.GetSnapshotAsync();
+        isLoading = false;
+    }
+
+    private MarkupString FormatBtcWithFiat(decimal amount)
+    {
+        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
     }
 }

@@ -39,6 +39,7 @@ builder.Services.AddScoped<PaymentConfirmationService>();
 builder.Services.AddScoped<AppInitializationService>();
 builder.Services.AddScoped<BtcPayWebhookService>();
 builder.Services.AddScoped<CurrencyPreferenceService>();
+builder.Services.AddScoped<DashboardMetricsService>();
 
 var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrWhiteSpace(defaultConnection) || defaultConnection.Contains("__SET_VIA_USER_SECRETS__"))

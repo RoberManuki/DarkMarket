@@ -1,7 +1,10 @@
 using System.Reflection;
 using System.Net;
+using DarkMarket.Data;
 using DarkMarket.Models;
 using DarkMarket.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DarkMarket.Tests;
 
@@ -64,6 +67,31 @@ public class BitcoinQuoteServiceTests
         Assert.Equal(400000m, result!.btc_brl);
         Assert.Equal(80000m, result.btc_usd);
         Assert.Equal(2, calls);
+    }
+
+    [Fact]
+    public async Task GetQuoteAsync_TracksExternalQuoteQuery_OnlyWhenFetchingLiveData()
+    {
+        var databaseName = Guid.NewGuid().ToString();
+        var serviceProvider = new ServiceCollection()
+            .AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase(databaseName))
+            .BuildServiceProvider();
+
+        var scopeFactory = serviceProvider.GetRequiredService<IServiceScopeFactory>();
+
+        var service = new BitcoinQuoteService(new StubHttpClientFactory(_ =>
+            HttpTestResponses.Json("{\"bitcoin\":{\"brl\":500000,\"usd\":100000}}")),
+            TestConfigurationFactory.Create(),
+            scopeFactory);
+
+        await service.GetQuoteAsync();
+        await service.GetQuoteAsync();
+
+        using var db = new AppDbContext(new DbContextOptionsBuilder<AppDbContext>()
+            .UseInMemoryDatabase(databaseName)
+            .Options);
+
+        Assert.Equal(1, db.Logs.Count(log => log.Source == "QuoteQuery"));
     }
 
     private static void SetPrivateField<T>(object target, string fieldName, T value)

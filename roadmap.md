@@ -3,23 +3,23 @@
 ## Mapeamento de Progresso (Mar/2026)
 
 ### ✅ Concluído
-- Testes automatizados de serviços críticos implementados e verdes (`50/50` passando no `DarkMarket.Tests`).
+- Testes automatizados de serviços críticos implementados e verdes (`61/61` passando no `DarkMarket.Tests`).
 - Fluxo de confirmação de pagamento unificado (`PaymentConfirmationService`) para telas de pagamento.
 - Webhook BTCPay desacoplado e endurecido (`BtcPayWebhookService`): validação de payload, limite de tamanho, comparação de secret em tempo constante e idempotência de criação/vínculo de pedido.
 - Inicialização da aplicação desacoplada (`AppInitializationService`) para seed de roles/admin/gateways.
 - Tela de logs administrativos funcional (`/admin/logs`) com filtros e paginação.
+- Perfil do usuário concluído (edição, resumo e avatar).
+- Exibição BTC+fiat concluída com fallback visual e preferência de moeda (USD/BRL) controlada no admin.
+- Telas `About` e `Contact` implementadas.
+- Dashboard com métricas reais de usuários, vendas, volume e pendências.
 
 ### 🟡 Parcial
 - Segurança geral e deploy: melhorias aplicadas no webhook e configuração, mas revisão completa de produção ainda pendente.
-- Métricas/dashboard: cards e estrutura existem, mas estatísticas de negócio (vendas/volume/pendências) ainda incompletas.
-- Contagem de consultas de cotação: existe contador básico, porém não persistido/auditável.
+- Contagem de consultas de cotação BTC contabilizada no backend (`QuoteQuery`) e exibida em dashboard e admin.
 
 ### 🔴 Pendente
 - Testes de integração de páginas/fluxos end-to-end (além dos testes de serviço atuais).
 - Revisão geral de UX/responsividade final.
-- Remoção de coluna `ID` nas listagens pendentes.
-- Perfil de usuário completo (edição/resumo/avatar).
-- Telas `About` e `Contact`.
 - Modal de confirmação de repasse e configuração de taxa operacional por admin.
 
 ## Fase 1: Estrutura Inicial e Layout
@@ -97,8 +97,8 @@
    - [x] Remover coluna ID das listagens
 
 4. **Métricas e Dashboard**
-   - [ ] Dashboard com estatísticas (usuários, vendas, volume, consultas, pendências)
-   - [ ] Contabilizar e exibir consultas de cotação BTC (dashboard/admin)
+   - [x] Dashboard com estatísticas (usuários, vendas, volume, consultas, pendências)
+   - [x] Contabilizar e exibir consultas de cotação BTC (dashboard/admin)
 
 5. **Funcionalidades para Usuário**
    - [x] Implementar tela de perfil do usuário (edição, resumo, avatar)
