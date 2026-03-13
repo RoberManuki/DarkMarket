@@ -20,7 +20,6 @@ else
     <table class="product-table">
         <thead>
             <tr>
-                <th>ID</th>
                 <th>Comprador</th>
                 <th>Produto</th>
                 <th>Status</th>
@@ -31,7 +30,6 @@ else
         @foreach (var order in orders)
         {
             <tr>
-                <td>@order.Id</td>
                 <td>@order.Buyer?.UserName</td>
                 <td>@order.Product?.Name</td>
                 <td>

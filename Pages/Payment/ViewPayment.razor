@@ -13,6 +13,8 @@
 @inject NavigationManager NavigationManager
 @inject LogService LogService
 @inject PaymentConfirmationService PaymentConfirmationService
+@inject BitcoinQuoteService BitcoinQuoteService
+@inject CurrencyPreferenceService CurrencyPreferenceService
 
 <div class="payment-container">
     <h2 class="payment-title">Detalhes do Pagamento</h2>
@@ -50,7 +52,7 @@
             }
             <div class="payment-amount-block">
                 <span class="label">Valor:</span>
-                <span class="payment-amount">@payment.Amount BTC (@payment.PaymentMethod)</span>
+                <span class="payment-amount">@FormatBtcWithUsdMarkup(payment.Amount) (@payment.PaymentMethod)</span>
             </div>
             <div class="payment-status-block">
                 <span class="label">Status:</span>
@@ -87,6 +89,8 @@
     private bool isLoading = false;
     private HubConnection? hubConnection;
     public string SelectedMethod { get; set; } = "";
+    private decimal? btcUsdRate;
+    private decimal? btcBrlRate;
 
     public string QRCodeValue =>
         payment != null && payment.Address != null && payment.Address.StartsWith("lnbc")
@@ -96,6 +100,10 @@
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
+        var quote = await BitcoinQuoteService.GetQuoteAsync();
+        btcUsdRate = quote?.btc_usd;
+        btcBrlRate = quote?.btc_brl;
+
         payment = await Db.Payments.FindAsync(PaymentId);
         isLoading = false;
 
@@ -147,13 +155,23 @@
             }
             else
             {
-                ToastRef?.Show($"Pagamento ainda não recebido. Recebido: {result.ReceivedAmount:0.########} BTC de {payment.Amount:0.########} BTC.", "warning");
+                ToastRef?.Show($"Pagamento ainda não recebido. Recebido: {FormatBtcWithUsdText(result.ReceivedAmount)} de {FormatBtcWithUsdText(payment.Amount)}.", "warning");
             }
         }
         catch
         {
             ToastRef?.Show("Erro ao verificar pagamento.", "error");
         }
+    }
+
+    private MarkupString FormatBtcWithUsdMarkup(decimal amount)
+    {
+        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
+    }
+
+    private string FormatBtcWithUsdText(decimal amount)
+    {
+        return BtcUsdFormatter.Format(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
     }
 }
 

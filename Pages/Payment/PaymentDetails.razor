@@ -5,9 +5,12 @@
 @using DarkMarket.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
+@using DarkMarket.Shared.Helpers
 
 @inject AppDbContext Db
 @inject NavigationManager Navigation
+@inject BitcoinQuoteService BitcoinQuoteService
+@inject CurrencyPreferenceService CurrencyPreferenceService
 
 <h2 class="page-title">Detalhes do Pagamento</h2>
 
@@ -23,7 +26,7 @@ else
             <img class="product-img" src="@payment.Product?.ImagePath" alt="@payment.Product?.Name" />
             <div class="product-info">
                 <div class="product-name">@payment.Product?.Name</div>
-                <div class="product-price">@payment.Amount BTC</div>
+                <div class="product-price">@FormatBtcWithUsd(payment.Amount)</div>
             </div>
         </div>
         <!-- Card da Direita: Pagamento -->
@@ -73,9 +76,15 @@ else
 @code {
     [Parameter] public int PaymentId { get; set; }
     public PaymentRecord? payment;
+    private decimal? btcUsdRate;
+    private decimal? btcBrlRate;
 
     protected override async Task OnInitializedAsync()
     {
+        var quote = await BitcoinQuoteService.GetQuoteAsync();
+        btcUsdRate = quote?.btc_usd;
+        btcBrlRate = quote?.btc_brl;
+
         payment = await Db.Payments
             .Include(p => p.Product)
             .Include(p => p.Order)
@@ -83,4 +92,9 @@ else
     }
 
     void GoBack() => Navigation.NavigateTo("/payments");
+
+    private MarkupString FormatBtcWithUsd(decimal amount)
+    {
+        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
+    }
 }

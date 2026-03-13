@@ -3,6 +3,8 @@
 @inject ProductService ProductService
 @inject NavigationManager Navigation
 @inject AuthenticationStateProvider AuthProvider
+@inject BitcoinQuoteService BitcoinQuoteService
+@inject CurrencyPreferenceService CurrencyPreferenceService
 
 @using Microsoft.AspNetCore.Components.Authorization
 
@@ -43,7 +45,7 @@ else
                 <!-- 2. Nome + Preço -->
                 <div class="product-main">
                     <div class="product-title">@p.Name</div>
-                    <div class="product-price">@p.Price.ToString("C")</div>
+                    <div class="product-price">@FormatBtcWithUsd(p.Price)</div>
                 </div>
                 <!-- 3. Descrição -->
                 <div class="product-desc-block">
@@ -95,6 +97,8 @@ else
     private List<Product>? products;
     private List<Product>? filteredProducts;
     private string? userId;
+    private decimal? btcUsdRate;
+    private decimal? btcBrlRate;
 
     private string filterName = "";
     private decimal? filterMinPrice;
@@ -110,6 +114,10 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        var quote = await BitcoinQuoteService.GetQuoteAsync();
+        btcUsdRate = quote?.btc_usd;
+        btcBrlRate = quote?.btc_brl;
+
         var authState = await AuthProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         userId = user.FindFirst(c => c.Type == "sub" || c.Type.Contains("nameidentifier"))?.Value;
@@ -149,6 +157,11 @@ else
     {
         if (CanGoToPreviousPage)
             currentPage--;
+    }
+
+    private MarkupString FormatBtcWithUsd(decimal amount)
+    {
+        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
     }
 }
 

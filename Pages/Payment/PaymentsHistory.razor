@@ -14,6 +14,8 @@
 @inject NavigationManager Navigation
 @inject LogService LogService
 @inject IJSRuntime JS
+@inject BitcoinQuoteService BitcoinQuoteService
+@inject CurrencyPreferenceService CurrencyPreferenceService
 
 <h2 class="page-title">Histórico de Pagamentos</h2>
 
@@ -59,7 +61,7 @@ else
             <tr>
                 <td data-label="Produto">@p.ProductId</td>
                 <td data-label="Endereço" style="font-family:monospace;">@p.Address</td>
-                <td data-label="Valor">@p.Amount BTC</td>
+                <td data-label="Valor">@FormatBtcWithUsd(p.Amount)</td>
                 <td data-label="Status">
                     @if (p.IsPaid)
                     {
@@ -111,6 +113,8 @@ else
     private DateTime? filterDate;
     [CascadingParameter] public Toast? ToastRef { get; set; }
     private HubConnection? hubConnection;
+    private decimal? btcUsdRate;
+    private decimal? btcBrlRate;
 
     private int pageSize = 10;
     private int currentPage = 1;
@@ -121,6 +125,10 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+                var quote = await BitcoinQuoteService.GetQuoteAsync();
+                btcUsdRate = quote?.btc_usd;
+                btcBrlRate = quote?.btc_brl;
+
         var authState = await AuthProvider.GetAuthenticationStateAsync();
         var userId = authState.User.FindFirst("sub")?.Value
           ?? authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -221,5 +229,10 @@ else
     {
         if (CanGoToPreviousPage)
             currentPage--;
+    }
+
+    private MarkupString FormatBtcWithUsd(decimal amount)
+    {
+        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
     }
 }

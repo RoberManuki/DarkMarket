@@ -1,18 +1,24 @@
-using System.Net.Http;
 using System.Net.Http.Json;
+using System.Net.Http.Headers;
 using DarkMarket.Models;
-using DarkMarket.Shared;
-using Microsoft.AspNetCore.Components;
 
 namespace DarkMarket.Services
 {
     public class BitcoinQuoteService
     {
         private readonly HttpClient _http;
+        private readonly string? _coinGeckoApiKey;
+        private readonly string _coinGeckoApiHeaderName;
 
-        public BitcoinQuoteService(IHttpClientFactory httpClientFactory)
+        public BitcoinQuoteService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
         {
             _http = httpClientFactory.CreateClient();
+            _http.DefaultRequestHeaders.UserAgent.ParseAdd("DarkMarket/1.0 (+https://localhost)");
+            _http.DefaultRequestHeaders.Accept.Clear();
+            _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+            _coinGeckoApiKey = configuration["CoinGecko:ApiKey"];
+            _coinGeckoApiHeaderName = configuration["CoinGecko:ApiHeaderName"] ?? "x-cg-demo-api-key";
         }
 
         private BitcoinQuote? _cachedQuote;
@@ -21,13 +27,22 @@ namespace DarkMarket.Services
 
         public async Task<BitcoinQuote?> GetQuoteAsync()
         {
-            if (_cachedQuote != null && DateTime.Now - _lastFetch < _cacheDuration)
+            if (_cachedQuote != null && DateTime.UtcNow - _lastFetch < _cacheDuration)
                 return _cachedQuote;
 
             try
             {
                 var url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl,usd";
-                var result = await _http.GetFromJsonAsync<CoinGeckoResponse>(url);
+
+                CoinGeckoResponse? result;
+                try
+                {
+                    result = await GetQuoteResponseAsync(url, includeApiKey: false);
+                }
+                catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Forbidden && !string.IsNullOrWhiteSpace(_coinGeckoApiKey))
+                {
+                    result = await GetQuoteResponseAsync(url, includeApiKey: true);
+                }
 
                 if (result?.bitcoin == null)
                     return null;
@@ -38,7 +53,7 @@ namespace DarkMarket.Services
                     btc_usd = result.bitcoin.Usd
                 };
 
-                _lastFetch = DateTime.Now;
+                _lastFetch = DateTime.UtcNow;
 
                 return _cachedQuote;
             }
@@ -46,6 +61,22 @@ namespace DarkMarket.Services
             {
                 return _cachedQuote; // Retorna último valor em caso de erro
             }
+        }
+
+        private async Task<CoinGeckoResponse?> GetQuoteResponseAsync(string url, bool includeApiKey)
+        {
+            using var request = new HttpRequestMessage(HttpMethod.Get, url);
+            request.Headers.Referrer = new Uri("https://www.coingecko.com/");
+
+            if (includeApiKey && !string.IsNullOrWhiteSpace(_coinGeckoApiKey))
+            {
+                request.Headers.Remove(_coinGeckoApiHeaderName);
+                request.Headers.Add(_coinGeckoApiHeaderName, _coinGeckoApiKey);
+            }
+
+            using var response = await _http.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<CoinGeckoResponse>();
         }
     }
 }

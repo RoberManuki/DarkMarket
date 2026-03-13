@@ -11,6 +11,8 @@
 @inject NavigationManager Navigation
 @inject LogService LogService
 @inject IJSRuntime JS
+@inject BitcoinQuoteService BitcoinQuoteService
+@inject CurrencyPreferenceService CurrencyPreferenceService
 
 <h2 class="page-title">Meus Produtos</h2>
 
@@ -60,7 +62,7 @@ else
                         }
                     </td>
                     <td data-label="Nome">@p.Name</td>
-                    <td data-label="Preço">@p.Price.ToString("C")</td>
+                    <td data-label="Preço">@FormatBtcWithUsd(p.Price)</td>
                     <td data-label="Criado em">@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
                     <td data-label="Ações">
                         <button class="edit-btn" @onclick='() => Navigation.NavigateTo($"/products/edit/{p.Id}")'>Editar</button>
@@ -88,6 +90,8 @@ else
     private int pageSize = 5;
     private int currentPage = 1;
     private int totalPages => filteredProducts == null ? 1 : (int)Math.Ceiling((double)filteredProducts.Count / pageSize);
+    private decimal? btcUsdRate;
+    private decimal? btcBrlRate;
 
     private bool CanGoToNextPage => currentPage < totalPages;
     private bool CanGoToPreviousPage => currentPage > 1;
@@ -95,6 +99,10 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        var quote = await BitcoinQuoteService.GetQuoteAsync();
+        btcUsdRate = quote?.btc_usd;
+        btcBrlRate = quote?.btc_brl;
+
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var userId = authState.User.FindFirst(c => c.Type == "sub" || c.Type.Contains("nameidentifier"))?.Value ?? "";
         products = await ProductService.GetByUserIdAsync(userId);
@@ -176,6 +184,11 @@ else
     {
         if (CanGoToPreviousPage)
             currentPage--;
+    }
+
+    private MarkupString FormatBtcWithUsd(decimal amount)
+    {
+        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
     }
 }
 

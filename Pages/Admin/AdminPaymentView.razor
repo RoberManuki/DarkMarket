@@ -4,8 +4,11 @@
 
 @using DarkMarket.Models
 @using Microsoft.AspNetCore.Authorization
+@using DarkMarket.Shared.Helpers
 
 @inject AppDbContext Db
+@inject BitcoinQuoteService BitcoinQuoteService
+@inject CurrencyPreferenceService CurrencyPreferenceService
 
 <h2 class="page-title">Detalhes do Pagamento</h2>
 
@@ -23,7 +26,7 @@ else
         <p><b>ID:</b> @payment.Id</p>
         <p><b>Usuário:</b> @payment.UserId</p>
         <p><b>Produto:</b> @payment.ProductId</p>
-        <p><b>Valor:</b> @payment.Amount BTC</p>
+        <p><b>Valor:</b> @FormatBtcWithUsd(payment.Amount)</p>
         <p><b>Status:</b> @(payment.IsPaid ? "Pago" : "Pendente")</p>
         <p><b>Data:</b> @payment.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</p>
         <button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin/payments")'>Voltar</button>
@@ -34,13 +37,24 @@ else
     [Parameter] public int Id { get; set; }
     private PaymentRecord? payment;
     private bool isLoading = true;
+    private decimal? btcUsdRate;
+    private decimal? btcBrlRate;
 
     [Inject] public NavigationManager NavigationManager { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
+        var quote = await BitcoinQuoteService.GetQuoteAsync();
+        btcUsdRate = quote?.btc_usd;
+        btcBrlRate = quote?.btc_brl;
+
         payment = await Db.Payments.FindAsync(Id);
         isLoading = false;
+    }
+
+    private MarkupString FormatBtcWithUsd(decimal amount)
+    {
+        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
     }
 }

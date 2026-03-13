@@ -9,6 +9,8 @@
 
 @inject ProductService ProductService
 @inject LogService LogService
+@inject BitcoinQuoteService BitcoinQuoteService
+@inject CurrencyPreferenceService CurrencyPreferenceService
 
 <h2 class="page-title">Produtos</h2>
 
@@ -53,8 +55,7 @@ else
                     </a>
                 </td>
                 <td data-label="Preço">
-                    @p.Price.ToString("F6") BTC
-                    @* <span class="price-usd">(@GetUsdValue(p.Price))</span> *@
+                    @FormatBtcWithUsd(p.Price)
                 </td>
                 <td data-label="Criado em">@p.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
                 <td data-label="Ações">
@@ -86,6 +87,8 @@ else
     private string filterUserId = "";
     private decimal? filterMinPrice;
     private decimal? filterMaxPrice;
+    private decimal? btcUsdRate;
+    private decimal? btcBrlRate;
 
     private int pageSize = 10;
     private int currentPage = 1;
@@ -101,6 +104,10 @@ else
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
+        var quote = await BitcoinQuoteService.GetQuoteAsync();
+        btcUsdRate = quote?.btc_usd;
+        btcBrlRate = quote?.btc_brl;
+
         allProducts = await ProductService.GetAllAsync();
         ApplyFilters();
         isLoading = false;
@@ -176,5 +183,10 @@ else
     {
         if (CanGoToPreviousPage)
             currentPage--;
+    }
+
+    private MarkupString FormatBtcWithUsd(decimal amount)
+    {
+        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
     }
 }

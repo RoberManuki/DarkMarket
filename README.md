@@ -118,12 +118,17 @@ dotnet ef database update
 
 Veja o arquivo [roadmap.md](roadmap.md) para detalhes das fases e próximos passos.
 
+**Status rápido (Mar/2026):**
+- ✅ Testes de serviços críticos concluídos e estáveis (`50/50` passando).
+- ✅ Fluxo de pagamento/webhook robustecido e desacoplado em serviços dedicados.
+- ✅ Auditoria administrativa disponível em `/admin/logs`.
+- 🟡 Próxima frente: testes de integração de páginas/fluxos e fechamento dos itens de UX/finalização.
+
 **Principais tarefas em andamento:**
-- Auditoria e logging centralizado
-- Métricas de uso e dashboard
-- Refino de UX e componentização
-- Testes automatizados para garantir estabilidade
-- Segurança e preparação para produção
+- Testes de integração (UI/fluxos) para complementar cobertura unitária atual
+- Métricas de uso e dashboard com indicadores de negócio persistidos
+- Refino de UX/componentização e limpeza visual final
+- Segurança e preparação para produção (hardening final + revisão de permissões)
 
 ---
 

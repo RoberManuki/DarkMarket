@@ -9,6 +9,8 @@
 
 @inject AppDbContext Db
 @inject NavigationManager NavigationManager
+@inject BitcoinQuoteService BitcoinQuoteService
+@inject CurrencyPreferenceService CurrencyPreferenceService
 
 <h2 class="page-title">Todas as Transações</h2>
 
@@ -91,7 +93,7 @@ else
                             <span class="text-danger">Desconhecido (ID: @t.SellerId)</span>
                         }
                     </td>
-                    <td>@t.Amount.ToString("0.#####") BTC</td>
+                    <td>@FormatBtcWithUsd(t.Amount)</td>
                     <td>
                         <span class="order-status-badge @t.Status.ToString().ToLower()">
                             @OrderStatusHelper.GetStatusText(t.Status)
@@ -129,6 +131,8 @@ else
     private decimal? filterMaxAmount;
     private string filterStatus = "";
     private DateTime? filterDate;
+    private decimal? btcUsdRate;
+    private decimal? btcBrlRate;
 
     private int pageSize = 10;
     private int currentPage = 1;
@@ -140,6 +144,10 @@ else
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
+        var quote = await BitcoinQuoteService.GetQuoteAsync();
+        btcUsdRate = quote?.btc_usd;
+        btcBrlRate = quote?.btc_brl;
+
         allOrders = await Db.Orders
             .Include(o => o.Product)
             .Include(o => o.Buyer)
@@ -197,5 +205,10 @@ else
     {
         if (CanGoToPreviousPage)
             currentPage--;
+    }
+
+    private MarkupString FormatBtcWithUsd(decimal amount)
+    {
+        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
     }
 }

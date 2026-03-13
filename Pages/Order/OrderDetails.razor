@@ -9,12 +9,15 @@
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.JSInterop
+@using DarkMarket.Shared.Helpers
 
 @inject AppDbContext Db
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider AuthProvider
 @inject UserManager<ApplicationUser> UserManager
 @inject IJSRuntime JS
+@inject BitcoinQuoteService BitcoinQuoteService
+@inject CurrencyPreferenceService CurrencyPreferenceService
 
 <nav class="breadcrumb">
     <a href="/">Início</a> &gt; <a href="/orders">Pedidos</a> &gt; Detalhes
@@ -37,7 +40,7 @@ else
             <img class="product-img" src="@order.Product?.ImagePath" alt="@order.Product?.Name" />
             <div class="product-info">
                 <div class="product-name">@order.Product?.Name</div>
-                <div class="product-price">@order.Amount BTC</div>
+                <div class="product-price">@FormatBtcWithUsd(order.Amount)</div>
                 <div class="product-desc">@order.Product?.ShortDescription</div>
             </div>
         </div>
@@ -316,10 +319,16 @@ else
     private string? sellerEvidenceError;
 
     private bool showReleaseModal = false;
+    private decimal? btcUsdRate;
+    private decimal? btcBrlRate;
 
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
+        var quote = await BitcoinQuoteService.GetQuoteAsync();
+        btcUsdRate = quote?.btc_usd;
+        btcBrlRate = quote?.btc_brl;
+
         var authState = await AuthProvider.GetAuthenticationStateAsync();
         var user = authState.User;
         var userId = UserManager.GetUserId(user);
@@ -357,6 +366,11 @@ else
     private void OnFileSelected(InputFileChangeEventArgs e)
     {
         confirmFile = e.File;
+    }
+
+    private MarkupString FormatBtcWithUsd(decimal amount)
+    {
+        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
     }
 
     private void OnSellerFileSelected(InputFileChangeEventArgs e)

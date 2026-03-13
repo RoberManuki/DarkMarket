@@ -12,6 +12,8 @@
 @inject NavigationManager NavigationManager
 @inject GatewayService GatewayService
 @inject PaymentConfirmationService PaymentConfirmationService
+@inject BitcoinQuoteService BitcoinQuoteService
+@inject CurrencyPreferenceService CurrencyPreferenceService
 
 <div class="payment-container">
     @if (product == null)
@@ -96,7 +98,7 @@
 
                     <div class="payment-amount-block">
                         <span class="label">Valor:</span>
-                        <span class="system-value">@Amount BTC (@SelectedMethod)</span>
+                        <span class="system-value">@FormatBtcWithUsdMarkup(Amount) (@SelectedMethod)</span>
                     </div>
                     <div class="payment-status-block">
                         <span class="label">Status:</span>
@@ -161,6 +163,8 @@
     [CascadingParameter] public Toast? ToastRef { get; set; }
     private const decimal MinBtcAmount = 0.000003m;
     private bool isLoading = false;
+    private decimal? btcUsdRate;
+    private decimal? btcBrlRate;
 
     private PaymentRecord? paymentRecord; // <-- Adicione este campo
 
@@ -176,6 +180,10 @@
     protected override async Task OnInitializedAsync()
     {
         isLoading = true;
+        var quote = await BitcoinQuoteService.GetQuoteAsync();
+        btcUsdRate = quote?.btc_usd;
+        btcBrlRate = quote?.btc_brl;
+
         product = await Db.Products.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == ProductId);
         isLoading = false;
         
@@ -226,7 +234,7 @@
                 level: "Warning",
                 userId: product?.UserId
             );
-            ToastRef?.Show($"O valor mínimo para pagamento é {MinBtcAmount} BTC.", "warning");
+            ToastRef?.Show($"O valor mínimo para pagamento é {FormatBtcWithUsdText(MinBtcAmount)}.", "warning");
             return;
         }
 
@@ -327,7 +335,7 @@
             }
             else
             {
-                ToastRef?.Show($"Pagamento ainda não recebido. Recebido: {result.ReceivedAmount:0.########} BTC de {Amount:0.########} BTC.", "warning");
+                ToastRef?.Show($"Pagamento ainda não recebido. Recebido: {FormatBtcWithUsdText(result.ReceivedAmount)} de {FormatBtcWithUsdText(Amount)}.", "warning");
             }
         }
         catch (Exception ex)
@@ -340,5 +348,15 @@
             );
             ToastRef?.Show("Erro ao verificar pagamento.", "error");
         }
+    }
+
+    private MarkupString FormatBtcWithUsdMarkup(decimal amount)
+    {
+        return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
+    }
+
+    private string FormatBtcWithUsdText(decimal amount)
+    {
+        return BtcUsdFormatter.Format(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
     }
 }

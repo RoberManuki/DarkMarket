@@ -3,12 +3,16 @@
 @inherits LayoutComponentBase
 
 @using DarkMarket.Models
+@using DarkMarket.Services
 @using DarkMarket.Shared.Components
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.JSInterop
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject CurrencyPreferenceService CurrencyPreferenceService
 
 <Toast @ref="ToastRef" />
 <CascadingValue Value="ToastRef">
@@ -21,6 +25,9 @@
             <header>
                 <h1>DarkMarket</h1>
                 <div class="header-actions">
+                    <span class="currency-indicator" title="Moeda ativa para exibição de cotação">
+                        Cotação: @CurrencyPreferenceService.SelectedFiatCurrency
+                    </span>
                     <AuthorizeView>
                         <Authorized>
                             <span>Olá, @(string.IsNullOrWhiteSpace(context.User.Identity?.Name) ? "Usuário" : context.User.Identity.Name)!</span>
@@ -45,6 +52,23 @@
 
 @code {
     private Toast? ToastRef;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+
+        try
+        {
+            var persistedCurrency = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", "darkmarket.fiatCurrency");
+            CurrencyPreferenceService.SetCurrency(persistedCurrency);
+            StateHasChanged();
+        }
+        catch
+        {
+            CurrencyPreferenceService.SetCurrency("USD");
+        }
+    }
 }
 
 <style>
@@ -84,6 +108,16 @@
         display: flex;
         align-items: center;
         gap: 1rem;
+    }
+    .currency-indicator {
+        background: #1d2530;
+        color: #9ec3ff;
+        border: 1px solid #334257;
+        border-radius: 999px;
+        padding: 0.2rem 0.7rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.2px;
     }
     .btn-link {
         background: none;
@@ -126,5 +160,24 @@
     .logout-btn:hover {
         background: linear-gradient(90deg, #555 0%, #222 100%);
         color: #fff;
+    }
+
+    .usd-unavailable-badge {
+        display: inline-block;
+        margin-left: 0.4rem;
+        padding: 0.12rem 0.45rem;
+        border-radius: 999px;
+        background: #3a3a3a;
+        color: #d0d0d0;
+        font-size: 0.8rem;
+        font-weight: 600;
+        vertical-align: middle;
+        cursor: help;
+        letter-spacing: 0.1px;
+    }
+
+    .usd-estimate {
+        margin-left: 0.3rem;
+        color: #9ec3ff;
     }
 </style>
