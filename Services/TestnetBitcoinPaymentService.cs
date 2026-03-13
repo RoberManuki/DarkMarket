@@ -153,6 +153,10 @@ namespace DarkMarket.Services
             db.Orders.Add(order);
             await db.SaveChangesAsync();
 
+            payment.OrderId = order.Id;
+            db.Payments.Update(payment);
+            await db.SaveChangesAsync();
+
             await log.LogAsync($"[Testnet] Order criada para paymentId={payment.PaymentId}, orderId={order.Id}", source: "Testnet", level: "Info");
         }
     }

@@ -131,66 +131,9 @@ public class AppInitializationServiceTests
         string adminPassword = "P@ssw0rd123!",
         string adminFullName = "Seed Admin")
     {
-        return new ConfigurationBuilder()
-            .AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                ["AdminSeed:Email"] = adminEmail,
-                ["AdminSeed:Password"] = adminPassword,
-                ["AdminSeed:FullName"] = adminFullName
-            })
-            .Build();
-    }
-
-    private sealed class TestLoggerProvider : ILoggerProvider
-    {
-        public List<string> Messages { get; } = new();
-
-        public ILogger CreateLogger(string categoryName)
-        {
-            return new TestLogger(Messages);
-        }
-
-        public void Dispose()
-        {
-        }
-    }
-
-    private sealed class TestLogger : ILogger
-    {
-        private readonly List<string> _messages;
-
-        public TestLogger(List<string> messages)
-        {
-            _messages = messages;
-        }
-
-        public IDisposable BeginScope<TState>(TState state) where TState : notnull
-        {
-            return NullScope.Instance;
-        }
-
-        public bool IsEnabled(LogLevel logLevel)
-        {
-            return true;
-        }
-
-        public void Log<TState>(
-            LogLevel logLevel,
-            EventId eventId,
-            TState state,
-            Exception? exception,
-            Func<TState, Exception?, string> formatter)
-        {
-            _messages.Add(formatter(state, exception));
-        }
-    }
-
-    private sealed class NullScope : IDisposable
-    {
-        public static readonly NullScope Instance = new();
-
-        public void Dispose()
-        {
-        }
+        return TestConfigurationFactory.Create(
+            ("AdminSeed:Email", adminEmail),
+            ("AdminSeed:Password", adminPassword),
+            ("AdminSeed:FullName", adminFullName));
     }
 }

@@ -29,11 +29,19 @@ namespace DarkMarket.Services
             if (dbPayment == null)
                 return (false, false, 0m);
 
-            if (dbPayment.IsPaid)
-                return (true, true, dbPayment.Amount);
-
             var paymentMethod = dbPayment.PaymentMethod ?? "Testnet";
             var service = _paymentFactory.GetService(paymentMethod);
+
+            if (dbPayment.IsPaid)
+            {
+                if (service is TestnetBitcoinPaymentService testnetPaidService && !string.IsNullOrEmpty(dbPayment.PaymentId))
+                {
+                    await testnetPaidService.CheckAndMarkPaymentAsync(_db, _logService, dbPayment.PaymentId);
+                }
+
+                return (true, true, dbPayment.Amount);
+            }
+
             var parameter = paymentMethod == "Testnet"
                 ? dbPayment.Address
                 : dbPayment.PaymentId ?? dbPayment.Address;
