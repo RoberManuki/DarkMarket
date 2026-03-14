@@ -3,7 +3,7 @@
 ## Mapeamento de Progresso (Mar/2026)
 
 ### ✅ Concluído
-- Testes automatizados de serviços críticos implementados e verdes (`61/61` passando no `DarkMarket.Tests`).
+- Testes automatizados de serviços críticos e integração HTTP (webhook + páginas protegidas + fluxo compra/pedido via webhook, incluindo idempotência com webhook duplicado, evento não-liquidado sem mutação, invoice inexistente sem efeito, payload com campos obrigatórios vazios/whitespace/tipos inválidos, payload acima do limite com `413` com e sem `Content-Length` e com caracteres UTF-8 multibyte, incluindo cenário combinado UTF-8 multibyte + `Content-Length` desconhecido, payload exatamente no limite aceito incluindo fronteira UTF-8 multibyte, payload JSON válido com escapes/unicode dentro do limite, validação estrita de secret (incluindo negação com espaços extras, header ausente, múltiplos valores, duplicação de valor válido, rejeição por diferença de casing no valor e aceitação com casing alternado no nome do header), acesso de comprador/vendedor/admin, acesso negado para intruso, negação quando `UserId` ausente/em branco no detalhe do pedido, negação no `/admin` com role em branco, permissão com roles mistas contendo `admin`, negação com roles mistas sem `admin` e permissão com `admin` duplicado) implementados e verdes (`105/105` passando no `DarkMarket.Tests`).
 - Fluxo de confirmação de pagamento unificado (`PaymentConfirmationService`) para telas de pagamento.
 - Webhook BTCPay desacoplado e endurecido (`BtcPayWebhookService`): validação de payload, limite de tamanho, comparação de secret em tempo constante e idempotência de criação/vínculo de pedido.
 - Inicialização da aplicação desacoplada (`AppInitializationService`) para seed de roles/admin/gateways.
@@ -16,6 +16,8 @@
 ### 🟡 Parcial
 - Segurança geral e deploy: melhorias aplicadas no webhook e configuração, mas revisão completa de produção ainda pendente.
 - Contagem de consultas de cotação BTC contabilizada no backend (`QuoteQuery`) e exibida em dashboard e admin.
+- Testes de integração com `WebApplicationFactory` cobrindo `/api/btcpay/webhook` (401 incluindo secret com espaços extras, secret ausente, secret com múltiplos valores, secret válido duplicado e valor com casing diferente; aceitação de secret válido com casing alternado no nome do header; 400 por JSON inválido/campos obrigatórios vazios/whitespace/tipos inválidos; 413 por payload excedido com e sem `Content-Length`, por excedente em bytes UTF-8 multibyte e por cenário combinado UTF-8 multibyte com `Content-Length` desconhecido; payload no limite aceito incluindo fronteira UTF-8 multibyte e payload JSON válido com escapes/unicode dentro do limite; confirmação; idempotência; evento não-liquidado sem efeito e invoice inexistente sem mutação), páginas protegidas (`/orders`, `/orders/{id}`, `/admin`, incluindo request sem `UserId`, com `UserId` em branco, com role em branco, com roles mistas contendo `admin`, com roles mistas sem `admin` e com `admin` duplicado), e fluxo compra/pedido no backend (pagamento confirmado -> pedido criado -> rota de detalhe acessível); cobertura E2E completa de UI/fluxos ainda pendente.
+- Regra de autorização de detalhe de pedido centralizada em serviço (`OrderAccessService`) com testes unitários dedicados para admin/comprador/vendedor/intruso.
 
 ### 🔴 Pendente
 - Testes de integração de páginas/fluxos end-to-end (além dos testes de serviço atuais).

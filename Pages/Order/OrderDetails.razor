@@ -18,6 +18,7 @@
 @inject IJSRuntime JS
 @inject BitcoinQuoteService BitcoinQuoteService
 @inject CurrencyPreferenceService CurrencyPreferenceService
+@inject OrderAccessService OrderAccessService
 
 <nav class="breadcrumb">
     <a href="/">Início</a> &gt; <a href="/orders">Pedidos</a> &gt; Detalhes
@@ -341,9 +342,15 @@ else
             .Include(o => o.Payment) 
             .FirstOrDefaultAsync(o => o.Id == Id);
 
-        if (order == null || (!isAdmin && order.BuyerId != userId && order.SellerId != userId))
+        if (!OrderAccessService.CanAccess(order, userId, isAdmin))
         {
             order = null;
+            isLoading = false;
+            return;
+        }
+
+        if (order is null)
+        {
             isLoading = false;
             return;
         }

@@ -7,6 +7,7 @@ using DarkMarket.Hubs;
 using DarkMarket.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Primitives;
 
 namespace DarkMarket.Services
 {
@@ -35,7 +36,7 @@ namespace DarkMarket.Services
             await _log.LogAsync("Webhook chamado.", source: "Webhook", level: "Info");
 
             var expectedSecret = _configuration["BtcPay:WebhookSecret"];
-            var receivedSecret = context.Request.Headers["X-BTCPay-Secret"].FirstOrDefault();
+            var receivedSecret = GetSingleWebhookSecretHeader(context.Request.Headers);
 
             if (!IsValidWebhookSecret(expectedSecret, receivedSecret))
             {
@@ -132,6 +133,17 @@ namespace DarkMarket.Services
                 return false;
 
             return CryptographicOperations.FixedTimeEquals(expectedBytes, receivedBytes);
+        }
+
+        private static string? GetSingleWebhookSecretHeader(IHeaderDictionary headers)
+        {
+            if (!headers.TryGetValue("X-BTCPay-Secret", out StringValues values))
+                return null;
+
+            if (values.Count != 1)
+                return null;
+
+            return values[0];
         }
 
         private static bool TryParseWebhookPayload(

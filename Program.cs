@@ -36,6 +36,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<LogService>();
 builder.Services.AddScoped<GatewayService>();
 builder.Services.AddScoped<PaymentConfirmationService>();
+builder.Services.AddScoped<OrderAccessService>();
 builder.Services.AddScoped<AppInitializationService>();
 builder.Services.AddScoped<BtcPayWebhookService>();
 builder.Services.AddScoped<CurrencyPreferenceService>();
@@ -81,3 +82,5 @@ using (var scope = app.Services.CreateScope())
 
 app.MapHub<PaymentHub>("/paymentHub");
 app.Run();
+
+public partial class Program { }
