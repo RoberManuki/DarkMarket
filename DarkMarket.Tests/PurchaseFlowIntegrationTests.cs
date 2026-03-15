@@ -218,6 +218,7 @@ public class PurchaseFlowIntegrationTests : IClassFixture<IntegrationTestWebAppF
 
         Assert.Equal(PaymentStatus.AguardandoEntrega, order!.Status);
         Assert.Equal(order.Id, payment.OrderId);
+        Assert.False(string.IsNullOrWhiteSpace(order.SellerId));
 
         var product = db.Products.FirstOrDefault(p => p.Id == payment.ProductId);
         Assert.NotNull(product);
@@ -226,7 +227,7 @@ public class PurchaseFlowIntegrationTests : IClassFixture<IntegrationTestWebAppF
             OrderId: order.Id,
             ProductId: product!.Id,
             BuyerId: order.BuyerId,
-            SellerId: order.SellerId,
+            SellerId: order.SellerId!,
             ProductName: product.Name);
     }
 

@@ -1,9 +1,12 @@
 @page "/admin/orders-review"
+@attribute [Authorize(Roles = "admin")]
 
 @using DarkMarket.Enums
 @using DarkMarket.Models
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @inject AppDbContext Db
+@inject OperationFeeCalculatorService OperationFeeCalculatorService
 
 <h2>Pedidos aguardando revisão do ADM</h2>
 
@@ -37,7 +40,7 @@ else
                 </td>
                 <td>
                     <a class="details-btn" href="@($"/orders/{order.Id}")">View Details</a>
-                    <button class="success-btn" @onclick="() => ShowReleaseModal(order.Id)">Release Funds</button>
+                    <button class="success-btn" @onclick="() => ShowReleaseModalAsync(order.Id)">Release Funds</button>
                 </td>
             </tr>
         }
@@ -53,6 +56,25 @@ else
             <div class="modal-content">
                 <i class="fa fa-exclamation-triangle" style="color:#f9a825; font-size:1.5em; margin-bottom:0.5em;"></i>
                 <p>Tem certeza que deseja repassar os fundos e finalizar o pedido?</p>
+
+                <div class="payment-details-card wide-card" style="margin-bottom: 1rem;">
+                    <div class="details-row"><span class="label">Produto:</span><span>@selectedOrder.Product?.Name</span></div>
+                    <div class="details-row"><span class="label">Quantidade:</span><span>1</span></div>
+                    <div class="details-row"><span class="label">Comprador:</span><span>@selectedOrder.Buyer?.UserName</span></div>
+                    <div class="details-row"><span class="label">Vendedor:</span><span>@selectedOrder.Seller?.UserName</span></div>
+                    <div class="details-row"><span class="label">Valor bruto:</span><span>@FormatBtc(selectedOrder.Amount)</span></div>
+                    <div class="details-row"><span class="label">Taxa operacional:</span><span>@(releaseBreakdown?.Percent.ToString("0.##") ?? "0")%</span></div>
+                    <div class="details-row"><span class="label">Valor da taxa:</span><span>@FormatBtc(releaseBreakdown?.FeeAmount ?? 0m)</span></div>
+                    <div class="details-row"><span class="label">Valor líquido (repasse):</span><span><b>@FormatBtc(releaseBreakdown?.NetAmount ?? 0m)</b></span></div>
+                </div>
+
+                @if (!string.IsNullOrWhiteSpace(selectedOrder.Product?.ImagePath))
+                {
+                    <div style="margin-bottom: 0.75rem;">
+                        <img src="@selectedOrder.Product.ImagePath" alt="@selectedOrder.Product.Name" style="max-width: 180px; border-radius: 8px;" />
+                    </div>
+                }
+
                 <div class="evidence-section">
                     <div class="evidence-card">
                         <i class="fa fa-user"></i> <b>Comprador</b>
@@ -97,21 +119,32 @@ else
     private bool showReleaseModal = false;
     private int releaseOrderId;
     private OrderModel? selectedOrder;
+    private OperationFeeBreakdown? releaseBreakdown;
 
     protected override async Task OnInitializedAsync()
     {
         orders = await Db.Orders
             .Include(o => o.Buyer)
+            .Include(o => o.Seller)
             .Include(o => o.Product)
             .Where(o => o.Status == PaymentStatus.AguardandoRevisaoAdm)
             .ToListAsync();
+
     }
 
-    private void ShowReleaseModal(int orderId)
+    private async Task ShowReleaseModalAsync(int orderId)
     {
         releaseOrderId = orderId;
         selectedOrder = orders.FirstOrDefault(o => o.Id == orderId);
-        showReleaseModal = selectedOrder != null;
+        if (selectedOrder is null)
+        {
+            showReleaseModal = false;
+            releaseBreakdown = null;
+            return;
+        }
+
+        releaseBreakdown = await OperationFeeCalculatorService.CalculateBreakdownAsync(selectedOrder.Amount);
+        showReleaseModal = true;
     }
 
     private async Task ConfirmReleaseFunds()
@@ -129,8 +162,11 @@ else
             order.FundsReleased = true;
             // TODO: lógica de repasse de fundos
             await Db.SaveChangesAsync();
-            orders.Remove(order);
+            orders.RemoveAll(o => o.Id == orderId);
             StateHasChanged();
         }
     }
+
+    private static string FormatBtc(decimal amount)
+        => $"{amount:0.########} BTC";
 }

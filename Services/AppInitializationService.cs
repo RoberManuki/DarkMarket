@@ -1,7 +1,9 @@
 using DarkMarket.Data;
 using DarkMarket.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.Globalization;
 
 namespace DarkMarket.Services
 {
@@ -31,6 +33,7 @@ namespace DarkMarket.Services
         {
             await SeedRolesAndAdminAsync();
             await SeedGatewaysAsync();
+            await SeedAdminSettingsAsync();
         }
 
         private async Task SeedRolesAndAdminAsync()
@@ -97,6 +100,24 @@ namespace DarkMarket.Services
             }
 
             await _db.SaveChangesAsync();
+        }
+
+        private async Task SeedAdminSettingsAsync()
+        {
+            var hasOperationFee = await _db.AppSettings
+                .AnyAsync(s => s.Key == AdminSettingsService.OperationFeePercentKey);
+
+            if (!hasOperationFee)
+            {
+                _db.AppSettings.Add(new AppSetting
+                {
+                    Key = AdminSettingsService.OperationFeePercentKey,
+                    Value = AdminSettingsService.DefaultOperationFeePercent
+                        .ToString("0.##", CultureInfo.InvariantCulture)
+                });
+
+                await _db.SaveChangesAsync();
+            }
         }
     }
 }

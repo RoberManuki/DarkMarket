@@ -3,7 +3,7 @@
 ## Mapeamento de Progresso (Mar/2026)
 
 ### ✅ Concluído
-- Testes automatizados de serviços críticos e integração HTTP (webhook + páginas protegidas + fluxo compra/pedido via webhook, incluindo idempotência com webhook duplicado, evento não-liquidado sem mutação, invoice inexistente sem efeito, payload com campos obrigatórios vazios/whitespace/tipos inválidos, payload acima do limite com `413` com e sem `Content-Length` e com caracteres UTF-8 multibyte, incluindo cenário combinado UTF-8 multibyte + `Content-Length` desconhecido, payload exatamente no limite aceito incluindo fronteira UTF-8 multibyte, payload JSON válido com escapes/unicode dentro do limite, validação estrita de secret (incluindo negação com espaços extras, header ausente, múltiplos valores, duplicação de valor válido, rejeição por diferença de casing no valor e aceitação com casing alternado no nome do header), acesso de comprador/vendedor/admin, acesso negado para intruso, negação quando `UserId` ausente/em branco no detalhe do pedido, negação no `/admin` com role em branco, permissão com roles mistas contendo `admin`, negação com roles mistas sem `admin` e permissão com `admin` duplicado) implementados e verdes (`105/105` passando no `DarkMarket.Tests`).
+- Testes automatizados de serviços críticos e integração HTTP (webhook + páginas protegidas + fluxo compra/pedido via webhook, incluindo idempotência com webhook duplicado, evento não-liquidado sem mutação, invoice inexistente sem efeito, payload com campos obrigatórios vazios/whitespace/tipos inválidos, payload acima do limite com `413` com e sem `Content-Length` e com caracteres UTF-8 multibyte, incluindo cenário combinado UTF-8 multibyte + `Content-Length` desconhecido, payload exatamente no limite aceito incluindo fronteira UTF-8 multibyte, payload JSON válido com escapes/unicode dentro do limite, validação estrita de secret (incluindo negação com espaços extras, header ausente, múltiplos valores, duplicação de valor válido, rejeição por diferença de casing no valor e aceitação com casing alternado no nome do header), acesso de comprador/vendedor/admin, acesso negado para intruso, negação quando `UserId` ausente/em branco no detalhe do pedido, negação no `/admin` com role em branco, permissão com roles mistas contendo `admin`, negação com roles mistas sem `admin` e permissão com `admin` duplicado, além de integração do fluxo de taxa operacional salva e refletida no cálculo de repasse) implementados e verdes (`112/112` passando no `DarkMarket.Tests`).
 - Fluxo de confirmação de pagamento unificado (`PaymentConfirmationService`) para telas de pagamento.
 - Webhook BTCPay desacoplado e endurecido (`BtcPayWebhookService`): validação de payload, limite de tamanho, comparação de secret em tempo constante e idempotência de criação/vínculo de pedido.
 - Inicialização da aplicação desacoplada (`AppInitializationService`) para seed de roles/admin/gateways.
@@ -12,6 +12,9 @@
 - Exibição BTC+fiat concluída com fallback visual e preferência de moeda (USD/BRL) controlada no admin.
 - Telas `About` e `Contact` implementadas.
 - Dashboard com métricas reais de usuários, vendas, volume e pendências.
+- Modal de confirmação de repasse implementado com detalhes do pedido (produto, quantidade, comprador, vendedor, valor bruto, taxa e valor líquido), incluindo evidências e pré-visualização da imagem do produto.
+- Configuração de taxa operacional por admin implementada no painel administrativo com persistência em banco.
+- Cálculo de repasse centralizado em serviço (`OperationFeeCalculatorService`) e reutilizado nos modais de repasse (`/admin/orders-review` e `/orders/{id}`) para refletir a taxa configurada.
 
 ### 🟡 Parcial
 - Segurança geral e deploy: melhorias aplicadas no webhook e configuração, mas revisão completa de produção ainda pendente.
@@ -22,7 +25,6 @@
 ### 🔴 Pendente
 - Testes de integração de páginas/fluxos end-to-end (além dos testes de serviço atuais).
 - Revisão geral de UX/responsividade final.
-- Modal de confirmação de repasse e configuração de taxa operacional por admin.
 
 ## Fase 1: Estrutura Inicial e Layout
 - [x] Organizar estrutura de pastas (Pages, Shared, Services, Models, Data)
@@ -108,8 +110,8 @@
    - [x] Implementar telas de About e Contact
 
 6. **Aprimoramento de Fluxos**
-   - [ ] Modal de confirmação de repasse: exibir detalhes do pedido (nome/foto/valor do produto, quantidade, taxa, valor líquido, vendedor/comprador)
-   - [ ] Permitir configuração da taxa de operação pelo admin
+   - [x] Modal de confirmação de repasse: exibir detalhes do pedido (nome/foto/valor do produto, quantidade, taxa, valor líquido, vendedor/comprador)
+   - [x] Permitir configuração da taxa de operação pelo admin
 
 ---
 

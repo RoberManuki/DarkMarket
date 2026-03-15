@@ -41,6 +41,8 @@ builder.Services.AddScoped<AppInitializationService>();
 builder.Services.AddScoped<BtcPayWebhookService>();
 builder.Services.AddScoped<CurrencyPreferenceService>();
 builder.Services.AddScoped<DashboardMetricsService>();
+builder.Services.AddScoped<AdminSettingsService>();
+builder.Services.AddScoped<OperationFeeCalculatorService>();
 
 var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrWhiteSpace(defaultConnection) || defaultConnection.Contains("__SET_VIA_USER_SECRETS__"))
@@ -76,6 +78,16 @@ app.MapPost("/api/btcpay/webhook", async (HttpContext context, BtcPayWebhookServ
 
 using (var scope = app.Services.CreateScope())
 {
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    if (db.Database.IsRelational())
+    {
+        await db.Database.MigrateAsync();
+    }
+    else
+    {
+        await db.Database.EnsureCreatedAsync();
+    }
+
     var initializer = scope.ServiceProvider.GetRequiredService<AppInitializationService>();
     await initializer.SeedAsync();
 }

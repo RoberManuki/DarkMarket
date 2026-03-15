@@ -1016,15 +1016,26 @@ footer {
     align-items: center;
     justify-content: center;
     z-index: 1000;
+    padding: 1rem;
+    overflow-y: auto;
 }
 .modal-card {
     background: #23272f;
     border-radius: 12px;
     box-shadow: 0 2px 16px #0008;
-    padding: 2rem 2.5rem;
+    padding: 1.5rem 1.5rem 1.25rem;
     min-width: 320px;
-    max-width: 98vw;
+    max-width: min(900px, 98vw);
+    max-height: calc(100vh - 2rem);
     color: #fff;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.modal-content {
+    overflow-y: auto;
+    padding-right: 0.35rem;
 }
 .modal-content label {
     font-weight: 600;
@@ -1045,7 +1056,10 @@ footer {
     display: flex;
     gap: 1rem;
     justify-content: flex-end;
-    margin-top: 1.5rem;
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid #343a44;
+    flex-shrink: 0;
 }
 
 .order-chat-card {
@@ -1327,6 +1341,7 @@ footer {
     gap: 1.5em;
     margin-top: 1em;
     justify-content: center;
+    flex-wrap: wrap;
 }
 .evidence-card {
     background: #23272f;
@@ -1353,6 +1368,33 @@ footer {
 .text-muted {
     color: #888;
     font-size: 0.95em;
+}
+
+@media (max-width: 768px) {
+    .modal-card {
+        min-width: 0;
+        width: 100%;
+        max-height: calc(100vh - 1rem);
+        padding: 1rem 1rem 0.9rem;
+    }
+
+    .modal-actions {
+        gap: 0.6rem;
+    }
+
+    .modal-actions .success-btn,
+    .modal-actions .back-btn {
+        flex: 1;
+    }
+
+    .evidence-section {
+        gap: 0.8rem;
+    }
+
+    .evidence-card {
+        min-width: 0;
+        width: 100%;
+    }
 }
 
 a.evidence-link {

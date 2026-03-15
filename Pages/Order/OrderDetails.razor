@@ -19,6 +19,7 @@
 @inject BitcoinQuoteService BitcoinQuoteService
 @inject CurrencyPreferenceService CurrencyPreferenceService
 @inject OrderAccessService OrderAccessService
+@inject OperationFeeCalculatorService OperationFeeCalculatorService
 
 <nav class="breadcrumb">
     <a href="/">Início</a> &gt; <a href="/orders">Pedidos</a> &gt; Detalhes
@@ -226,6 +227,25 @@ else
                 <div class="modal-content">
                     <i class="fa fa-exclamation-triangle" style="color:#f9a825; font-size:1.5em; margin-bottom:0.5em;"></i>
                     <p>Tem certeza que deseja repassar os fundos e finalizar o pedido?</p>
+
+                    <div class="payment-details-card wide-card" style="margin-bottom: 1rem;">
+                        <div class="details-row"><span class="label">Produto:</span><span>@order.Product?.Name</span></div>
+                        <div class="details-row"><span class="label">Quantidade:</span><span>1</span></div>
+                        <div class="details-row"><span class="label">Comprador:</span><span>@order.Buyer?.UserName</span></div>
+                        <div class="details-row"><span class="label">Vendedor:</span><span>@order.Seller?.UserName</span></div>
+                        <div class="details-row"><span class="label">Valor bruto:</span><span>@FormatBtc(order.Amount)</span></div>
+                        <div class="details-row"><span class="label">Taxa operacional:</span><span>@(releaseBreakdown?.Percent.ToString("0.##") ?? "0")%</span></div>
+                        <div class="details-row"><span class="label">Valor da taxa:</span><span>@FormatBtc(releaseBreakdown?.FeeAmount ?? 0m)</span></div>
+                        <div class="details-row"><span class="label">Valor líquido (repasse):</span><span><b>@FormatBtc(releaseBreakdown?.NetAmount ?? 0m)</b></span></div>
+                    </div>
+
+                    @if (!string.IsNullOrWhiteSpace(order.Product?.ImagePath))
+                    {
+                        <div style="margin-bottom: 0.75rem;">
+                            <img src="@order.Product.ImagePath" alt="@order.Product.Name" style="max-width: 180px; border-radius: 8px;" />
+                        </div>
+                    }
+
                     <div class="evidence-section">
                         <div class="evidence-card">
                             <i class="fa fa-user"></i> <b>Comprador</b>
@@ -322,6 +342,7 @@ else
     private bool showReleaseModal = false;
     private decimal? btcUsdRate;
     private decimal? btcBrlRate;
+    private OperationFeeBreakdown? releaseBreakdown;
 
     protected override async Task OnInitializedAsync()
     {
@@ -354,6 +375,8 @@ else
             isLoading = false;
             return;
         }
+
+        releaseBreakdown = await OperationFeeCalculatorService.CalculateBreakdownAsync(order.Amount);
 
         isBuyer = order.BuyerId == userId;
         isSeller = order.SellerId == userId;
@@ -471,6 +494,9 @@ else
         showReleaseModal = false;
         await ReleaseFunds();
     }
+
+    private static string FormatBtc(decimal amount)
+        => $"{amount:0.########} BTC";
 
     private async Task SendMessage()
     {

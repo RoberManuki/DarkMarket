@@ -14,6 +14,7 @@ namespace DarkMarket.Data
         public DbSet<GatewayInfo> Gateways { get; set; }
         public DbSet<OrderModel> Orders { get; set; }
         public DbSet<OrderMessage> OrderMessages { get; set; }
+        public DbSet<AppSetting> AppSettings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

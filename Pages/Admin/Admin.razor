@@ -7,6 +7,7 @@
 
 @inject CurrencyPreferenceService CurrencyPreferenceService
 @inject DashboardMetricsService DashboardMetricsService
+@inject AdminSettingsService AdminSettingsService
 @inject IJSRuntime JSRuntime
 
 <h2 class="page-title">Painel Administrativo</h2>
@@ -34,21 +35,56 @@
     <span><b>Consultas de cotação (total):</b> @quoteQueriesCount</span>
 </div>
 
+<div class="admin-settings-card operation-fee-card">
+    <label for="operation-fee"><b>Taxa operacional (%):</b></label>
+    <input id="operation-fee"
+           class="fee-input"
+           type="number"
+           min="0"
+           max="100"
+           step="0.01"
+           @bind="operationFeePercent" />
+    <button class="details-btn" @onclick="SaveOperationFeeAsync">Salvar taxa</button>
+    @if (!string.IsNullOrWhiteSpace(operationFeeMessage))
+    {
+        <span class="operation-fee-message @(operationFeeSaved ? "ok" : "error")">@operationFeeMessage</span>
+    }
+</div>
+
 @code {
     private string selectedFiat = "USD";
     private int quoteQueriesCount;
+    private decimal operationFeePercent;
+    private string? operationFeeMessage;
+    private bool operationFeeSaved;
 
     protected override async Task OnInitializedAsync()
     {
         selectedFiat = CurrencyPreferenceService.SelectedFiatCurrency;
         var snapshot = await DashboardMetricsService.GetSnapshotAsync();
         quoteQueriesCount = snapshot.QuoteQueriesCount;
+        operationFeePercent = await AdminSettingsService.GetOperationFeePercentAsync();
     }
 
     private async Task ApplyCurrencyPreferenceAsync()
     {
         CurrencyPreferenceService.SetCurrency(selectedFiat);
         await JSRuntime.InvokeVoidAsync("localStorage.setItem", "darkmarket.fiatCurrency", CurrencyPreferenceService.SelectedFiatCurrency);
+    }
+
+    private async Task SaveOperationFeeAsync()
+    {
+        var saved = await AdminSettingsService.SetOperationFeePercentAsync(operationFeePercent);
+        operationFeeSaved = saved;
+
+        if (saved)
+        {
+            operationFeeMessage = "Taxa operacional salva com sucesso.";
+            operationFeePercent = await AdminSettingsService.GetOperationFeePercentAsync();
+            return;
+        }
+
+        operationFeeMessage = "Informe uma taxa entre 0 e 100.";
     }
 }
 
@@ -70,6 +106,27 @@
     border: 1px solid #444;
     border-radius: 6px;
     padding: 0.35rem 0.6rem;
+}
+
+.fee-input {
+    width: 120px;
+    background: #181818;
+    color: #f0f0f0;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 0.35rem 0.6rem;
+}
+
+.operation-fee-card {
+    gap: 0.6rem;
+}
+
+.operation-fee-message.ok {
+    color: #81c784;
+}
+
+.operation-fee-message.error {
+    color: #ff8a80;
 }
 
 .admin-nav {
