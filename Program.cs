@@ -43,6 +43,8 @@ builder.Services.AddScoped<CurrencyPreferenceService>();
 builder.Services.AddScoped<DashboardMetricsService>();
 builder.Services.AddScoped<AdminSettingsService>();
 builder.Services.AddScoped<OperationFeeCalculatorService>();
+builder.Services.AddScoped<AdminOrderReleaseService>();
+builder.Services.AddScoped<AdminLogsQueryService>();
 
 var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrWhiteSpace(defaultConnection) || defaultConnection.Contains("__SET_VIA_USER_SECRETS__"))

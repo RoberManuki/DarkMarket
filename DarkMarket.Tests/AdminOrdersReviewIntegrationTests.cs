@@ -58,6 +58,7 @@ public class AdminOrdersReviewIntegrationTests : IClassFixture<IntegrationTestWe
             .Include(o => o.Seller)
             .Include(o => o.Product)
             .Where(o => o.Status == PaymentStatus.AguardandoRevisaoAdm)
+            .Where(o => o.SellerId != null && o.SellerId.StartsWith("seller-review-"))
             .ToListAsync();
 
         Assert.Equal(3, reviewOrders.Count);
@@ -117,6 +118,7 @@ public class AdminOrdersReviewIntegrationTests : IClassFixture<IntegrationTestWe
             .Include(o => o.Product)
             .Where(o => o.Status == PaymentStatus.AguardandoRevisaoAdm)
             .Where(o => o.Amount == 0.005m)
+            .Where(o => o.SellerId != null && o.SellerId.StartsWith("seller-tie-"))
             .ToListAsync();
 
         Assert.Equal(4, reviewOrders.Count);
@@ -169,6 +171,7 @@ public class AdminOrdersReviewIntegrationTests : IClassFixture<IntegrationTestWe
             .Include(o => o.Product)
             .Where(o => o.Status == PaymentStatus.AguardandoRevisaoAdm)
             .Where(o => o.Amount >= 0.007m && o.Amount < 0.008m)
+            .Where(o => o.SellerId != null && o.SellerId.StartsWith("seller-buyer-tie-"))
             .ToListAsync();
 
         Assert.Equal(4, reviewOrders.Count);
@@ -228,6 +231,7 @@ public class AdminOrdersReviewIntegrationTests : IClassFixture<IntegrationTestWe
             .Include(o => o.Product)
             .Where(o => o.Status == PaymentStatus.AguardandoRevisaoAdm)
             .Where(o => o.Amount >= 0.009m && o.Amount < 0.010m)
+            .Where(o => o.SellerId != null && o.SellerId.StartsWith("seller-product-tie-"))
             .ToListAsync();
 
         Assert.Equal(5, reviewOrders.Count);

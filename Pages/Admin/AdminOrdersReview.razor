@@ -4,12 +4,14 @@
 @using DarkMarket.Enums
 @using DarkMarket.Models
 @using DarkMarket.Services
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.JSInterop
 @using System.Globalization
 @inject AppDbContext Db
 @inject OperationFeeCalculatorService OperationFeeCalculatorService
+@inject AdminOrderReleaseService AdminOrderReleaseService
 @inject IJSRuntime JS
 
 <h2 class="page-title">Pedidos aguardando revisão do ADM</h2>
@@ -164,6 +166,8 @@ else
 }
 
 @code {
+    [CascadingParameter] private Task<AuthenticationState>? AuthenticationStateTask { get; set; }
+
     List<OrderModel> orders = new();
     private bool showReleaseModal = false;
     private int releaseOrderId;
@@ -310,22 +314,36 @@ else
 
     private async Task ReleaseFunds(int orderId)
     {
-        var order = await Db.Orders.FindAsync(orderId);
-        if (order != null && order.Status == PaymentStatus.AguardandoRevisaoAdm)
+        var adminUserId = await GetCurrentUserIdAsync();
+        var result = await AdminOrderReleaseService.ReleaseFundsAsync(orderId, adminUserId);
+        if (!result.Succeeded)
         {
-            order.Status = PaymentStatus.Finalizado;
-            order.FundsReleased = true;
-            // TODO: lógica de repasse de fundos
-            await Db.SaveChangesAsync();
-            orders.RemoveAll(o => o.Id == orderId);
-            if (currentPage > TotalPages)
-            {
-                currentPage = TotalPages;
-            }
-
-            await PersistFilterStateAsync();
-            StateHasChanged();
+            return;
         }
+
+        orders.RemoveAll(o => o.Id == orderId);
+        if (currentPage > TotalPages)
+        {
+            currentPage = TotalPages;
+        }
+
+        await PersistFilterStateAsync();
+        StateHasChanged();
+    }
+
+    private async Task<string?> GetCurrentUserIdAsync()
+    {
+        if (AuthenticationStateTask is null)
+        {
+            return null;
+        }
+
+        var authState = await AuthenticationStateTask;
+        var user = authState.User;
+
+        return user.Identity?.IsAuthenticated == true
+            ? user.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+            : null;
     }
 
     private async Task LoadFiltersFromStorageAsync()
