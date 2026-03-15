@@ -54,6 +54,11 @@ public class AdminPaymentsFilterStateServiceTests
     public async Task SaveAsync_PersistsValuesAndPageFallback()
     {
         var js = new FakeLocalStorageJsRuntime();
+
+        // Preload optional keys to verify SaveAsync removes stale filters.
+        js.Set(AdminPaymentsStorageKeys.MinAmountFilter, "0.01");
+        js.Set(AdminPaymentsStorageKeys.DateFilter, new DateTime(2026, 3, 10).ToString("o", CultureInfo.InvariantCulture));
+
         var service = new AdminPaymentsFilterStateService(js);
 
         await service.SaveAsync(new AdminPaymentsFilterState

@@ -1,5 +1,4 @@
 using Microsoft.JSInterop;
-using System.Globalization;
 
 namespace DarkMarket.Services;
 
@@ -29,45 +28,15 @@ public class AdminOrdersFilterStateService
     {
         try
         {
-            int? id = null;
-            var idRaw = await _js.InvokeAsync<string?>("localStorage.getItem", AdminOrdersStorageKeys.IdFilter);
-            if (int.TryParse(idRaw, out var parsedId) && parsedId >= 0)
-            {
-                id = parsedId;
-            }
-
-            var product = await _js.InvokeAsync<string?>("localStorage.getItem", AdminOrdersStorageKeys.ProductFilter) ?? string.Empty;
-            var buyer = await _js.InvokeAsync<string?>("localStorage.getItem", AdminOrdersStorageKeys.BuyerFilter) ?? string.Empty;
-            var seller = await _js.InvokeAsync<string?>("localStorage.getItem", AdminOrdersStorageKeys.SellerFilter) ?? string.Empty;
-            var status = await _js.InvokeAsync<string?>("localStorage.getItem", AdminOrdersStorageKeys.StatusFilter) ?? string.Empty;
-
-            decimal? minAmount = null;
-            var minAmountRaw = await _js.InvokeAsync<string?>("localStorage.getItem", AdminOrdersStorageKeys.MinAmountFilter);
-            if (decimal.TryParse(minAmountRaw, NumberStyles.Number, CultureInfo.InvariantCulture, out var parsedMinAmount))
-            {
-                minAmount = parsedMinAmount;
-            }
-
-            decimal? maxAmount = null;
-            var maxAmountRaw = await _js.InvokeAsync<string?>("localStorage.getItem", AdminOrdersStorageKeys.MaxAmountFilter);
-            if (decimal.TryParse(maxAmountRaw, NumberStyles.Number, CultureInfo.InvariantCulture, out var parsedMaxAmount))
-            {
-                maxAmount = parsedMaxAmount;
-            }
-
-            DateTime? date = null;
-            var dateRaw = await _js.InvokeAsync<string?>("localStorage.getItem", AdminOrdersStorageKeys.DateFilter);
-            if (DateTime.TryParse(dateRaw, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var parsedDate))
-            {
-                date = parsedDate.Date;
-            }
-
-            int? page = null;
-            var pageRaw = await _js.InvokeAsync<string?>("localStorage.getItem", AdminOrdersStorageKeys.Page);
-            if (int.TryParse(pageRaw, out var parsedPage) && parsedPage > 0)
-            {
-                page = parsedPage;
-            }
+            var id = await LocalStorageStateHelpers.GetNonNegativeIntAsync(_js, AdminOrdersStorageKeys.IdFilter);
+            var product = await LocalStorageStateHelpers.GetStringAsync(_js, AdminOrdersStorageKeys.ProductFilter);
+            var buyer = await LocalStorageStateHelpers.GetStringAsync(_js, AdminOrdersStorageKeys.BuyerFilter);
+            var seller = await LocalStorageStateHelpers.GetStringAsync(_js, AdminOrdersStorageKeys.SellerFilter);
+            var status = await LocalStorageStateHelpers.GetStringAsync(_js, AdminOrdersStorageKeys.StatusFilter);
+            var minAmount = await LocalStorageStateHelpers.GetDecimalAsync(_js, AdminOrdersStorageKeys.MinAmountFilter);
+            var maxAmount = await LocalStorageStateHelpers.GetDecimalAsync(_js, AdminOrdersStorageKeys.MaxAmountFilter);
+            var date = await LocalStorageStateHelpers.GetDateAsync(_js, AdminOrdersStorageKeys.DateFilter);
+            var page = await LocalStorageStateHelpers.GetPositiveIntAsync(_js, AdminOrdersStorageKeys.Page);
 
             return new AdminOrdersFilterState
             {
@@ -92,48 +61,15 @@ public class AdminOrdersFilterStateService
     {
         try
         {
-            if (state.Id.HasValue)
-            {
-                await _js.InvokeVoidAsync("localStorage.setItem", AdminOrdersStorageKeys.IdFilter, state.Id.Value.ToString(CultureInfo.InvariantCulture));
-            }
-            else
-            {
-                await _js.InvokeVoidAsync("localStorage.removeItem", AdminOrdersStorageKeys.IdFilter);
-            }
-
-            await _js.InvokeVoidAsync("localStorage.setItem", AdminOrdersStorageKeys.ProductFilter, state.Product);
-            await _js.InvokeVoidAsync("localStorage.setItem", AdminOrdersStorageKeys.BuyerFilter, state.Buyer);
-            await _js.InvokeVoidAsync("localStorage.setItem", AdminOrdersStorageKeys.SellerFilter, state.Seller);
-            await _js.InvokeVoidAsync("localStorage.setItem", AdminOrdersStorageKeys.StatusFilter, state.Status);
-
-            if (state.MinAmount.HasValue)
-            {
-                await _js.InvokeVoidAsync("localStorage.setItem", AdminOrdersStorageKeys.MinAmountFilter, state.MinAmount.Value.ToString(CultureInfo.InvariantCulture));
-            }
-            else
-            {
-                await _js.InvokeVoidAsync("localStorage.removeItem", AdminOrdersStorageKeys.MinAmountFilter);
-            }
-
-            if (state.MaxAmount.HasValue)
-            {
-                await _js.InvokeVoidAsync("localStorage.setItem", AdminOrdersStorageKeys.MaxAmountFilter, state.MaxAmount.Value.ToString(CultureInfo.InvariantCulture));
-            }
-            else
-            {
-                await _js.InvokeVoidAsync("localStorage.removeItem", AdminOrdersStorageKeys.MaxAmountFilter);
-            }
-
-            if (state.Date.HasValue)
-            {
-                await _js.InvokeVoidAsync("localStorage.setItem", AdminOrdersStorageKeys.DateFilter, state.Date.Value.ToString("o", CultureInfo.InvariantCulture));
-            }
-            else
-            {
-                await _js.InvokeVoidAsync("localStorage.removeItem", AdminOrdersStorageKeys.DateFilter);
-            }
-
-            await _js.InvokeVoidAsync("localStorage.setItem", AdminOrdersStorageKeys.Page, (state.Page ?? 1).ToString(CultureInfo.InvariantCulture));
+            await LocalStorageStateHelpers.SetOrRemoveIntAsync(_js, AdminOrdersStorageKeys.IdFilter, state.Id);
+            await LocalStorageStateHelpers.SetStringAsync(_js, AdminOrdersStorageKeys.ProductFilter, state.Product);
+            await LocalStorageStateHelpers.SetStringAsync(_js, AdminOrdersStorageKeys.BuyerFilter, state.Buyer);
+            await LocalStorageStateHelpers.SetStringAsync(_js, AdminOrdersStorageKeys.SellerFilter, state.Seller);
+            await LocalStorageStateHelpers.SetStringAsync(_js, AdminOrdersStorageKeys.StatusFilter, state.Status);
+            await LocalStorageStateHelpers.SetOrRemoveDecimalAsync(_js, AdminOrdersStorageKeys.MinAmountFilter, state.MinAmount);
+            await LocalStorageStateHelpers.SetOrRemoveDecimalAsync(_js, AdminOrdersStorageKeys.MaxAmountFilter, state.MaxAmount);
+            await LocalStorageStateHelpers.SetOrRemoveDateAsync(_js, AdminOrdersStorageKeys.DateFilter, state.Date);
+            await LocalStorageStateHelpers.SetPageAsync(_js, AdminOrdersStorageKeys.Page, state.Page);
         }
         catch
         {

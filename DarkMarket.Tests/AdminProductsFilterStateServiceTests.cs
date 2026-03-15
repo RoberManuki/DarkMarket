@@ -100,6 +100,12 @@ public class AdminProductsFilterStateServiceTests
     public async Task SaveAsync_WhenPageIsNull_PersistsPageOne()
     {
         var js = new FakeLocalStorageJsRuntime();
+
+        // Preload keys to verify SaveAsync cleans nullable filters.
+        js.Set(AdminProductsStorageKeys.IdFilter, "12");
+        js.Set(AdminProductsStorageKeys.MinPriceFilter, "0.10");
+        js.Set(AdminProductsStorageKeys.MaxPriceFilter, "0.20");
+
         var service = new AdminProductsFilterStateService(js);
 
         await service.SaveAsync(new AdminProductsFilterState
@@ -113,6 +119,9 @@ public class AdminProductsFilterStateServiceTests
         });
 
         Assert.Equal("1", js.Get(AdminProductsStorageKeys.Page));
+        Assert.Null(js.Get(AdminProductsStorageKeys.IdFilter));
+        Assert.Null(js.Get(AdminProductsStorageKeys.MinPriceFilter));
+        Assert.Null(js.Get(AdminProductsStorageKeys.MaxPriceFilter));
     }
 
     [Fact]

@@ -44,6 +44,11 @@ public class AdminLogsFilterStateServiceTests
     public async Task SaveAsync_WritesValuesAndRemovesMissingDates()
     {
         var js = new FakeLocalStorageJsRuntime();
+
+        // Preload date keys to verify SaveAsync removes stale StartDate and overwrites EndDate.
+        js.Set(AdminLogsStorageKeys.StartDateFilter, new DateTime(2026, 2, 1).ToString("o", CultureInfo.InvariantCulture));
+        js.Set(AdminLogsStorageKeys.EndDateFilter, new DateTime(2026, 2, 2).ToString("o", CultureInfo.InvariantCulture));
+
         var service = new AdminLogsFilterStateService(js);
 
         await service.SaveAsync(new AdminLogsFilterState

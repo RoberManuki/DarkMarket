@@ -60,6 +60,12 @@ public class AdminOrdersFilterStateServiceTests
     public async Task SaveAsync_PersistsValuesAndRemovesNullables()
     {
         var js = new FakeLocalStorageJsRuntime();
+
+        // Preload optional keys to verify SaveAsync clears stale state.
+        js.Set(AdminOrdersStorageKeys.IdFilter, "20");
+        js.Set(AdminOrdersStorageKeys.MinAmountFilter, "0.03");
+        js.Set(AdminOrdersStorageKeys.DateFilter, new DateTime(2026, 3, 10).ToString("o", CultureInfo.InvariantCulture));
+
         var service = new AdminOrdersFilterStateService(js);
 
         await service.SaveAsync(new AdminOrdersFilterState

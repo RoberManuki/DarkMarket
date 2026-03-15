@@ -1,5 +1,4 @@
 using Microsoft.JSInterop;
-using System.Globalization;
 
 namespace DarkMarket.Services;
 
@@ -27,37 +26,13 @@ public class AdminPaymentsFilterStateService
     {
         try
         {
-            var userId = await _js.InvokeAsync<string?>("localStorage.getItem", AdminPaymentsStorageKeys.UserFilter) ?? string.Empty;
-            var productId = await _js.InvokeAsync<string?>("localStorage.getItem", AdminPaymentsStorageKeys.ProductFilter) ?? string.Empty;
-            var status = await _js.InvokeAsync<string?>("localStorage.getItem", AdminPaymentsStorageKeys.StatusFilter) ?? string.Empty;
-
-            decimal? minAmount = null;
-            var minAmountRaw = await _js.InvokeAsync<string?>("localStorage.getItem", AdminPaymentsStorageKeys.MinAmountFilter);
-            if (decimal.TryParse(minAmountRaw, NumberStyles.Number, CultureInfo.InvariantCulture, out var parsedMinAmount))
-            {
-                minAmount = parsedMinAmount;
-            }
-
-            decimal? maxAmount = null;
-            var maxAmountRaw = await _js.InvokeAsync<string?>("localStorage.getItem", AdminPaymentsStorageKeys.MaxAmountFilter);
-            if (decimal.TryParse(maxAmountRaw, NumberStyles.Number, CultureInfo.InvariantCulture, out var parsedMaxAmount))
-            {
-                maxAmount = parsedMaxAmount;
-            }
-
-            DateTime? date = null;
-            var dateRaw = await _js.InvokeAsync<string?>("localStorage.getItem", AdminPaymentsStorageKeys.DateFilter);
-            if (DateTime.TryParse(dateRaw, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var parsedDate))
-            {
-                date = parsedDate.Date;
-            }
-
-            int? page = null;
-            var pageRaw = await _js.InvokeAsync<string?>("localStorage.getItem", AdminPaymentsStorageKeys.Page);
-            if (int.TryParse(pageRaw, out var parsedPage) && parsedPage > 0)
-            {
-                page = parsedPage;
-            }
+            var userId = await LocalStorageStateHelpers.GetStringAsync(_js, AdminPaymentsStorageKeys.UserFilter);
+            var productId = await LocalStorageStateHelpers.GetStringAsync(_js, AdminPaymentsStorageKeys.ProductFilter);
+            var status = await LocalStorageStateHelpers.GetStringAsync(_js, AdminPaymentsStorageKeys.StatusFilter);
+            var minAmount = await LocalStorageStateHelpers.GetDecimalAsync(_js, AdminPaymentsStorageKeys.MinAmountFilter);
+            var maxAmount = await LocalStorageStateHelpers.GetDecimalAsync(_js, AdminPaymentsStorageKeys.MaxAmountFilter);
+            var date = await LocalStorageStateHelpers.GetDateAsync(_js, AdminPaymentsStorageKeys.DateFilter);
+            var page = await LocalStorageStateHelpers.GetPositiveIntAsync(_js, AdminPaymentsStorageKeys.Page);
 
             return new AdminPaymentsFilterState
             {
@@ -80,38 +55,13 @@ public class AdminPaymentsFilterStateService
     {
         try
         {
-            await _js.InvokeVoidAsync("localStorage.setItem", AdminPaymentsStorageKeys.UserFilter, state.UserId);
-            await _js.InvokeVoidAsync("localStorage.setItem", AdminPaymentsStorageKeys.ProductFilter, state.ProductId);
-            await _js.InvokeVoidAsync("localStorage.setItem", AdminPaymentsStorageKeys.StatusFilter, state.Status);
-
-            if (state.MinAmount.HasValue)
-            {
-                await _js.InvokeVoidAsync("localStorage.setItem", AdminPaymentsStorageKeys.MinAmountFilter, state.MinAmount.Value.ToString(CultureInfo.InvariantCulture));
-            }
-            else
-            {
-                await _js.InvokeVoidAsync("localStorage.removeItem", AdminPaymentsStorageKeys.MinAmountFilter);
-            }
-
-            if (state.MaxAmount.HasValue)
-            {
-                await _js.InvokeVoidAsync("localStorage.setItem", AdminPaymentsStorageKeys.MaxAmountFilter, state.MaxAmount.Value.ToString(CultureInfo.InvariantCulture));
-            }
-            else
-            {
-                await _js.InvokeVoidAsync("localStorage.removeItem", AdminPaymentsStorageKeys.MaxAmountFilter);
-            }
-
-            if (state.Date.HasValue)
-            {
-                await _js.InvokeVoidAsync("localStorage.setItem", AdminPaymentsStorageKeys.DateFilter, state.Date.Value.ToString("o", CultureInfo.InvariantCulture));
-            }
-            else
-            {
-                await _js.InvokeVoidAsync("localStorage.removeItem", AdminPaymentsStorageKeys.DateFilter);
-            }
-
-            await _js.InvokeVoidAsync("localStorage.setItem", AdminPaymentsStorageKeys.Page, (state.Page ?? 1).ToString(CultureInfo.InvariantCulture));
+            await LocalStorageStateHelpers.SetStringAsync(_js, AdminPaymentsStorageKeys.UserFilter, state.UserId);
+            await LocalStorageStateHelpers.SetStringAsync(_js, AdminPaymentsStorageKeys.ProductFilter, state.ProductId);
+            await LocalStorageStateHelpers.SetStringAsync(_js, AdminPaymentsStorageKeys.StatusFilter, state.Status);
+            await LocalStorageStateHelpers.SetOrRemoveDecimalAsync(_js, AdminPaymentsStorageKeys.MinAmountFilter, state.MinAmount);
+            await LocalStorageStateHelpers.SetOrRemoveDecimalAsync(_js, AdminPaymentsStorageKeys.MaxAmountFilter, state.MaxAmount);
+            await LocalStorageStateHelpers.SetOrRemoveDateAsync(_js, AdminPaymentsStorageKeys.DateFilter, state.Date);
+            await LocalStorageStateHelpers.SetPageAsync(_js, AdminPaymentsStorageKeys.Page, state.Page);
         }
         catch
         {
