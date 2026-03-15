@@ -144,21 +144,21 @@ public class AdminLogFilteringIntegrationTests : IClassFixture<IntegrationTestWe
     {
         var marker = Guid.NewGuid().ToString("N");
         var expected = await SeedLogAsync(
-            source: "AdminOrdersReview",
+            source: AdminAuditSources.OrdersReview,
             message: $"repasse confirmado token {marker}",
-            level: "Info",
+            level: AdminAuditLevels.Success,
             timestampUtc: new DateTime(2026, 3, 14, 12, 0, 0, DateTimeKind.Utc));
 
         _ = await SeedLogAsync(
-            source: "AdminOrdersReview",
+            source: AdminAuditSources.OrdersReview,
             message: $"repasse confirmado token {marker}",
-            level: "Warning",
+            level: AdminAuditLevels.Refused,
             timestampUtc: new DateTime(2026, 3, 14, 13, 0, 0, DateTimeKind.Utc));
 
         _ = await SeedLogAsync(
-            source: "AdminOrdersReview",
+            source: AdminAuditSources.OrdersReview,
             message: $"repasse confirmado token {marker}",
-            level: "Info",
+            level: AdminAuditLevels.Success,
             timestampUtc: new DateTime(2026, 3, 1, 8, 0, 0, DateTimeKind.Utc));
 
         using var scope = _factory.Services.CreateScope();
@@ -167,7 +167,7 @@ public class AdminLogFilteringIntegrationTests : IClassFixture<IntegrationTestWe
         var filtered = AdminLogFiltering.Apply(db.Logs, new AdminLogFilterCriteria
         {
             GlobalTerm = marker,
-            Level = "Info",
+            Level = AdminAuditLevels.Success,
             StartDate = new DateTime(2026, 3, 10),
             EndDate = new DateTime(2026, 3, 20)
         })

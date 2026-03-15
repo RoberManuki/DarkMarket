@@ -45,6 +45,12 @@ builder.Services.AddScoped<AdminSettingsService>();
 builder.Services.AddScoped<OperationFeeCalculatorService>();
 builder.Services.AddScoped<AdminOrderReleaseService>();
 builder.Services.AddScoped<AdminLogsQueryService>();
+builder.Services.AddScoped<AdminLogsExportService>();
+builder.Services.AddScoped<AdminLogsFilterStateService>();
+builder.Services.AddScoped<AdminUsersFilterStateService>();
+builder.Services.AddScoped<AdminPaymentsFilterStateService>();
+builder.Services.AddScoped<AdminOrdersFilterStateService>();
+builder.Services.AddScoped<AdminProductsFilterStateService>();
 
 var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrWhiteSpace(defaultConnection) || defaultConnection.Contains("__SET_VIA_USER_SECRETS__"))

@@ -9,11 +9,11 @@
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.JSInterop
 @using System.Globalization
-@using System.Text
-@using System.Text.Json
 
 @inject AppDbContext Db
 @inject AdminLogsQueryService AdminLogsQueryService
+@inject AdminLogsExportService AdminLogsExportService
+@inject AdminLogsFilterStateService AdminLogsFilterStateService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
 
@@ -36,25 +36,24 @@
     </select>
     <input type="date" @bind="filterStartDate" />
     <input type="date" @bind="filterEndDate" />
-    <button @onclick="ApplyFilters">Filtrar</button>
-    <button @onclick="ClearFilters">Limpar</button>
+    <FilterActionButtons OnApply="ApplyFilters" OnClear="ClearFilters" />
     <button @onclick="ExportCsvAsync" disabled="@(totalLogs == 0 || HasInvalidDateRange)">Exportar CSV</button>
     <button @onclick="ExportJsonAsync" disabled="@(totalLogs == 0 || HasInvalidDateRange)">Exportar JSON</button>
 </div>
 
 <div class="filter-bar logs-quick-range-bar">
-    <button class="@QuickRangeButtonClass(QuickRangePreset.Today)" @onclick="SetTodayRangeAsync">Hoje</button>
-    <button class="@QuickRangeButtonClass(QuickRangePreset.Last7Days)" @onclick="() => SetLastDaysRangeAsync(7)">Últimos 7 dias</button>
-    <button class="@QuickRangeButtonClass(QuickRangePreset.Last30Days)" @onclick="() => SetLastDaysRangeAsync(30)">Últimos 30 dias</button>
-    <button class="@QuickRangeButtonClass(QuickRangePreset.CurrentMonth)" @onclick="SetCurrentMonthRangeAsync">Mês atual</button>
-    <button class="@QuickRangeButtonClass(QuickRangePreset.None)" @onclick="ClearDateRangeAsync">Limpar período</button>
+    <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.Today)" @onclick="SetTodayRangeAsync">Hoje</button>
+    <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.Last7Days)" @onclick="() => SetLastDaysRangeAsync(7)">Últimos 7 dias</button>
+    <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.Last30Days)" @onclick="() => SetLastDaysRangeAsync(30)">Últimos 30 dias</button>
+    <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.CurrentMonth)" @onclick="SetCurrentMonthRangeAsync">Mês atual</button>
+    <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.None)" @onclick="ClearDateRangeAsync">Limpar período</button>
 </div>
 
 <div class="filter-bar logs-audit-filter-bar">
-    <button class="@AuditQuickFilterButtonClass(AuditQuickFilter.All)" @onclick="() => SetAuditQuickFilterAsync(AuditQuickFilter.All)">Todos (@auditCountAll)</button>
-    <button class="@AuditQuickFilterButtonClass(AuditQuickFilter.ReleaseOnly)" @onclick="() => SetAuditQuickFilterAsync(AuditQuickFilter.ReleaseOnly)">Somente repasses (@auditCountReleaseOnly)</button>
-    <button class="@AuditQuickFilterButtonClass(AuditQuickFilter.ReleaseSuccess)" @onclick="() => SetAuditQuickFilterAsync(AuditQuickFilter.ReleaseSuccess)">Repasses OK (@auditCountReleaseSuccess)</button>
-    <button class="@AuditQuickFilterButtonClass(AuditQuickFilter.ReleaseRefused)" @onclick="() => SetAuditQuickFilterAsync(AuditQuickFilter.ReleaseRefused)">Repasses recusados (@auditCountReleaseRefused)</button>
+    <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.All)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.All)">Todos (@auditCountAll)</button>
+    <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseOnly)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseOnly)">Somente repasses (@auditCountReleaseOnly)</button>
+    <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseSuccess)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseSuccess)">Repasses OK (@auditCountReleaseSuccess)</button>
+    <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseRefused)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseRefused)">Repasses recusados (@auditCountReleaseRefused)</button>
 </div>
 
 @if (HasInvalidDateRange)
@@ -156,11 +155,7 @@ else
     </table>
 }
 
-<div class="pagination">
-    <button @onclick="PrevPage" disabled="@(!CanGoToPreviousPage)">Anterior</button>
-    <span class="pagination-info">Página @currentPage de @totalPages</span>
-    <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Próxima</button>
-</div>
+<PaginationControls CurrentPage="@currentPage" TotalPages="@totalPages" OnPrevious="PrevPage" OnNext="NextPage" />
 
 <button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
 
@@ -173,7 +168,7 @@ else
     private int auditCountReleaseRefused;
     private int pageSize = 10;
     private int currentPage = 1;
-    private int totalPages => (int)Math.Ceiling((double)totalLogs / pageSize);
+    private int totalPages => Math.Max(1, (int)Math.Ceiling((double)totalLogs / pageSize));
     private bool filtersLoaded;
     private bool showRestoredFiltersNotice;
 
@@ -184,32 +179,16 @@ else
     private string filterLevel = "";
     private DateTime? filterStartDate;
     private DateTime? filterEndDate;
-    private CancellationTokenSource? globalSearchDebounceCts;
+    private readonly DebounceDispatcher globalSearchDebouncer = new();
 
-    private const string LogsGlobalSearchStorageKey = "admin.logs.global";
-    private const string LogsUserFilterStorageKey = "admin.logs.user";
-    private const string LogsSourceFilterStorageKey = "admin.logs.source";
-    private const string LogsMessageFilterStorageKey = "admin.logs.message";
-    private const string LogsLevelFilterStorageKey = "admin.logs.level";
-    private const string LogsStartDateFilterStorageKey = "admin.logs.startDate";
-    private const string LogsEndDateFilterStorageKey = "admin.logs.endDate";
-    private const string LogsPageStorageKey = "admin.logs.page";
-    private const string LogsQuickRangePresetStorageKey = "admin.logs.quickRangePreset";
-    private const string LogsAuditQuickFilterStorageKey = "admin.logs.auditQuickFilter";
-    private const string LogsSortColumnStorageKey = "admin.logs.sortColumn";
-    private const string LogsSortAscendingStorageKey = "admin.logs.sortAscending";
-
-    private QuickRangePreset selectedQuickRangePreset = QuickRangePreset.None;
-    private AuditQuickFilter selectedAuditQuickFilter = AuditQuickFilter.All;
+    private AdminLogsQuickRangePreset selectedQuickRangePreset = AdminLogsQuickRangePreset.None;
+    private AdminLogsAuditQuickFilter selectedAuditQuickFilter = AdminLogsAuditQuickFilter.All;
     private AdminLogSortColumn currentSortColumn = AdminLogSortColumn.Timestamp;
     private bool sortAscending;
 
     private bool HasInvalidDateRange => filterStartDate.HasValue && filterEndDate.HasValue && filterStartDate.Value.Date > filterEndDate.Value.Date;
     private bool HasDateRangeFilter => filterStartDate.HasValue || filterEndDate.HasValue;
     private string ActivePeriodSummary => BuildActivePeriodSummary();
-    private bool CanGoToNextPage => currentPage < totalPages;
-    private bool CanGoToPreviousPage => currentPage > 1;
-
     protected override async Task OnInitializedAsync()
     {
         await LoadLogs();
@@ -312,29 +291,13 @@ else
     private async Task OnGlobalSearchInput(ChangeEventArgs args)
     {
         filterGlobalSearch = args.Value?.ToString() ?? string.Empty;
-
-        globalSearchDebounceCts?.Cancel();
-        globalSearchDebounceCts?.Dispose();
-        globalSearchDebounceCts = new CancellationTokenSource();
-        var token = globalSearchDebounceCts.Token;
-
-        try
-        {
-            await Task.Delay(350, token);
-            if (!token.IsCancellationRequested)
-            {
-                await ApplyFilters();
-            }
-        }
-        catch (TaskCanceledException)
-        {
-        }
+        await globalSearchDebouncer.DebounceAsync(TimeSpan.FromMilliseconds(350), ApplyFilters);
     }
 
     private async Task SetTodayRangeAsync()
     {
         var today = DateTime.Today;
-        selectedQuickRangePreset = QuickRangePreset.Today;
+        selectedQuickRangePreset = AdminLogsQuickRangePreset.Today;
         filterStartDate = today;
         filterEndDate = today;
         await ApplyFiltersCore(true, false);
@@ -347,7 +310,7 @@ else
             return;
         }
 
-        selectedQuickRangePreset = days == 7 ? QuickRangePreset.Last7Days : QuickRangePreset.Last30Days;
+        selectedQuickRangePreset = days == 7 ? AdminLogsQuickRangePreset.Last7Days : AdminLogsQuickRangePreset.Last30Days;
         filterEndDate = DateTime.Today;
         filterStartDate = filterEndDate.Value.AddDays(-(days - 1));
         await ApplyFiltersCore(true, false);
@@ -356,7 +319,7 @@ else
     private async Task SetCurrentMonthRangeAsync()
     {
         var today = DateTime.Today;
-        selectedQuickRangePreset = QuickRangePreset.CurrentMonth;
+        selectedQuickRangePreset = AdminLogsQuickRangePreset.CurrentMonth;
         filterStartDate = new DateTime(today.Year, today.Month, 1);
         filterEndDate = filterStartDate.Value.AddMonths(1).AddDays(-1);
         await ApplyFiltersCore(true, false);
@@ -364,29 +327,29 @@ else
 
     private async Task ClearDateRangeAsync()
     {
-        selectedQuickRangePreset = QuickRangePreset.None;
+        selectedQuickRangePreset = AdminLogsQuickRangePreset.None;
         filterStartDate = null;
         filterEndDate = null;
         await ApplyFiltersCore(true, false);
     }
 
-    private async Task SetAuditQuickFilterAsync(AuditQuickFilter filter)
+    private async Task SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter filter)
     {
         selectedAuditQuickFilter = filter;
 
         switch (filter)
         {
-            case AuditQuickFilter.ReleaseOnly:
-                filterSource = "AdminOrdersReview";
+            case AdminLogsAuditQuickFilter.ReleaseOnly:
+                filterSource = AdminAuditSources.OrdersReview;
                 filterLevel = string.Empty;
                 break;
-            case AuditQuickFilter.ReleaseSuccess:
-                filterSource = "AdminOrdersReview";
-                filterLevel = "Info";
+            case AdminLogsAuditQuickFilter.ReleaseSuccess:
+                filterSource = AdminAuditSources.OrdersReview;
+                filterLevel = AdminAuditLevels.Success;
                 break;
-            case AuditQuickFilter.ReleaseRefused:
-                filterSource = "AdminOrdersReview";
-                filterLevel = "Warning";
+            case AdminLogsAuditQuickFilter.ReleaseRefused:
+                filterSource = AdminAuditSources.OrdersReview;
+                filterLevel = AdminAuditLevels.Refused;
                 break;
             default:
                 filterSource = string.Empty;
@@ -424,10 +387,10 @@ else
         return sortAscending ? "↑" : "↓";
     }
 
-    private string QuickRangeButtonClass(QuickRangePreset preset)
+    private string QuickRangeButtonClass(AdminLogsQuickRangePreset preset)
         => selectedQuickRangePreset == preset ? "quick-range-btn active" : "quick-range-btn";
 
-    private string AuditQuickFilterButtonClass(AuditQuickFilter filter)
+    private string AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter filter)
         => selectedAuditQuickFilter == filter ? "quick-range-btn active" : "quick-range-btn";
 
     private void SyncSelectedQuickRangePreset()
@@ -440,60 +403,19 @@ else
         selectedAuditQuickFilter = InferAuditQuickFilter();
     }
 
-    private QuickRangePreset InferQuickRangePresetFromDates()
+    private AdminLogsQuickRangePreset InferQuickRangePresetFromDates()
     {
-        var today = DateTime.Today;
-        var start = filterStartDate?.Date;
-        var end = filterEndDate?.Date;
-
-        if (!start.HasValue && !end.HasValue)
-        {
-            return QuickRangePreset.None;
-        }
-
-        if (start == today && end == today)
-        {
-            return QuickRangePreset.Today;
-        }
-
-        if (start == today.AddDays(-6) && end == today)
-        {
-            return QuickRangePreset.Last7Days;
-        }
-
-        if (start == today.AddDays(-29) && end == today)
-        {
-            return QuickRangePreset.Last30Days;
-        }
-
-        var firstDayOfMonth = new DateTime(today.Year, today.Month, 1);
-        var lastDayOfMonth = firstDayOfMonth.AddMonths(1).AddDays(-1);
-        if (start == firstDayOfMonth && end == lastDayOfMonth)
-        {
-            return QuickRangePreset.CurrentMonth;
-        }
-
-        return QuickRangePreset.Custom;
+        return AdminLogsFilterInference.InferQuickRangePreset(filterStartDate, filterEndDate, DateTime.Today);
     }
 
-    private AuditQuickFilter InferAuditQuickFilter()
+    private AdminLogsAuditQuickFilter InferAuditQuickFilter()
     {
-        if (!string.Equals(filterSource, "AdminOrdersReview", StringComparison.Ordinal))
-        {
-            return AuditQuickFilter.All;
-        }
-
-        return filterLevel switch
-        {
-            "Info" => AuditQuickFilter.ReleaseSuccess,
-            "Warning" => AuditQuickFilter.ReleaseRefused,
-            _ => AuditQuickFilter.ReleaseOnly
-        };
+        return AdminLogsFilterInference.InferAuditQuickFilter(filterSource, filterLevel);
     }
 
     private async Task NextPage()
     {
-        if (!CanGoToNextPage)
+        if (currentPage >= totalPages)
         {
             return;
         }
@@ -505,7 +427,7 @@ else
 
     private async Task PrevPage()
     {
-        if (!CanGoToPreviousPage)
+        if (currentPage <= 1)
         {
             return;
         }
@@ -522,8 +444,8 @@ else
         filterSource = "";
         filterMessage = "";
         filterLevel = "";
-        selectedAuditQuickFilter = AuditQuickFilter.All;
-        selectedQuickRangePreset = QuickRangePreset.None;
+        selectedAuditQuickFilter = AdminLogsAuditQuickFilter.All;
+        selectedQuickRangePreset = AdminLogsQuickRangePreset.None;
         filterStartDate = null;
         filterEndDate = null;
         showRestoredFiltersNotice = false;
@@ -548,23 +470,9 @@ else
             return;
         }
 
-        var csv = new StringBuilder();
-        csv.AppendLine("TimestampUtc,Level,Source,UserId,UserName,Message,Exception");
-
-        foreach (var row in rows)
-        {
-            csv
-                .Append(EscapeCsv(row.Timestamp.ToString("O", CultureInfo.InvariantCulture))).Append(',')
-                .Append(EscapeCsv(row.Level)).Append(',')
-                .Append(EscapeCsv(row.Source)).Append(',')
-                .Append(EscapeCsv(row.UserId)).Append(',')
-                .Append(EscapeCsv(row.User?.UserName)).Append(',')
-                .Append(EscapeCsv(row.Message)).Append(',')
-                .Append(EscapeCsv(row.Exception))
-                .AppendLine();
-        }
-
-        await JS.InvokeVoidAsync("darkMarketDownloadFile", BuildExportFileName("csv"), csv.ToString(), "text/csv;charset=utf-8;");
+        var csv = AdminLogsExportService.BuildCsv(rows);
+        var fileName = AdminLogsExportService.BuildExportFileName("csv", filterLevel, filterSource, filterStartDate, filterEndDate);
+        await JS.InvokeVoidAsync("darkMarketDownloadFile", fileName, csv, "text/csv;charset=utf-8;");
     }
 
     private async Task ExportJsonAsync()
@@ -584,204 +492,61 @@ else
             return;
         }
 
-        var payload = rows.Select(row => new
-        {
-            timestampUtc = row.Timestamp.ToString("O", CultureInfo.InvariantCulture),
-            row.Level,
-            row.Source,
-            row.UserId,
-            userName = row.User?.UserName,
-            row.Message,
-            row.Exception
-        });
-
-        var json = JsonSerializer.Serialize(payload, new JsonSerializerOptions { WriteIndented = true });
-        await JS.InvokeVoidAsync("darkMarketDownloadFile", BuildExportFileName("json"), json, "application/json;charset=utf-8;");
-    }
-
-    private string BuildExportFileName(string extension)
-    {
-        var suffixParts = new List<string>();
-
-        if (!string.IsNullOrWhiteSpace(filterLevel))
-        {
-            suffixParts.Add($"level-{NormalizeForFileName(filterLevel)}");
-        }
-
-        if (!string.IsNullOrWhiteSpace(filterSource))
-        {
-            suffixParts.Add($"source-{NormalizeForFileName(filterSource)}");
-        }
-
-        if (filterStartDate.HasValue)
-        {
-            suffixParts.Add($"from-{filterStartDate.Value:yyyyMMdd}");
-        }
-
-        if (filterEndDate.HasValue)
-        {
-            suffixParts.Add($"to-{filterEndDate.Value:yyyyMMdd}");
-        }
-
-        var suffix = suffixParts.Count > 0 ? "-" + string.Join("-", suffixParts) : "";
-        return $"admin-logs{suffix}-{DateTime.UtcNow:yyyyMMdd-HHmmss}.{extension}";
-    }
-
-    private static string NormalizeForFileName(string value)
-    {
-        var trimmed = value.Trim().ToLowerInvariant();
-        var normalized = new StringBuilder(trimmed.Length);
-
-        foreach (var ch in trimmed)
-        {
-            if (char.IsLetterOrDigit(ch))
-            {
-                normalized.Append(ch);
-            }
-            else if (ch == '-' || ch == '_')
-            {
-                normalized.Append(ch);
-            }
-            else
-            {
-                normalized.Append('-');
-            }
-        }
-
-        return normalized.ToString().Trim('-');
-    }
-
-    private static string EscapeCsv(string? value)
-    {
-        if (string.IsNullOrEmpty(value))
-        {
-            return "\"\"";
-        }
-
-        var escaped = value.Replace("\"", "\"\"");
-        return $"\"{escaped}\"";
+        var json = AdminLogsExportService.BuildJson(rows);
+        var fileName = AdminLogsExportService.BuildExportFileName("json", filterLevel, filterSource, filterStartDate, filterEndDate);
+        await JS.InvokeVoidAsync("darkMarketDownloadFile", fileName, json, "application/json;charset=utf-8;");
     }
 
     private async Task LoadFilterStateFromStorageAsync()
     {
-        try
+        var state = await AdminLogsFilterStateService.LoadAsync();
+
+        filterGlobalSearch = state.GlobalSearch;
+        filterUserId = state.UserId;
+        filterSource = state.Source;
+        filterMessage = state.Message;
+        filterLevel = state.Level;
+        filterStartDate = state.StartDate;
+        filterEndDate = state.EndDate;
+
+        selectedQuickRangePreset = state.QuickRangePreset ?? InferQuickRangePresetFromDates();
+        selectedAuditQuickFilter = state.AuditQuickFilter ?? InferAuditQuickFilter();
+
+        if (state.SortColumn.HasValue)
         {
-            var restoredAnyState = false;
-
-            filterGlobalSearch = await JS.InvokeAsync<string?>("localStorage.getItem", LogsGlobalSearchStorageKey) ?? "";
-            filterUserId = await JS.InvokeAsync<string?>("localStorage.getItem", LogsUserFilterStorageKey) ?? "";
-            filterSource = await JS.InvokeAsync<string?>("localStorage.getItem", LogsSourceFilterStorageKey) ?? "";
-            filterMessage = await JS.InvokeAsync<string?>("localStorage.getItem", LogsMessageFilterStorageKey) ?? "";
-            filterLevel = await JS.InvokeAsync<string?>("localStorage.getItem", LogsLevelFilterStorageKey) ?? "";
-
-            if (!string.IsNullOrWhiteSpace(filterGlobalSearch)
-                || !string.IsNullOrWhiteSpace(filterUserId)
-                || !string.IsNullOrWhiteSpace(filterSource)
-                || !string.IsNullOrWhiteSpace(filterMessage)
-                || !string.IsNullOrWhiteSpace(filterLevel))
-            {
-                restoredAnyState = true;
-            }
-
-            var startDateRaw = await JS.InvokeAsync<string?>("localStorage.getItem", LogsStartDateFilterStorageKey);
-            if (DateTime.TryParse(startDateRaw, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var startDateValue))
-            {
-                filterStartDate = startDateValue.Date;
-                restoredAnyState = true;
-            }
-
-            var endDateRaw = await JS.InvokeAsync<string?>("localStorage.getItem", LogsEndDateFilterStorageKey);
-            if (DateTime.TryParse(endDateRaw, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind, out var endDateValue))
-            {
-                filterEndDate = endDateValue.Date;
-                restoredAnyState = true;
-            }
-
-            var quickRangePresetRaw = await JS.InvokeAsync<string?>("localStorage.getItem", LogsQuickRangePresetStorageKey);
-            if (Enum.TryParse<QuickRangePreset>(quickRangePresetRaw, out var storedPreset))
-            {
-                selectedQuickRangePreset = storedPreset;
-            }
-            else
-            {
-                selectedQuickRangePreset = InferQuickRangePresetFromDates();
-            }
-
-            var auditQuickFilterRaw = await JS.InvokeAsync<string?>("localStorage.getItem", LogsAuditQuickFilterStorageKey);
-            if (Enum.TryParse<AuditQuickFilter>(auditQuickFilterRaw, out var storedAuditFilter))
-            {
-                selectedAuditQuickFilter = storedAuditFilter;
-            }
-            else
-            {
-                selectedAuditQuickFilter = InferAuditQuickFilter();
-            }
-
-            var sortColumnRaw = await JS.InvokeAsync<string?>("localStorage.getItem", LogsSortColumnStorageKey);
-            if (Enum.TryParse<AdminLogSortColumn>(sortColumnRaw, out var storedSortColumn))
-            {
-                currentSortColumn = storedSortColumn;
-            }
-
-            var sortAscendingRaw = await JS.InvokeAsync<string?>("localStorage.getItem", LogsSortAscendingStorageKey);
-            if (bool.TryParse(sortAscendingRaw, out var storedSortAscending))
-            {
-                sortAscending = storedSortAscending;
-            }
-
-            var pageRaw = await JS.InvokeAsync<string?>("localStorage.getItem", LogsPageStorageKey);
-            if (int.TryParse(pageRaw, out var pageValue) && pageValue > 0)
-            {
-                currentPage = pageValue;
-                restoredAnyState = restoredAnyState || currentPage > 1;
-            }
-
-            showRestoredFiltersNotice = restoredAnyState;
+            currentSortColumn = state.SortColumn.Value;
         }
-        catch
+
+        if (state.SortAscending.HasValue)
         {
-            // No-op: localStorage may be unavailable.
+            sortAscending = state.SortAscending.Value;
         }
+
+        if (state.Page.HasValue)
+        {
+            currentPage = state.Page.Value;
+        }
+
+        showRestoredFiltersNotice = AdminLogsFilterStateRules.ShouldShowRestoredNotice(state);
     }
 
     private async Task PersistFilterStateAsync()
     {
-        try
+        await AdminLogsFilterStateService.SaveAsync(new AdminLogsFilterState
         {
-            await JS.InvokeVoidAsync("localStorage.setItem", LogsGlobalSearchStorageKey, filterGlobalSearch);
-            await JS.InvokeVoidAsync("localStorage.setItem", LogsUserFilterStorageKey, filterUserId);
-            await JS.InvokeVoidAsync("localStorage.setItem", LogsSourceFilterStorageKey, filterSource);
-            await JS.InvokeVoidAsync("localStorage.setItem", LogsMessageFilterStorageKey, filterMessage);
-            await JS.InvokeVoidAsync("localStorage.setItem", LogsLevelFilterStorageKey, filterLevel);
-            await JS.InvokeVoidAsync("localStorage.setItem", LogsQuickRangePresetStorageKey, selectedQuickRangePreset.ToString());
-            await JS.InvokeVoidAsync("localStorage.setItem", LogsAuditQuickFilterStorageKey, selectedAuditQuickFilter.ToString());
-            await JS.InvokeVoidAsync("localStorage.setItem", LogsSortColumnStorageKey, currentSortColumn.ToString());
-            await JS.InvokeVoidAsync("localStorage.setItem", LogsSortAscendingStorageKey, sortAscending.ToString(CultureInfo.InvariantCulture));
-
-            if (filterStartDate.HasValue)
-            {
-                await JS.InvokeVoidAsync("localStorage.setItem", LogsStartDateFilterStorageKey, filterStartDate.Value.ToString("o", CultureInfo.InvariantCulture));
-            }
-            else
-            {
-                await JS.InvokeVoidAsync("localStorage.removeItem", LogsStartDateFilterStorageKey);
-            }
-
-            if (filterEndDate.HasValue)
-            {
-                await JS.InvokeVoidAsync("localStorage.setItem", LogsEndDateFilterStorageKey, filterEndDate.Value.ToString("o", CultureInfo.InvariantCulture));
-            }
-            else
-            {
-                await JS.InvokeVoidAsync("localStorage.removeItem", LogsEndDateFilterStorageKey);
-            }
-
-            await JS.InvokeVoidAsync("localStorage.setItem", LogsPageStorageKey, currentPage.ToString(CultureInfo.InvariantCulture));
-        }
-        catch
-        {
-            // No-op: ignore storage failures.
-        }
+            GlobalSearch = filterGlobalSearch,
+            UserId = filterUserId,
+            Source = filterSource,
+            Message = filterMessage,
+            Level = filterLevel,
+            StartDate = filterStartDate,
+            EndDate = filterEndDate,
+            Page = currentPage,
+            QuickRangePreset = selectedQuickRangePreset,
+            AuditQuickFilter = selectedAuditQuickFilter,
+            SortColumn = currentSortColumn,
+            SortAscending = sortAscending
+        });
     }
 
     private void DismissRestoredNotice()
@@ -810,137 +575,14 @@ else
     }
 
     private static string SourceBadgeClass(string source)
-        => string.Equals(source, "AdminOrdersReview", StringComparison.Ordinal)
+        => string.Equals(source, AdminAuditSources.OrdersReview, StringComparison.Ordinal)
             ? "log-source-badge admin-orders-review"
             : "log-source-badge";
 
     public void Dispose()
     {
-        globalSearchDebounceCts?.Cancel();
-        globalSearchDebounceCts?.Dispose();
+        globalSearchDebouncer.Dispose();
     }
 
-    private enum QuickRangePreset
-    {
-        None,
-        Today,
-        Last7Days,
-        Last30Days,
-        CurrentMonth,
-        Custom
-    }
-
-    private enum AuditQuickFilter
-    {
-        All,
-        ReleaseOnly,
-        ReleaseSuccess,
-        ReleaseRefused
-    }
 }
 
-<style>
-    .log-table {
-        width: 100%;
-        background: #23272b;
-        color: #f0f0f0;
-        border-radius: 8px;
-        margin-top: 2rem;
-        font-size: 0.98rem;
-    }
-    .log-table th, .log-table td {
-        padding: 0.75rem 1rem;
-        border-bottom: 1px solid #333;
-        text-align: left;
-        vertical-align: top;
-    }
-    .log-table th {
-        background: #181818;
-        color: #8ab4f8;
-        font-weight: bold;
-    }
-    .table-sort-btn {
-        background: transparent;
-        border: none;
-        color: inherit;
-        font: inherit;
-        font-weight: 700;
-        cursor: pointer;
-        padding: 0;
-    }
-    .table-sort-btn:hover {
-        color: #ffe082;
-    }
-    .log-table tr:nth-child(even) {
-        background: #22262b;
-    }
-    .log-table tr:hover {
-        background: #2a2f36;
-    }
-    .log-table td {
-        word-break: break-word;
-    }
-    .pagination {
-        display: flex;
-        justify-content: center;
-        margin-top: 1rem;
-    }
-    .pagination button {
-        background: #f9a825;
-        color: #23272b;
-        border: none;
-        border-radius: 4px;
-        padding: 0.5rem 1rem;
-        margin: 0 0.5rem;
-        cursor: pointer;
-        font-weight: bold;
-    }
-    .pagination button:disabled {
-        background: #555;
-        cursor: not-allowed;
-    }
-    .logs-quick-range-bar {
-        margin-top: -0.7rem;
-        margin-bottom: 1rem;
-    }
-    .logs-audit-filter-bar {
-        margin-top: -0.6rem;
-        margin-bottom: 1rem;
-    }
-    .logs-quick-range-bar .quick-range-btn.active {
-        background: #8ab4f8;
-        color: #181818;
-    }
-    .logs-audit-filter-bar .quick-range-btn.active {
-        background: #8ab4f8;
-        color: #181818;
-    }
-    .log-source-badge {
-        display: inline-block;
-        padding: 0.1rem 0.45rem;
-        border-radius: 999px;
-        font-size: 0.85rem;
-        background: #2a2f36;
-        color: #d7dee6;
-        border: 1px solid #3a424d;
-    }
-    .log-source-badge.admin-orders-review {
-        background: #102a43;
-        color: #8ab4f8;
-        border-color: #1f4d78;
-        font-weight: 700;
-    }
-</style>
-
-<script>
-    window.darkMarketDownloadFile = (fileName, content, mimeType) => {
-        const blob = new Blob([content], { type: mimeType });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.setAttribute('download', fileName);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(link.href);
-    };
-</script>

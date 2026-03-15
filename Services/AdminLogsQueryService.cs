@@ -33,25 +33,40 @@ public class AdminLogsQueryService
         int requestedPage,
         int pageSize)
     {
+        var effectivePageSize = Math.Max(pageSize, 1);
         var filteredQuery = AdminLogFiltering.Apply(_db.Logs.AsQueryable(), primaryCriteria);
         var totalLogs = await filteredQuery.CountAsync();
 
-        var totalPages = Math.Max(1, (int)Math.Ceiling(totalLogs / (double)pageSize));
+        var totalPages = Math.Max(1, (int)Math.Ceiling(totalLogs / (double)effectivePageSize));
         var effectivePage = Math.Min(Math.Max(requestedPage, 1), totalPages);
 
         var logs = await AdminLogSorting
             .Apply(filteredQuery, sortColumn, sortAscending)
             .Include(l => l.User)
-            .Skip((effectivePage - 1) * pageSize)
-            .Take(pageSize)
+            .Skip((effectivePage - 1) * effectivePageSize)
+            .Take(effectivePageSize)
             .ToListAsync();
 
         var auditBase = AdminLogFiltering.Apply(_db.Logs.AsQueryable(), auditCountsCriteria);
-        var counts = new AdminLogsAuditCounts(
-            All: await auditBase.CountAsync(),
-            ReleaseOnly: await auditBase.Where(log => log.Source == "AdminOrdersReview").CountAsync(),
-            ReleaseSuccess: await auditBase.Where(log => log.Source == "AdminOrdersReview" && log.Level == "Info").CountAsync(),
-            ReleaseRefused: await auditBase.Where(log => log.Source == "AdminOrdersReview" && log.Level == "Warning").CountAsync());
+
+        var countsProjection = await auditBase
+            .GroupBy(_ => 1)
+            .Select(g => new
+            {
+                All = g.Count(),
+                ReleaseOnly = g.Count(log => log.Source == AdminAuditSources.OrdersReview),
+                ReleaseSuccess = g.Count(log => log.Source == AdminAuditSources.OrdersReview && log.Level == AdminAuditLevels.Success),
+                ReleaseRefused = g.Count(log => log.Source == AdminAuditSources.OrdersReview && log.Level == AdminAuditLevels.Refused)
+            })
+            .FirstOrDefaultAsync();
+
+        var counts = countsProjection is null
+            ? new AdminLogsAuditCounts(0, 0, 0, 0)
+            : new AdminLogsAuditCounts(
+                All: countsProjection.All,
+                ReleaseOnly: countsProjection.ReleaseOnly,
+                ReleaseSuccess: countsProjection.ReleaseSuccess,
+                ReleaseRefused: countsProjection.ReleaseRefused);
 
         return new AdminLogsPageData(totalLogs, effectivePage, logs, counts);
     }

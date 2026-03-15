@@ -18,8 +18,8 @@ public class AdminLogsQueryServiceIntegrationTests : IClassFixture<IntegrationTe
     public async Task GetPageDataAsync_ReturnsCountsAndSortedPage()
     {
         var marker = Guid.NewGuid().ToString("N");
-        _ = await SeedLogAsync("AdminOrdersReview", $"msg {marker}", level: "Info", userId: $"user-b-{marker}", timestampUtc: new DateTime(2026, 3, 10, 8, 0, 0, DateTimeKind.Utc));
-        _ = await SeedLogAsync("AdminOrdersReview", $"msg {marker}", level: "Warning", userId: $"user-c-{marker}", timestampUtc: new DateTime(2026, 3, 11, 8, 0, 0, DateTimeKind.Utc));
+        _ = await SeedLogAsync(AdminAuditSources.OrdersReview, $"msg {marker}", level: AdminAuditLevels.Success, userId: $"user-b-{marker}", timestampUtc: new DateTime(2026, 3, 10, 8, 0, 0, DateTimeKind.Utc));
+        _ = await SeedLogAsync(AdminAuditSources.OrdersReview, $"msg {marker}", level: AdminAuditLevels.Refused, userId: $"user-c-{marker}", timestampUtc: new DateTime(2026, 3, 11, 8, 0, 0, DateTimeKind.Utc));
         _ = await SeedLogAsync("Webhook", $"msg {marker}", level: "Info", userId: $"user-a-{marker}", timestampUtc: new DateTime(2026, 3, 12, 8, 0, 0, DateTimeKind.Utc));
 
         using var scope = _factory.Services.CreateScope();
@@ -49,9 +49,9 @@ public class AdminLogsQueryServiceIntegrationTests : IClassFixture<IntegrationTe
     public async Task GetPageDataAsync_WhenRequestedPageIsTooHigh_ClampsToLastPage()
     {
         var marker = Guid.NewGuid().ToString("N");
-        _ = await SeedLogAsync("AdminOrdersReview", $"msg {marker}", userId: $"user-1-{marker}", timestampUtc: new DateTime(2026, 3, 10, 8, 0, 0, DateTimeKind.Utc));
-        _ = await SeedLogAsync("AdminOrdersReview", $"msg {marker}", userId: $"user-2-{marker}", timestampUtc: new DateTime(2026, 3, 11, 8, 0, 0, DateTimeKind.Utc));
-        _ = await SeedLogAsync("AdminOrdersReview", $"msg {marker}", userId: $"user-3-{marker}", timestampUtc: new DateTime(2026, 3, 12, 8, 0, 0, DateTimeKind.Utc));
+        _ = await SeedLogAsync(AdminAuditSources.OrdersReview, $"msg {marker}", userId: $"user-1-{marker}", timestampUtc: new DateTime(2026, 3, 10, 8, 0, 0, DateTimeKind.Utc));
+        _ = await SeedLogAsync(AdminAuditSources.OrdersReview, $"msg {marker}", userId: $"user-2-{marker}", timestampUtc: new DateTime(2026, 3, 11, 8, 0, 0, DateTimeKind.Utc));
+        _ = await SeedLogAsync(AdminAuditSources.OrdersReview, $"msg {marker}", userId: $"user-3-{marker}", timestampUtc: new DateTime(2026, 3, 12, 8, 0, 0, DateTimeKind.Utc));
 
         using var scope = _factory.Services.CreateScope();
         var service = scope.ServiceProvider.GetRequiredService<AdminLogsQueryService>();
@@ -67,6 +67,31 @@ public class AdminLogsQueryServiceIntegrationTests : IClassFixture<IntegrationTe
         Assert.Equal(3, data.TotalLogs);
         Assert.Equal(2, data.EffectivePage);
         Assert.Single(data.Logs);
+    }
+
+    [Fact]
+    public async Task GetPageDataAsync_WhenPageOrPageSizeIsInvalid_NormalizesValues()
+    {
+        var marker = Guid.NewGuid().ToString("N");
+        _ = await SeedLogAsync(AdminAuditSources.OrdersReview, $"msg {marker}", userId: $"user-1-{marker}", timestampUtc: new DateTime(2026, 3, 10, 8, 0, 0, DateTimeKind.Utc));
+        _ = await SeedLogAsync(AdminAuditSources.OrdersReview, $"msg {marker}", userId: $"user-2-{marker}", timestampUtc: new DateTime(2026, 3, 11, 8, 0, 0, DateTimeKind.Utc));
+
+        using var scope = _factory.Services.CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<AdminLogsQueryService>();
+
+        var data = await service.GetPageDataAsync(
+            primaryCriteria: new AdminLogFilterCriteria { GlobalTerm = marker },
+            auditCountsCriteria: new AdminLogFilterCriteria { GlobalTerm = marker },
+            sortColumn: AdminLogSortColumn.Timestamp,
+            sortAscending: false,
+            requestedPage: 0,
+            pageSize: 0);
+
+        Assert.Equal(2, data.TotalLogs);
+        Assert.Equal(1, data.EffectivePage);
+        Assert.Single(data.Logs);
+        Assert.Equal(2, data.AuditCounts.All);
+        Assert.Equal(2, data.AuditCounts.ReleaseOnly);
     }
 
     private async Task<int> SeedLogAsync(

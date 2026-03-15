@@ -29,8 +29,8 @@ public class AdminOrderReleaseService
         {
             await _logService.LogAsync(
                 $"Tentativa de repasse para pedido inexistente (OrderId: {orderId}).",
-                source: "AdminOrdersReview",
-                level: "Warning",
+                source: AdminAuditSources.OrdersReview,
+                level: AdminAuditLevels.Refused,
                 userId: adminUserId);
 
             return new AdminOrderReleaseResult(false, "OrderNotFound");
@@ -40,8 +40,8 @@ public class AdminOrderReleaseService
         {
             await _logService.LogAsync(
                 $"Tentativa de repasse recusada por status inválido (OrderId: {orderId}, StatusAtual: {order.Status}).",
-                source: "AdminOrdersReview",
-                level: "Warning",
+                source: AdminAuditSources.OrdersReview,
+                level: AdminAuditLevels.Refused,
                 userId: adminUserId);
 
             return new AdminOrderReleaseResult(false, "InvalidStatus");
@@ -56,8 +56,8 @@ public class AdminOrderReleaseService
 
         await _logService.LogAsync(
             $"Repasse de fundos confirmado (OrderId: {orderId}, StatusAnterior: {previousStatus}, StatusNovo: {order.Status}, GrossBTC: {order.Amount:0.########}, FeePercent: {breakdown.Percent:0.##}, FeeBTC: {breakdown.FeeAmount:0.########}, NetBTC: {breakdown.NetAmount:0.########}).",
-            source: "AdminOrdersReview",
-            level: "Info",
+            source: AdminAuditSources.OrdersReview,
+            level: AdminAuditLevels.Success,
             userId: adminUserId);
 
         return new AdminOrderReleaseResult(true, "Released");

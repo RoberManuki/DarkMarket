@@ -361,6 +361,74 @@ footer {
     background-color: #2c2f36;
 }
 
+.log-table {
+    width: 100%;
+    background: #23272b;
+    color: #f0f0f0;
+    border-radius: 8px;
+    margin-top: 2rem;
+    font-size: 0.98rem;
+}
+
+.log-table th,
+.log-table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #333;
+    text-align: left;
+    vertical-align: top;
+}
+
+.log-table th {
+    background: #181818;
+    color: #8ab4f8;
+    font-weight: bold;
+}
+
+.log-table tr:nth-child(even) {
+    background: #22262b;
+}
+
+.log-table tr:hover {
+    background: #2a2f36;
+}
+
+.log-table td {
+    word-break: break-word;
+}
+
+.logs-quick-range-bar {
+    margin-top: -0.7rem;
+    margin-bottom: 1rem;
+}
+
+.logs-audit-filter-bar {
+    margin-top: -0.6rem;
+    margin-bottom: 1rem;
+}
+
+.logs-quick-range-bar .quick-range-btn.active,
+.logs-audit-filter-bar .quick-range-btn.active {
+    background: #8ab4f8;
+    color: #181818;
+}
+
+.log-source-badge {
+    display: inline-block;
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    background: #2a2f36;
+    color: #d7dee6;
+    border: 1px solid #3a424d;
+}
+
+.log-source-badge.admin-orders-review {
+    background: #102a43;
+    color: #8ab4f8;
+    border-color: #1f4d78;
+    font-weight: 700;
+}
+
 .edit-btn {
     background: #1976d2;
     color: #fff;

@@ -49,12 +49,12 @@ public class AdminOrderReleaseServiceIntegrationTests : IClassFixture<Integratio
         Assert.True(updatedOrder.FundsReleased);
 
         var log = db.Logs
-            .Where(l => l.Source == "AdminOrdersReview" && l.Message.Contains($"OrderId: {orderId}"))
+            .Where(l => l.Source == AdminAuditSources.OrdersReview && l.Message.Contains($"OrderId: {orderId}"))
             .OrderByDescending(l => l.Id)
             .FirstOrDefault();
 
         Assert.NotNull(log);
-        Assert.Equal("Info", log!.Level);
+        Assert.Equal(AdminAuditLevels.Success, log!.Level);
         Assert.Equal($"admin-{marker}", log.UserId);
         Assert.Contains("StatusAnterior: AguardandoRevisaoAdm", log.Message);
         Assert.Contains("StatusNovo: Finalizado", log.Message);
@@ -90,12 +90,12 @@ public class AdminOrderReleaseServiceIntegrationTests : IClassFixture<Integratio
         Assert.Equal(PaymentStatus.Finalizado, order.Status);
 
         var log = db.Logs
-            .Where(l => l.Source == "AdminOrdersReview" && l.Message.Contains($"OrderId: {orderId}"))
+            .Where(l => l.Source == AdminAuditSources.OrdersReview && l.Message.Contains($"OrderId: {orderId}"))
             .OrderByDescending(l => l.Id)
             .FirstOrDefault();
 
         Assert.NotNull(log);
-        Assert.Equal("Warning", log!.Level);
+        Assert.Equal(AdminAuditLevels.Refused, log!.Level);
         Assert.Contains("status inválido", log.Message, StringComparison.OrdinalIgnoreCase);
     }
 
@@ -117,12 +117,12 @@ public class AdminOrderReleaseServiceIntegrationTests : IClassFixture<Integratio
         var db = verifyScope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         var log = db.Logs
-            .Where(l => l.Source == "AdminOrdersReview" && l.Message.Contains($"OrderId: {missingOrderId}"))
+            .Where(l => l.Source == AdminAuditSources.OrdersReview && l.Message.Contains($"OrderId: {missingOrderId}"))
             .OrderByDescending(l => l.Id)
             .FirstOrDefault();
 
         Assert.NotNull(log);
-        Assert.Equal("Warning", log!.Level);
+        Assert.Equal(AdminAuditLevels.Refused, log!.Level);
         Assert.Equal($"admin-{marker}", log.UserId);
         Assert.Contains("pedido inexistente", log.Message, StringComparison.OrdinalIgnoreCase);
     }

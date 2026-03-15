@@ -9,6 +9,7 @@
 @using Microsoft.JSInterop
 
 @inject LogService LogService
+@inject AdminUsersFilterStateService AdminUsersFilterStateService
 
 <h2 class="page-title">Usuários do Sistema</h2>
 
@@ -21,20 +22,18 @@
         <option value="Ativo">Ativo</option>
         <option value="Bloqueado">Bloqueado</option>
     </select>
-    <button @onclick="ApplyFilters">Filtrar</button>
-    <button @onclick="ClearFilters">Limpar</button>
+    <FilterActionButtons OnApply="ApplyFiltersAndPersist" OnClear="ClearFilters" />
 </div>
 
-@if (isLoading)
+@if (showRestoredFiltersNotice)
 {
-    <div class="loading-spinner">Carregando usuários...</div>
+    <div class="orders-review-restored-notice">
+        <span>Filtros de usuários restaurados da sessão anterior.</span>
+        <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="Fechar aviso">×</button>
+    </div>
 }
-else if (filteredUsers == null || !filteredUsers.Any())
-{
-    <p>Nenhum usuário encontrado.</p>
-}
-else
-{
+
+<AdminDataState IsLoading="@isLoading" IsEmpty="@(filteredUsers == null || !filteredUsers.Any())" LoadingText="Carregando usuários..." EmptyText="Nenhum usuário encontrado.">
     <table class="product-table">
         <thead>
             <tr>
@@ -83,12 +82,8 @@ else
         </tbody>
     </table>
 
-    <div class="pagination">
-        <button @onclick="PrevPage" disabled="@(!CanGoToPreviousPage)">Anterior</button>
-        <span class="pagination-info">Página @currentPage de @totalPages</span>
-        <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Próxima</button>
-    </div>
-}
+    <PaginationControls CurrentPage="@currentPage" TotalPages="@totalPages" OnPrevious="PrevPage" OnNext="NextPage" />
+</AdminDataState>
 
 <button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
 
@@ -100,6 +95,8 @@ else
     private List<ApplicationUser>? users;
     private bool isLoading = true;
     private Dictionary<string, string> userRoles = new();
+    private bool filtersLoaded;
+    private bool showRestoredFiltersNotice;
 
     private string filterUserName = "";
     private string filterEmail = "";
@@ -110,10 +107,7 @@ else
 
     private int pageSize = 10;
     private int currentPage = 1;
-    private int totalPages => filteredUsers == null ? 1 : (int)Math.Ceiling((double)filteredUsers.Count / pageSize);
-
-    private bool CanGoToNextPage => currentPage < totalPages;
-    private bool CanGoToPreviousPage => currentPage > 1;
+    private int totalPages => filteredUsers == null ? 1 : Math.Max(1, (int)Math.Ceiling((double)filteredUsers.Count / pageSize));
 
     protected override async Task OnInitializedAsync()
     {
@@ -128,13 +122,30 @@ else
                 userRoles[user.Id] = roles.Any() ? string.Join(", ", roles) : "-";
             }
         }
-        ApplyFilters();
+        ApplyFilters(resetPage: false);
         isLoading = false;
     }
 
-    private void ApplyFilters()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        currentPage = 1;
+        if (!firstRender || filtersLoaded)
+        {
+            return;
+        }
+
+        await LoadFilterStateFromStorageAsync();
+        ApplyFilters(resetPage: false);
+        filtersLoaded = true;
+        StateHasChanged();
+    }
+
+    private void ApplyFilters(bool resetPage = true)
+    {
+        if (resetPage)
+        {
+            currentPage = 1;
+        }
+
         filteredUsers = users?
             .Where(u =>
                 (string.IsNullOrWhiteSpace(filterUserName) || (u.UserName?.Contains(filterUserName, StringComparison.OrdinalIgnoreCase) ?? false)) &&
@@ -145,6 +156,18 @@ else
                     (filterStatus == "Bloqueado" && (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)))
             )
             .ToList();
+
+        if (currentPage > totalPages)
+        {
+            currentPage = totalPages;
+        }
+    }
+
+    private async Task ApplyFiltersAndPersist()
+    {
+        ApplyFilters();
+        showRestoredFiltersNotice = false;
+        await PersistFilterStateAsync();
     }
 
     private async Task LockUser(string userId)
@@ -229,13 +252,15 @@ else
         }
     }
 
-    private void ClearFilters()
+    private async Task ClearFilters()
     {
         filterUserName = "";
         filterEmail = "";
         filterRole = "";
         filterStatus = "";
+        showRestoredFiltersNotice = false;
         ApplyFilters();
+        await PersistFilterStateAsync();
     }
 
     private async Task LoadUsers()
@@ -251,24 +276,61 @@ else
                 userRoles[user.Id] = roles.Any() ? string.Join(", ", roles) : "-";
             }
         }
-        ApplyFilters();
+        ApplyFilters(resetPage: false);
         isLoading = false;
         StateHasChanged();
     }
 
-    private void NextPage()
+    private async Task NextPage()
     {
-        if (CanGoToNextPage)
+        if (currentPage < totalPages)
         {
             currentPage++;
+            await PersistFilterStateAsync();
         }
     }
 
-    private void PrevPage()
+    private async Task PrevPage()
     {
-        if (CanGoToPreviousPage)
+        if (currentPage > 1)
         {
             currentPage--;
+            await PersistFilterStateAsync();
         }
+    }
+
+    private async Task LoadFilterStateFromStorageAsync()
+    {
+        var state = await AdminUsersFilterStateService.LoadAsync();
+
+        filterUserName = state.UserName;
+        filterEmail = state.Email;
+        filterRole = state.Role;
+        filterStatus = state.Status;
+        currentPage = state.Page ?? 1;
+
+        showRestoredFiltersNotice =
+            !string.IsNullOrWhiteSpace(filterUserName)
+            || !string.IsNullOrWhiteSpace(filterEmail)
+            || !string.IsNullOrWhiteSpace(filterRole)
+            || !string.IsNullOrWhiteSpace(filterStatus)
+            || currentPage > 1;
+    }
+
+    private async Task PersistFilterStateAsync()
+    {
+        await AdminUsersFilterStateService.SaveAsync(new AdminUsersFilterState
+        {
+            UserName = filterUserName,
+            Email = filterEmail,
+            Role = filterRole,
+            Status = filterStatus,
+            Page = currentPage
+        });
+    }
+
+    private void DismissRestoredNotice()
+    {
+        showRestoredFiltersNotice = false;
     }
 }

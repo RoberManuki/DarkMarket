@@ -5,12 +5,14 @@
 @using DarkMarket.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.JSInterop
 @using DarkMarket.Shared.Helpers
 
 @inject AppDbContext Db
 @inject NavigationManager NavigationManager
 @inject BitcoinQuoteService BitcoinQuoteService
 @inject CurrencyPreferenceService CurrencyPreferenceService
+@inject AdminOrdersFilterStateService AdminOrdersFilterStateService
 
 <h2 class="page-title">Todas as Transações</h2>
 
@@ -27,20 +29,18 @@
         <option value="Pendente">Pendente</option>
     </select>
     <input type="date" @bind="filterDate" />
-    <button @onclick="ApplyFilters">Filtrar</button>
-    <button @onclick="ClearFilters">Limpar</button>
+    <FilterActionButtons OnApply="ApplyFiltersAndPersist" OnClear="ClearFilters" />
 </div>
 
-@if (isLoading)
+@if (showRestoredFiltersNotice)
 {
-    <div class="loading-spinner">Carregando...</div>
+    <div class="orders-review-restored-notice">
+        <span>Filtros de transações restaurados da sessão anterior.</span>
+        <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="Fechar aviso">×</button>
+    </div>
 }
-else if (filteredOrders == null || !filteredOrders.Any())
-{
-    <div class="alert alert-info">Nenhuma transação encontrada.</div>
-}
-else
-{
+
+<AdminDataState IsLoading="@isLoading" IsEmpty="@(filteredOrders == null || !filteredOrders.Any())" LoadingText="Carregando..." EmptyText="Nenhuma transação encontrada." EmptyCssClass="alert alert-info">
     <table class="product-table">
         <thead>
             <tr>
@@ -108,17 +108,15 @@ else
         </tbody>
     </table>
 
-    <div class="pagination">
-        <button @onclick="PrevPage" disabled="@(!CanGoToPreviousPage)">Anterior</button>
-        <span class="pagination-info">Página @currentPage de @totalPages</span>
-        <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Próxima</button>
-    </div>
-}
+    <PaginationControls CurrentPage="@currentPage" TotalPages="@totalPages" OnPrevious="PrevPage" OnNext="NextPage" />
+</AdminDataState>
 
 <button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
 
 @code {
     private bool isLoading = true;
+    private bool filtersLoaded;
+    private bool showRestoredFiltersNotice;
     private List<OrderModel>? allOrders;
     private List<OrderModel>? filteredOrders;
 
@@ -136,10 +134,9 @@ else
 
     private int pageSize = 10;
     private int currentPage = 1;
-    private int totalPages => filteredOrders == null ? 1 : (int)Math.Ceiling((double)filteredOrders.Count / pageSize);
+    private int totalPages => filteredOrders == null ? 1 : Math.Max(1, (int)Math.Ceiling((double)filteredOrders.Count / pageSize));
 
-    private bool CanGoToNextPage => currentPage < totalPages;
-    private bool CanGoToPreviousPage => currentPage > 1;
+    [Inject] public IJSRuntime JS { get; set; } = default!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -154,13 +151,30 @@ else
             .Include(o => o.Seller)
             .OrderByDescending(t => t.CreatedAt)
             .ToListAsync();
-        ApplyFilters();
+        ApplyFilters(resetPage: false);
         isLoading = false;
     }
 
-    private void ApplyFilters()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        currentPage = 1;
+        if (!firstRender || filtersLoaded)
+        {
+            return;
+        }
+
+        await LoadFilterStateFromStorageAsync();
+        ApplyFilters(resetPage: false);
+        filtersLoaded = true;
+        StateHasChanged();
+    }
+
+    private void ApplyFilters(bool resetPage = true)
+    {
+        if (resetPage)
+        {
+            currentPage = 1;
+        }
+
         filteredOrders = allOrders?
             .Where(t =>
                 (!filterId.HasValue || t.Id == filterId.Value) &&
@@ -175,6 +189,18 @@ else
                 (!filterDate.HasValue || t.CreatedAt.Date == filterDate.Value.Date)
             )
             .ToList();
+
+        if (currentPage > totalPages)
+        {
+            currentPage = totalPages;
+        }
+    }
+
+    private async Task ApplyFiltersAndPersist()
+    {
+        ApplyFilters();
+        showRestoredFiltersNotice = false;
+        await PersistFilterStateAsync();
     }
 
     private void GoToDetails(int id)
@@ -182,7 +208,7 @@ else
         NavigationManager.NavigateTo($"/orders/{id}");
     }
 
-    private void ClearFilters()
+    private async Task ClearFilters()
     {
         filterId = null;
         filterProduct = "";
@@ -192,19 +218,74 @@ else
         filterMaxAmount = null;
         filterStatus = "";
         filterDate = null;
+        showRestoredFiltersNotice = false;
         ApplyFilters();
+        await PersistFilterStateAsync();
     }
 
-    private void NextPage()
+    private async Task NextPage()
     {
-        if (CanGoToNextPage)
+        if (currentPage < totalPages)
+        {
             currentPage++;
+            await PersistFilterStateAsync();
+        }
     }
 
-    private void PrevPage()
+    private async Task PrevPage()
     {
-        if (CanGoToPreviousPage)
+        if (currentPage > 1)
+        {
             currentPage--;
+            await PersistFilterStateAsync();
+        }
+    }
+
+    private async Task LoadFilterStateFromStorageAsync()
+    {
+        var state = await AdminOrdersFilterStateService.LoadAsync();
+
+        filterId = state.Id;
+        filterProduct = state.Product;
+        filterBuyer = state.Buyer;
+        filterSeller = state.Seller;
+        filterMinAmount = state.MinAmount;
+        filterMaxAmount = state.MaxAmount;
+        filterStatus = state.Status;
+        filterDate = state.Date;
+        currentPage = state.Page ?? 1;
+
+        showRestoredFiltersNotice =
+            filterId.HasValue
+            || !string.IsNullOrWhiteSpace(filterProduct)
+            || !string.IsNullOrWhiteSpace(filterBuyer)
+            || !string.IsNullOrWhiteSpace(filterSeller)
+            || filterMinAmount.HasValue
+            || filterMaxAmount.HasValue
+            || !string.IsNullOrWhiteSpace(filterStatus)
+            || filterDate.HasValue
+            || currentPage > 1;
+    }
+
+    private async Task PersistFilterStateAsync()
+    {
+        await AdminOrdersFilterStateService.SaveAsync(new AdminOrdersFilterState
+        {
+            Id = filterId,
+            Product = filterProduct,
+            Buyer = filterBuyer,
+            Seller = filterSeller,
+            MinAmount = filterMinAmount,
+            MaxAmount = filterMaxAmount,
+            Status = filterStatus,
+            Date = filterDate,
+            Page = currentPage
+        });
+    }
+
+    private void DismissRestoredNotice()
+    {
+        showRestoredFiltersNotice = false;
     }
 
     private MarkupString FormatBtcWithUsd(decimal amount)
