@@ -3,49 +3,98 @@
 
 @using DarkMarket.Enums
 @using DarkMarket.Models
+@using DarkMarket.Services
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.JSInterop
+@using System.Globalization
 @inject AppDbContext Db
 @inject OperationFeeCalculatorService OperationFeeCalculatorService
+@inject IJSRuntime JS
 
-<h2>Pedidos aguardando revisão do ADM</h2>
+<h2 class="page-title">Pedidos aguardando revisão do ADM</h2>
+
+<div class="filter-bar">
+    <input type="text" placeholder="Filtrar por comprador..." @bind="buyerFilter" @bind:event="oninput" @bind:after="OnFiltersChangedAsync" />
+    <input type="text" placeholder="Filtrar por produto..." @bind="productFilter" @bind:event="oninput" @bind:after="OnFiltersChangedAsync" />
+    <input type="number" placeholder="Valor mínimo (BTC)" @bind="minAmountFilter" @bind:after="OnFiltersChangedAsync" min="0" step="0.00000001" />
+    <input type="number" placeholder="Valor máximo (BTC)" @bind="maxAmountFilter" @bind:after="OnFiltersChangedAsync" min="0" step="0.00000001" />
+    <button @onclick="ClearFiltersAsync">Limpar filtros</button>
+    <button class="sort-reset-btn" @onclick="ResetSortingAsync" disabled="@IsDefaultSort">Resetar ordenação</button>
+</div>
+
+@if (showRestoredFiltersNotice)
+{
+    <div class="orders-review-restored-notice">
+        <span>Filtros restaurados da sessão anterior.</span>
+        <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="Fechar aviso">×</button>
+    </div>
+}
 
 @if (orders == null)
 {
-    <p>Loading...</p>
+    <p>Carregando...</p>
 }
 else if (!orders.Any())
 {
     <p>Nenhum pedido aguardando revisão.</p>
 }
+else if (!FilteredOrders.Any())
+{
+    <p>Nenhum pedido encontrado para os filtros informados.</p>
+}
 else
 {
+    <div class="orders-review-sort-summary">Ordenado por @CurrentSortLabel</div>
+
     <table class="product-table">
         <thead>
             <tr>
-                <th>Comprador</th>
-                <th>Produto</th>
+                <th>
+                    <button class="@(SortButtonClass(OrderReviewSortColumn.Buyer))" @onclick="() => ApplySortAsync(OrderReviewSortColumn.Buyer)">
+                        Comprador @SortIndicator(OrderReviewSortColumn.Buyer)
+                    </button>
+                </th>
+                <th>
+                    <button class="@(SortButtonClass(OrderReviewSortColumn.Product))" @onclick="() => ApplySortAsync(OrderReviewSortColumn.Product)">
+                        Produto @SortIndicator(OrderReviewSortColumn.Product)
+                    </button>
+                </th>
+                <th>
+                    <button class="@(SortButtonClass(OrderReviewSortColumn.Amount))" @onclick="() => ApplySortAsync(OrderReviewSortColumn.Amount)">
+                        Valor @SortIndicator(OrderReviewSortColumn.Amount)
+                    </button>
+                </th>
                 <th>Status</th>
                 <th>Ações</th>
             </tr>
         </thead>
         <tbody>
-        @foreach (var order in orders)
+        @foreach (var order in PagedOrders)
         {
             <tr>
-                <td>@order.Buyer?.UserName</td>
-                <td>@order.Product?.Name</td>
-                <td>
+                <td data-label="Comprador">@order.Buyer?.UserName</td>
+                <td data-label="Produto">@order.Product?.Name</td>
+                <td data-label="Valor">@FormatBtc(order.Amount)</td>
+                <td data-label="Status">
                     <span class="order-status-badge aguardandorevisaoadm">Aguardando revisão ADM</span>
                 </td>
-                <td>
-                    <a class="details-btn" href="@($"/orders/{order.Id}")">View Details</a>
-                    <button class="success-btn" @onclick="() => ShowReleaseModalAsync(order.Id)">Release Funds</button>
+                <td data-label="Ações">
+                    <div class="order-review-actions">
+                        <a class="details-btn" href="@($"/orders/{order.Id}")">Detalhes</a>
+                        <button class="success-btn" @onclick="() => ShowReleaseModalAsync(order.Id)">Repassar</button>
+                    </div>
                 </td>
             </tr>
         }
         </tbody>
     </table>
+
+    <div class="pagination">
+        <button @onclick="PrevPageAsync" disabled="@(currentPage <= 1)">Anterior</button>
+        <span class="pagination-info">Página @currentPage de @TotalPages</span>
+        <button @onclick="NextPageAsync" disabled="@(currentPage >= TotalPages)">Próxima</button>
+    </div>
 }
 
 @if (showReleaseModal && selectedOrder != null)
@@ -120,6 +169,52 @@ else
     private int releaseOrderId;
     private OrderModel? selectedOrder;
     private OperationFeeBreakdown? releaseBreakdown;
+    private string buyerFilter = string.Empty;
+    private string productFilter = string.Empty;
+    private decimal? minAmountFilter;
+    private decimal? maxAmountFilter;
+    private int currentPage = 1;
+    private const int pageSize = 8;
+    private bool filtersLoaded;
+    private bool showRestoredFiltersNotice;
+    private OrderReviewSortColumn currentSortColumn = OrderReviewSortColumn.Amount;
+    private bool sortAscending = false;
+
+    private const string BuyerFilterStorageKey = "admin.ordersReview.buyerFilter";
+    private const string ProductFilterStorageKey = "admin.ordersReview.productFilter";
+    private const string MinAmountStorageKey = "admin.ordersReview.minAmount";
+    private const string MaxAmountStorageKey = "admin.ordersReview.maxAmount";
+    private const string PageStorageKey = "admin.ordersReview.page";
+    private const string SortColumnStorageKey = "admin.ordersReview.sortColumn";
+    private const string SortDirectionStorageKey = "admin.ordersReview.sortAscending";
+    private bool IsDefaultSort => currentSortColumn == OrderReviewSortColumn.Amount && !sortAscending;
+    private string CurrentSortLabel => $"{SortColumnLabel(currentSortColumn)} {(sortAscending ? "↑" : "↓")}";
+
+    private IEnumerable<OrderModel> FilteredOrders
+    {
+        get
+        {
+            var query = orders.Where(o =>
+                (string.IsNullOrWhiteSpace(buyerFilter)
+                    || (o.Buyer?.UserName?.Contains(buyerFilter, StringComparison.OrdinalIgnoreCase) ?? false))
+                &&
+                (string.IsNullOrWhiteSpace(productFilter)
+                    || (o.Product?.Name?.Contains(productFilter, StringComparison.OrdinalIgnoreCase) ?? false))
+                &&
+                (!minAmountFilter.HasValue || o.Amount >= minAmountFilter.Value)
+                &&
+                (!maxAmountFilter.HasValue || o.Amount <= maxAmountFilter.Value));
+
+            return OrderReviewSorting.Apply(query, currentSortColumn, sortAscending);
+        }
+    }
+
+    private int TotalPages => Math.Max(1, (int)Math.Ceiling(FilteredOrders.Count() / (double)pageSize));
+
+    private IEnumerable<OrderModel> PagedOrders =>
+        FilteredOrders
+            .Skip((currentPage - 1) * pageSize)
+            .Take(pageSize);
 
     protected override async Task OnInitializedAsync()
     {
@@ -130,6 +225,66 @@ else
             .Where(o => o.Status == PaymentStatus.AguardandoRevisaoAdm)
             .ToListAsync();
 
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || filtersLoaded)
+        {
+            return;
+        }
+
+        await LoadFiltersFromStorageAsync();
+        filtersLoaded = true;
+        StateHasChanged();
+    }
+
+    private async Task ClearFiltersAsync()
+    {
+        buyerFilter = string.Empty;
+        productFilter = string.Empty;
+        minAmountFilter = null;
+        maxAmountFilter = null;
+        currentPage = 1;
+        showRestoredFiltersNotice = false;
+        await PersistFilterStateAsync();
+    }
+
+    private async Task ResetSortingAsync()
+    {
+        if (IsDefaultSort)
+        {
+            return;
+        }
+
+        currentSortColumn = OrderReviewSortColumn.Amount;
+        sortAscending = false;
+        currentPage = 1;
+        await PersistFilterStateAsync();
+    }
+
+    private async Task OnFiltersChangedAsync()
+    {
+        currentPage = 1;
+        await PersistFilterStateAsync();
+    }
+
+    private async Task NextPageAsync()
+    {
+        if (currentPage < TotalPages)
+        {
+            currentPage++;
+            await PersistFilterStateAsync();
+        }
+    }
+
+    private async Task PrevPageAsync()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+            await PersistFilterStateAsync();
+        }
     }
 
     private async Task ShowReleaseModalAsync(int orderId)
@@ -163,9 +318,149 @@ else
             // TODO: lógica de repasse de fundos
             await Db.SaveChangesAsync();
             orders.RemoveAll(o => o.Id == orderId);
+            if (currentPage > TotalPages)
+            {
+                currentPage = TotalPages;
+            }
+
+            await PersistFilterStateAsync();
             StateHasChanged();
         }
     }
+
+    private async Task LoadFiltersFromStorageAsync()
+    {
+        try
+        {
+            var restoredAnyState = false;
+
+            buyerFilter = await JS.InvokeAsync<string?>("localStorage.getItem", BuyerFilterStorageKey) ?? string.Empty;
+            productFilter = await JS.InvokeAsync<string?>("localStorage.getItem", ProductFilterStorageKey) ?? string.Empty;
+
+            if (!string.IsNullOrWhiteSpace(buyerFilter) || !string.IsNullOrWhiteSpace(productFilter))
+            {
+                restoredAnyState = true;
+            }
+
+            var minAmountRaw = await JS.InvokeAsync<string?>("localStorage.getItem", MinAmountStorageKey);
+            if (decimal.TryParse(minAmountRaw, NumberStyles.Number, CultureInfo.InvariantCulture, out var minValue))
+            {
+                minAmountFilter = minValue;
+                restoredAnyState = true;
+            }
+
+            var maxAmountRaw = await JS.InvokeAsync<string?>("localStorage.getItem", MaxAmountStorageKey);
+            if (decimal.TryParse(maxAmountRaw, NumberStyles.Number, CultureInfo.InvariantCulture, out var maxValue))
+            {
+                maxAmountFilter = maxValue;
+                restoredAnyState = true;
+            }
+
+            var pageRaw = await JS.InvokeAsync<string?>("localStorage.getItem", PageStorageKey);
+            if (int.TryParse(pageRaw, out var pageValue) && pageValue > 0)
+            {
+                currentPage = Math.Min(pageValue, TotalPages);
+                restoredAnyState = restoredAnyState || currentPage > 1;
+            }
+
+            var sortColumnRaw = await JS.InvokeAsync<string?>("localStorage.getItem", SortColumnStorageKey);
+            if (Enum.TryParse<OrderReviewSortColumn>(sortColumnRaw, out var savedSortColumn))
+            {
+                currentSortColumn = savedSortColumn;
+                restoredAnyState = true;
+            }
+
+            var sortDirectionRaw = await JS.InvokeAsync<string?>("localStorage.getItem", SortDirectionStorageKey);
+            if (bool.TryParse(sortDirectionRaw, out var savedSortAscending))
+            {
+                sortAscending = savedSortAscending;
+                restoredAnyState = true;
+            }
+
+            showRestoredFiltersNotice = restoredAnyState;
+        }
+        catch
+        {
+            // No-op: keep default filter state when localStorage is unavailable.
+        }
+    }
+
+    private async Task PersistFilterStateAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("localStorage.setItem", BuyerFilterStorageKey, buyerFilter);
+            await JS.InvokeVoidAsync("localStorage.setItem", ProductFilterStorageKey, productFilter);
+
+            if (minAmountFilter.HasValue)
+            {
+                await JS.InvokeVoidAsync("localStorage.setItem", MinAmountStorageKey, minAmountFilter.Value.ToString(CultureInfo.InvariantCulture));
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("localStorage.removeItem", MinAmountStorageKey);
+            }
+
+            if (maxAmountFilter.HasValue)
+            {
+                await JS.InvokeVoidAsync("localStorage.setItem", MaxAmountStorageKey, maxAmountFilter.Value.ToString(CultureInfo.InvariantCulture));
+            }
+            else
+            {
+                await JS.InvokeVoidAsync("localStorage.removeItem", MaxAmountStorageKey);
+            }
+
+            await JS.InvokeVoidAsync("localStorage.setItem", PageStorageKey, currentPage.ToString(CultureInfo.InvariantCulture));
+            await JS.InvokeVoidAsync("localStorage.setItem", SortColumnStorageKey, currentSortColumn.ToString());
+            await JS.InvokeVoidAsync("localStorage.setItem", SortDirectionStorageKey, sortAscending.ToString(CultureInfo.InvariantCulture));
+        }
+        catch
+        {
+            // No-op: ignore storage failures and keep in-memory behavior.
+        }
+    }
+
+    private void DismissRestoredNotice()
+    {
+        showRestoredFiltersNotice = false;
+    }
+
+    private async Task ApplySortAsync(OrderReviewSortColumn column)
+    {
+        if (currentSortColumn == column)
+        {
+            sortAscending = !sortAscending;
+        }
+        else
+        {
+            currentSortColumn = column;
+            sortAscending = true;
+        }
+
+        currentPage = 1;
+        await PersistFilterStateAsync();
+    }
+
+    private string SortIndicator(OrderReviewSortColumn column)
+    {
+        if (currentSortColumn != column)
+        {
+            return "↕";
+        }
+
+        return sortAscending ? "↑" : "↓";
+    }
+
+    private string SortButtonClass(OrderReviewSortColumn column)
+        => currentSortColumn == column ? "table-sort-btn active" : "table-sort-btn";
+
+    private static string SortColumnLabel(OrderReviewSortColumn column)
+        => column switch
+        {
+            OrderReviewSortColumn.Buyer => "Comprador",
+            OrderReviewSortColumn.Product => "Produto",
+            _ => "Valor"
+        };
 
     private static string FormatBtc(decimal amount)
         => $"{amount:0.########} BTC";

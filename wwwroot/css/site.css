@@ -455,6 +455,11 @@ footer {
         min-width: 90px;
         display: inline-block;
     }
+
+    .order-review-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
 }
 
 .gateway-select {
@@ -622,6 +627,44 @@ footer {
 .details-btn:hover {
     background: #c17900;
     color: #fff;
+}
+
+.order-review-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.order-review-actions .details-btn,
+.order-review-actions .success-btn {
+    margin-right: 0;
+}
+
+.table-sort-btn {
+    background: transparent;
+    border: none;
+    color: inherit;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+}
+
+.table-sort-btn:hover {
+    color: #ffe082;
+}
+
+.table-sort-btn.active {
+    color: #ffe082;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.orders-review-sort-summary {
+    margin: -0.2rem 0 0.7rem;
+    color: #b3d6ff;
+    font-size: 0.94rem;
+    font-weight: 600;
 }
 
 .pagination {
@@ -797,6 +840,12 @@ footer {
     color: #23272b;
 }
 
+.filter-bar .sort-reset-btn:disabled {
+    background: #3f464d;
+    color: #9aa7b3;
+    cursor: not-allowed;
+}
+
 /* Filtros de pagamentos */
 .filter-bar select,
 .filter-bar input[type="date"] {
@@ -818,6 +867,34 @@ footer {
 .filter-bar input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1);
     cursor: pointer;
+}
+
+.orders-review-restored-notice {
+    margin: -0.5rem 0 1rem;
+    padding: 0.55rem 0.75rem;
+    border-left: 3px solid #8ab4f8;
+    background: #1b2430;
+    color: #b3d6ff;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.orders-review-restored-close {
+    border: none;
+    background: transparent;
+    color: #8ab4f8;
+    font-size: 1.15rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0;
+}
+
+.orders-review-restored-close:hover {
+    color: #b3d6ff;
 }
 
 .mt-2 {
