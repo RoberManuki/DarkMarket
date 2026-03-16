@@ -41,6 +41,14 @@
     <button @onclick="ExportJsonAsync" disabled="@(totalLogs == 0 || HasInvalidDateRange)">Exportar JSON</button>
 </div>
 
+@if (!string.IsNullOrWhiteSpace(exportNotice))
+{
+    <div class="orders-review-restored-notice" role="status">
+        <span>@exportNotice</span>
+        <button type="button" class="orders-review-restored-close" @onclick="DismissExportNotice" aria-label="Fechar aviso">×</button>
+    </div>
+}
+
 <div class="filter-bar logs-quick-range-bar">
     <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.Today)" @onclick="SetTodayRangeAsync">Hoje</button>
     <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.Last7Days)" @onclick="() => SetLastDaysRangeAsync(7)">Últimos 7 dias</button>
@@ -169,8 +177,10 @@ else
     private int pageSize = 10;
     private int currentPage = 1;
     private int totalPages => Math.Max(1, (int)Math.Ceiling((double)totalLogs / pageSize));
+    private const int ExportMaxRows = 10000;
     private bool filtersLoaded;
     private bool showRestoredFiltersNotice;
+    private string? exportNotice;
 
     private string filterGlobalSearch = "";
     private string filterUserId = "";
@@ -259,7 +269,7 @@ else
 
     private IQueryable<AppLog> BuildFilteredLogsQuery()
     {
-        return AdminLogFiltering.Apply(Db.Logs.AsQueryable(), BuildPrimaryFilterCriteria());
+        return AdminLogFiltering.Apply(Db.Logs.AsNoTracking(), BuildPrimaryFilterCriteria());
     }
 
     private Task ApplyFilters()
@@ -460,19 +470,20 @@ else
             return;
         }
 
-        var rows = await BuildFilteredLogsQuery()
-            .Include(l => l.User)
-            .OrderByDescending(l => l.Timestamp)
-            .ToListAsync();
-
-        if (rows.Count == 0)
+        var export = await BuildExportRowsAsync();
+        if (export.Rows.Count == 0)
         {
+            exportNotice = null;
             return;
         }
 
-        var csv = AdminLogsExportService.BuildCsv(rows);
-        var fileName = AdminLogsExportService.BuildExportFileName("csv", filterLevel, filterSource, filterStartDate, filterEndDate);
+        var csv = AdminLogsExportService.BuildCsv(export.Rows);
+        var fileName = AdminLogsExportService.BuildExportFileName("csv", filterLevel, filterSource, filterStartDate, filterEndDate, export.Truncated);
         await JS.InvokeVoidAsync("darkMarketDownloadFile", fileName, csv, "text/csv;charset=utf-8;");
+
+        exportNotice = export.Truncated
+            ? $"Export truncado para {ExportMaxRows} registros para manter performance." 
+            : null;
     }
 
     private async Task ExportJsonAsync()
@@ -482,19 +493,44 @@ else
             return;
         }
 
-        var rows = await BuildFilteredLogsQuery()
-            .Include(l => l.User)
-            .OrderByDescending(l => l.Timestamp)
-            .ToListAsync();
-
-        if (rows.Count == 0)
+        var export = await BuildExportRowsAsync();
+        if (export.Rows.Count == 0)
         {
+            exportNotice = null;
             return;
         }
 
-        var json = AdminLogsExportService.BuildJson(rows);
-        var fileName = AdminLogsExportService.BuildExportFileName("json", filterLevel, filterSource, filterStartDate, filterEndDate);
+        var json = AdminLogsExportService.BuildJson(export.Rows);
+        var fileName = AdminLogsExportService.BuildExportFileName("json", filterLevel, filterSource, filterStartDate, filterEndDate, export.Truncated);
         await JS.InvokeVoidAsync("darkMarketDownloadFile", fileName, json, "application/json;charset=utf-8;");
+
+        exportNotice = export.Truncated
+            ? $"Export truncado para {ExportMaxRows} registros para manter performance."
+            : null;
+    }
+
+    private async Task<(List<AdminLogExportRow> Rows, bool Truncated)> BuildExportRowsAsync()
+    {
+        var rows = await BuildFilteredLogsQuery()
+            .OrderByDescending(l => l.Timestamp)
+            .Select(l => new AdminLogExportRow(
+                l.Timestamp,
+                l.Level,
+                l.Source,
+                l.UserId,
+                l.User != null ? l.User.UserName : null,
+                l.Message,
+                l.Exception))
+            .Take(ExportMaxRows + 1)
+            .ToListAsync();
+
+        var truncated = rows.Count > ExportMaxRows;
+        if (truncated)
+        {
+            rows = rows.Take(ExportMaxRows).ToList();
+        }
+
+        return (rows, truncated);
     }
 
     private async Task LoadFilterStateFromStorageAsync()
@@ -552,6 +588,11 @@ else
     private void DismissRestoredNotice()
     {
         showRestoredFiltersNotice = false;
+    }
+
+    private void DismissExportNotice()
+    {
+        exportNotice = null;
     }
 
     private string BuildActivePeriodSummary()

@@ -39,34 +39,10 @@ public class AdminLogsFilterStateService
             var startDate = await LocalStorageStateHelpers.GetDateAsync(_js, AdminLogsStorageKeys.StartDateFilter);
             var endDate = await LocalStorageStateHelpers.GetDateAsync(_js, AdminLogsStorageKeys.EndDateFilter);
             var page = await LocalStorageStateHelpers.GetPositiveIntAsync(_js, AdminLogsStorageKeys.Page);
-
-            AdminLogsQuickRangePreset? quickRangePreset = null;
-            var quickRangePresetRaw = await _js.InvokeAsync<string?>("localStorage.getItem", AdminLogsStorageKeys.QuickRangePreset);
-            if (Enum.TryParse<AdminLogsQuickRangePreset>(quickRangePresetRaw, out var parsedQuickRangePreset))
-            {
-                quickRangePreset = parsedQuickRangePreset;
-            }
-
-            AdminLogsAuditQuickFilter? auditQuickFilter = null;
-            var auditQuickFilterRaw = await _js.InvokeAsync<string?>("localStorage.getItem", AdminLogsStorageKeys.AuditQuickFilter);
-            if (Enum.TryParse<AdminLogsAuditQuickFilter>(auditQuickFilterRaw, out var parsedAuditQuickFilter))
-            {
-                auditQuickFilter = parsedAuditQuickFilter;
-            }
-
-            AdminLogSortColumn? sortColumn = null;
-            var sortColumnRaw = await _js.InvokeAsync<string?>("localStorage.getItem", AdminLogsStorageKeys.SortColumn);
-            if (Enum.TryParse<AdminLogSortColumn>(sortColumnRaw, out var parsedSortColumn))
-            {
-                sortColumn = parsedSortColumn;
-            }
-
-            bool? sortAscending = null;
-            var sortAscendingRaw = await _js.InvokeAsync<string?>("localStorage.getItem", AdminLogsStorageKeys.SortAscending);
-            if (bool.TryParse(sortAscendingRaw, out var parsedSortAscending))
-            {
-                sortAscending = parsedSortAscending;
-            }
+            var quickRangePreset = await LocalStorageStateHelpers.GetEnumAsync<AdminLogsQuickRangePreset>(_js, AdminLogsStorageKeys.QuickRangePreset);
+            var auditQuickFilter = await LocalStorageStateHelpers.GetEnumAsync<AdminLogsAuditQuickFilter>(_js, AdminLogsStorageKeys.AuditQuickFilter);
+            var sortColumn = await LocalStorageStateHelpers.GetEnumAsync<AdminLogSortColumn>(_js, AdminLogsStorageKeys.SortColumn);
+            var sortAscending = await LocalStorageStateHelpers.GetNullableBoolAsync(_js, AdminLogsStorageKeys.SortAscending);
 
             return new AdminLogsFilterState
             {

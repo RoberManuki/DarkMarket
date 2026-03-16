@@ -36,6 +36,19 @@ internal static class LocalStorageStateHelpers
             : null;
     }
 
+    public static async Task<TEnum?> GetEnumAsync<TEnum>(IJSRuntime js, string key)
+        where TEnum : struct
+    {
+        var raw = await js.InvokeAsync<string?>("localStorage.getItem", key);
+        return Enum.TryParse<TEnum>(raw, out var parsed) ? parsed : null;
+    }
+
+    public static async Task<bool?> GetNullableBoolAsync(IJSRuntime js, string key)
+    {
+        var raw = await js.InvokeAsync<string?>("localStorage.getItem", key);
+        return bool.TryParse(raw, out var parsed) ? parsed : null;
+    }
+
     public static Task SetStringAsync(IJSRuntime js, string key, string value)
         => js.InvokeVoidAsync("localStorage.setItem", key, value ?? string.Empty).AsTask();
 

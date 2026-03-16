@@ -1,6 +1,5 @@
 using DarkMarket.Services;
 using DarkMarket.Tests.TestDoubles;
-using Microsoft.JSInterop;
 using System.Globalization;
 
 namespace DarkMarket.Tests;
@@ -58,6 +57,26 @@ public class LocalStorageStateHelpersTests
         var date = await LocalStorageStateHelpers.GetDateAsync(js, "date");
 
         Assert.Equal(new DateTime(2026, 3, 15), date);
+    }
+
+    [Fact]
+    public async Task GetEnumAsync_And_GetNullableBoolAsync_ParseAndFallbackCorrectly()
+    {
+        var js = new FakeLocalStorageJsRuntime();
+        js.Set("quick", AdminLogsQuickRangePreset.Last7Days.ToString());
+        js.Set("quick-bad", "unknown");
+        js.Set("flag", "true");
+        js.Set("flag-bad", "not-bool");
+
+        var quick = await LocalStorageStateHelpers.GetEnumAsync<AdminLogsQuickRangePreset>(js, "quick");
+        var quickBad = await LocalStorageStateHelpers.GetEnumAsync<AdminLogsQuickRangePreset>(js, "quick-bad");
+        var flag = await LocalStorageStateHelpers.GetNullableBoolAsync(js, "flag");
+        var flagBad = await LocalStorageStateHelpers.GetNullableBoolAsync(js, "flag-bad");
+
+        Assert.Equal(AdminLogsQuickRangePreset.Last7Days, quick);
+        Assert.Null(quickBad);
+        Assert.True(flag);
+        Assert.Null(flagBad);
     }
 
     [Fact]

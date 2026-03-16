@@ -5,9 +5,18 @@ using System.Text.Json;
 
 namespace DarkMarket.Services;
 
+public sealed record AdminLogExportRow(
+    DateTime Timestamp,
+    string Level,
+    string Source,
+    string? UserId,
+    string? UserName,
+    string? Message,
+    string? Exception);
+
 public class AdminLogsExportService
 {
-    public string BuildCsv(IEnumerable<AppLog> rows)
+    public string BuildCsv(IEnumerable<AdminLogExportRow> rows)
     {
         var csv = new StringBuilder();
         csv.AppendLine("TimestampUtc,Level,Source,UserId,UserName,Message,Exception");
@@ -19,7 +28,7 @@ public class AdminLogsExportService
                 .Append(EscapeCsv(row.Level)).Append(',')
                 .Append(EscapeCsv(row.Source)).Append(',')
                 .Append(EscapeCsv(row.UserId)).Append(',')
-                .Append(EscapeCsv(row.User?.UserName)).Append(',')
+                .Append(EscapeCsv(row.UserName)).Append(',')
                 .Append(EscapeCsv(row.Message)).Append(',')
                 .Append(EscapeCsv(row.Exception))
                 .AppendLine();
@@ -28,7 +37,19 @@ public class AdminLogsExportService
         return csv.ToString();
     }
 
-    public string BuildJson(IEnumerable<AppLog> rows)
+    public string BuildCsv(IEnumerable<AppLog> rows)
+    {
+        return BuildCsv(rows.Select(row => new AdminLogExportRow(
+            Timestamp: row.Timestamp,
+            Level: row.Level,
+            Source: row.Source,
+            UserId: row.UserId,
+            UserName: row.User?.UserName,
+            Message: row.Message,
+            Exception: row.Exception)));
+    }
+
+    public string BuildJson(IEnumerable<AdminLogExportRow> rows)
     {
         var payload = rows.Select(row => new
         {
@@ -36,12 +57,24 @@ public class AdminLogsExportService
             row.Level,
             row.Source,
             row.UserId,
-            userName = row.User?.UserName,
+            userName = row.UserName,
             row.Message,
             row.Exception
         });
 
         return JsonSerializer.Serialize(payload, new JsonSerializerOptions { WriteIndented = true });
+    }
+
+    public string BuildJson(IEnumerable<AppLog> rows)
+    {
+        return BuildJson(rows.Select(row => new AdminLogExportRow(
+            Timestamp: row.Timestamp,
+            Level: row.Level,
+            Source: row.Source,
+            UserId: row.UserId,
+            UserName: row.User?.UserName,
+            Message: row.Message,
+            Exception: row.Exception)));
     }
 
     public string BuildExportFileName(
@@ -50,6 +83,7 @@ public class AdminLogsExportService
         string? filterSource,
         DateTime? filterStartDate,
         DateTime? filterEndDate,
+        bool truncated = false,
         DateTime? utcNow = null)
     {
         var suffixParts = new List<string>();
@@ -72,6 +106,11 @@ public class AdminLogsExportService
         if (filterEndDate.HasValue)
         {
             suffixParts.Add($"to-{filterEndDate.Value:yyyyMMdd}");
+        }
+
+        if (truncated)
+        {
+            suffixParts.Add("truncated");
         }
 
         var suffix = suffixParts.Count > 0 ? "-" + string.Join("-", suffixParts) : "";

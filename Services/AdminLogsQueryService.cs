@@ -34,7 +34,7 @@ public class AdminLogsQueryService
         int pageSize)
     {
         var effectivePageSize = Math.Max(pageSize, 1);
-        var filteredQuery = AdminLogFiltering.Apply(_db.Logs.AsQueryable(), primaryCriteria);
+        var filteredQuery = AdminLogFiltering.Apply(_db.Logs.AsNoTracking(), primaryCriteria);
         var totalLogs = await filteredQuery.CountAsync();
 
         var totalPages = Math.Max(1, (int)Math.Ceiling(totalLogs / (double)effectivePageSize));
@@ -47,7 +47,7 @@ public class AdminLogsQueryService
             .Take(effectivePageSize)
             .ToListAsync();
 
-        var auditBase = AdminLogFiltering.Apply(_db.Logs.AsQueryable(), auditCountsCriteria);
+        var auditBase = AdminLogFiltering.Apply(_db.Logs.AsNoTracking(), auditCountsCriteria);
 
         var countsProjection = await auditBase
             .GroupBy(_ => 1)
