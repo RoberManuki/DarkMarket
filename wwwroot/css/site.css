@@ -1,16 +1,11 @@
-body {
-    background-color: #121212;
-    color: #e0e0e0;
-    font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
-}
-
 /* Layout fallback: garante estilo do MainLayout/NavMenu sem depender de CSS isolation */
 html,
 body {
     background: #181818;
     color: #f0f0f0;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
 .main {
@@ -32,7 +27,7 @@ body {
     overflow-y: auto;
 }
 
-header {
+.main > header {
     background: #111;
     padding: 1rem;
     text-align: center;
@@ -82,9 +77,6 @@ header {
 
 .sidebar nav ul li {
     list-style: none;
-}
-
-.sidebar nav ul li {
     margin: 1rem 0;
 }
 
@@ -153,18 +145,21 @@ header {
         font-size: 0.9rem;
     }
 
-    .dashboard-container .crypto-quote-row {
+    .dashboard-container .crypto-quote-row,
+    .index-container .crypto-quote-row {
         flex-direction: column;
         gap: 1.2rem;
         padding: 1rem 0.8rem;
     }
 
-    .dashboard-container .crypto-quote-content {
+    .dashboard-container .crypto-quote-content,
+    .index-container .crypto-quote-content {
         flex-direction: column;
         gap: 1rem;
     }
 
-    .dashboard-container .crypto-label-text {
+    .dashboard-container .crypto-label-text,
+    .index-container .crypto-label-text {
         font-size: 1.5rem;
     }
 }
@@ -174,6 +169,15 @@ header {
     padding: 2rem 2rem 2rem 0.5rem; /* padding-left reduzido de 2rem para 0.5rem */
 }
 
+.main > footer {
+    background: #111;
+    color: #aaa;
+    text-align: center;
+    padding: 1rem;
+    border-top: 1px solid #333;
+}
+
+/* Utilities and dashboard primitives */
 .dark-mode {
     background-color: #000;
     color: #fff;
@@ -204,95 +208,8 @@ header {
     width: 100%;
 }
 
-/* Dashboard fallback: cards de cotacao de moedas */
-.dashboard-container .crypto-quote-row {
-    display: flex;
-    align-items: center;
-    background: linear-gradient(90deg, #23272b 60%, #181c20 100%);
-    border-radius: 14px;
-    box-shadow: 0 2px 16px #000a;
-    margin-bottom: 2.5rem;
-    padding: 2rem 2.5rem;
-    width: 100%;
-    min-height: 120px;
-    gap: 2.5rem;
-    box-sizing: border-box;
-}
-
-.dashboard-container .crypto-quote-label {
-    min-width: 180px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-}
-
-.dashboard-container .crypto-label-text {
-    font-size: 2.1rem;
-    font-weight: bold;
-    color: #f9a825;
-    letter-spacing: 2px;
-    text-shadow: 0 2px 12px #000a;
-    text-transform: uppercase;
-}
-
-.dashboard-container .crypto-quote-content {
-    display: flex;
-    flex: 1;
-    justify-content: space-evenly;
-    align-items: center;
-    gap: 2.5rem;
-}
-
-.dashboard-container .crypto-quote-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 120px;
-}
-
-.dashboard-container .crypto-img-col {
-    flex-direction: row;
-    gap: 1rem;
-}
-
-.dashboard-container .crypto-img {
-    width: 64px;
-    height: 64px;
-    margin-right: 0.5rem;
-    filter: drop-shadow(0 2px 8px #0008);
-}
-
-.dashboard-container .crypto-amount {
-    font-size: 1.4rem;
-    font-weight: bold;
-    color: #f8f8f2;
-    letter-spacing: 1px;
-}
-
-.dashboard-container .crypto-currency {
-    font-size: 1.1rem;
-    color: #b0b0b0;
-    margin-bottom: 0.2rem;
-    letter-spacing: 1px;
-}
-
-.dashboard-container .crypto-value {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #8ab4f8;
-    text-shadow: 0 2px 8px #0008;
-}
-
-.dashboard-container .crypto-usd-col .crypto-value {
-    color: #8ab4f8;
-}
-
-.dashboard-container .crypto-brl-col .crypto-value {
-    color: #4caf50;
-}
-
-/* Home fallback: card de cotacao de bitcoin */
+/* Fallback compartilhado: cards de cotacao de moedas (Dashboard/Home) */
+.dashboard-container .crypto-quote-row,
 .index-container .crypto-quote-row {
     display: flex;
     align-items: center;
@@ -307,6 +224,7 @@ header {
     box-sizing: border-box;
 }
 
+.dashboard-container .crypto-quote-label,
 .index-container .crypto-quote-label {
     min-width: 180px;
     display: flex;
@@ -314,6 +232,7 @@ header {
     justify-content: flex-start;
 }
 
+.dashboard-container .crypto-label-text,
 .index-container .crypto-label-text {
     font-size: 2.1rem;
     font-weight: bold;
@@ -323,6 +242,7 @@ header {
     text-transform: uppercase;
 }
 
+.dashboard-container .crypto-quote-content,
 .index-container .crypto-quote-content {
     display: flex;
     flex: 1;
@@ -331,6 +251,7 @@ header {
     gap: 2.5rem;
 }
 
+.dashboard-container .crypto-quote-col,
 .index-container .crypto-quote-col {
     display: flex;
     flex-direction: column;
@@ -339,11 +260,13 @@ header {
     min-width: 120px;
 }
 
+.dashboard-container .crypto-img-col,
 .index-container .crypto-img-col {
     flex-direction: row;
     gap: 1rem;
 }
 
+.dashboard-container .crypto-img,
 .index-container .crypto-img {
     width: 64px;
     height: 64px;
@@ -351,6 +274,7 @@ header {
     filter: drop-shadow(0 2px 8px #0008);
 }
 
+.dashboard-container .crypto-amount,
 .index-container .crypto-amount {
     font-size: 1.4rem;
     font-weight: bold;
@@ -358,6 +282,7 @@ header {
     letter-spacing: 1px;
 }
 
+.dashboard-container .crypto-currency,
 .index-container .crypto-currency {
     font-size: 1.1rem;
     color: #b0b0b0;
@@ -365,6 +290,7 @@ header {
     letter-spacing: 1px;
 }
 
+.dashboard-container .crypto-value,
 .index-container .crypto-value {
     font-size: 1.5rem;
     font-weight: bold;
@@ -372,10 +298,12 @@ header {
     text-shadow: 0 2px 8px #0008;
 }
 
+.dashboard-container .crypto-usd-col .crypto-value,
 .index-container .crypto-usd-col .crypto-value {
     color: #8ab4f8;
 }
 
+.dashboard-container .crypto-brl-col .crypto-value,
 .index-container .crypto-brl-col .crypto-value {
     color: #4caf50;
 }
@@ -408,21 +336,6 @@ header {
 .dashboard-container h1 {
     font-size: 2.5rem;
     font-weight: bold;
-
-    .index-container .crypto-quote-row {
-        flex-direction: column;
-        gap: 1.2rem;
-        padding: 1rem 0.8rem;
-    }
-
-    .index-container .crypto-quote-content {
-        flex-direction: column;
-        gap: 1rem;
-    }
-
-    .index-container .crypto-label-text {
-        font-size: 1.5rem;
-    }
     color: #f9a825;
     margin-bottom: 1.5rem;
     letter-spacing: 1px;
@@ -457,6 +370,7 @@ header {
     margin-right: 0.7rem;
 }
 
+/* Shared tables and row actions */
 .payments-table {
     width: 100%;
     background: #23272b;
@@ -475,15 +389,6 @@ header {
 .payments-table th {
     color: #f9a825;
     font-size: 1.1rem;
-}
-
-.payment-btn.payment-btn-generate {
-    background: #f9a825;
-    color: #181818;
-}
-
-.payment-btn.payment-btn-generate:hover {
-    background: #c17900;
 }
 
 .save-btn, .cancel-btn {
@@ -533,23 +438,6 @@ header {
     background: #2e7031;
 }
 
-/* --- Payment Card Styles --- */
-.payment-card {
-    background: #2c2f33;
-    border-radius: 12px;
-    padding: 2rem 1.5rem 1.5rem 1.5rem;
-    box-shadow: 0 1px 8px #0006;
-    min-width: 320px;
-    max-width: 400px;
-    flex: 1 1 0;
-    margin-top: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Centraliza verticalmente */
-    align-items: center;
-    gap: 1.1rem;         /* Espaço entre blocos */
-}
-
 .product-summary {
     display: flex;
     flex-direction: column;
@@ -565,69 +453,6 @@ header {
     margin-top: 0;
     text-align: center;
     gap: 1.1rem;
-}
-
-.payment-address-block, .payment-amount-block, .payment-status-block {
-    margin-bottom: 1.2rem;
-    width: 100%;
-    text-align: center;
-}
-.payment-address {
-    font-family: monospace;
-    background: #23272f;
-    color: #8ab4f8; 
-    border-radius: 4px;
-    padding: 0.2em 0.5em;
-    margin-right: 0.7em;
-    font-size: 0.97em;
-    display: inline-block;
-    word-break: break-all;
-    margin-top: 0.3rem;
-}
-.payment-amount {
-    font-size: 1.1rem;
-    font-weight: bold;
-    margin-left: 0.3rem;
-}
-.label {
-    color: #f9a825;
-    font-weight: bold;
-    width: 7em;         /* Força largura fixa */
-    min-width: 7em;
-    display: inline-block;
-}
-.payment-status-ok {
-    color: #43a047;
-    font-weight: bold;
-    margin-left: 0.5rem;
-}
-.payment-status-wait {
-    color: #ff9800;
-    font-weight: bold;
-    margin-left: 0.5rem;
-}
-.payment-btn {
-    background: #f9a825;
-    color: #181818;
-    font-weight: bold;
-    padding: 0.5rem 1.2rem;
-    border-radius: 8px;
-    border: none;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-top: 0.7rem;
-    margin-bottom: 0.2rem;
-    margin-left: 0.5rem;
-    box-shadow: 0 2px 8px #0004;
-    transition: background 0.2s, color 0.2s;
-    display: inline-flex;
-    align-items: center;
-}
-.payment-btn:hover {
-    background: #c17900;
-}
-.payment-qrcode-block {
-    margin: 1.2rem 0;
 }
 
 .product-table {
@@ -771,6 +596,8 @@ header {
     margin-top: 1.5rem;
     font-size: 1.2rem;
     color: #8ab4f8;
+    text-align: center;
+    padding: 1rem 0;
 }
 
 .spinning {
@@ -912,6 +739,7 @@ header {
     color: #fff;
 }
 
+/* Generic form surfaces and controls */
 /* Form Card - centralizado para todos os forms */
 .form-card {
     background: #23272b;
@@ -1230,11 +1058,6 @@ header {
     margin-top: 1.2rem;
 }
 
-.loading-spinner {
-    text-align: center;
-    padding: 1rem 0;
-}
-
 .align-right {
     text-align: right;
 }
@@ -1390,6 +1213,7 @@ header {
     letter-spacing: 1px;
 }
 
+/* Filters, sorting, and pagination */
 .filter-section {
     margin-top: 3rem;
     padding-left: 2rem;
@@ -1602,28 +1426,13 @@ header {
     margin-bottom: 2rem;
 }
 
+/* Order/payment detail layouts, chat, and modals */
 .details-container {
     display: flex;
     justify-content: center;
     align-items: stretch;
     gap: 2.5rem;
     margin-bottom: 2rem;
-}
-
-.product-card,
-.payment-details-card {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    min-width: 320px;
-    max-width: 400px;
-    flex: 1 1 0;
-}
-
-.payment-details-card.wide-card {
-    min-width: 400px;
-    max-width: 520px; /* aumenta a largura do card da direita */
-    flex: 1.3 1 0;    /* faz ele ocupar mais espaço que o da esquerda */
 }
 
 /* Garante que ambos tenham a mesma altura */
@@ -1633,6 +1442,8 @@ header {
 .product-card {
     display: flex;
     flex-direction: column;
+    height: 100%;
+    flex: 1 1 0;
     align-items: center;
     justify-content: center;
     min-width: 260px;
@@ -1646,6 +1457,53 @@ header {
     box-sizing: border-box;
     gap: 1.2rem;
 }
+
+/* Fallback: garante o card de detalhes do pedido fora de modais */
+.details-container > .payment-details-card {
+    min-width: 320px;
+    max-width: 520px;
+    flex: 1.1 1 0;
+    background: #23272f;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px #0004;
+    border: 1px solid #333a;
+    padding: 2rem 2.5rem;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+}
+
+.details-container > .payment-details-card.wide-card {
+    max-width: 560px;
+    flex: 1.3 1 0;
+}
+
+.details-container > .payment-details-card .details-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 0.7em;
+}
+
+.details-container > .payment-details-card .details-row > span:last-child {
+    min-width: 0;
+    text-align: right;
+    overflow-wrap: anywhere;
+}
+
+.details-container > .payment-details-card .label {
+    width: 7em;
+    min-width: 7em;
+    display: inline-block;
+    text-align: left;
+}
+
+.details-container > .payment-details-card .card-footer {
+    margin-top: 0.6rem;
+}
+
 .product-img {
     width: 120px;
     height: 120px;
@@ -1670,19 +1528,6 @@ header {
     color: #1eaa6f;
     font-weight: 500;
 }
-.payment-details-card {
-    min-width: 320px;
-    max-width: 480px;
-    background: #23272f;
-    border-radius: 12px;
-    box-shadow: 0 2px 12px #0004;
-    border: 1px solid #333a;
-    padding: 2rem 2.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.2rem;
-    height: 100%;
-}
 .details-row {
     display: flex;
     align-items: flex-start;
@@ -1705,8 +1550,7 @@ header {
     padding: 0;           /* Remove qualquer padding */
     margin: 0;            /* Remove qualquer margin */
 }
-.badge,
-.payment-address {
+.badge {
     padding: 0.18em 0.9em;
     border-radius: 1em;
     font-size: 0.98em;
@@ -1723,18 +1567,6 @@ header {
     background: #f1c40f;
     color: #222;
 }
-.payment-address {
-    font-family: monospace;
-    background: #23272f;
-    color: #f9a825; /* Amarelo alaranjado do sistema */
-    border-radius: 4px;
-    padding: 0.2em 0.5em;
-    margin-right: 0.7em;
-    font-size: 0.97em;
-    display: inline-block;
-    word-break: break-all;
-    margin-top: 0.3rem;
-}
 .order-waiting-confirmation {
     background: #f1c40f22;
     color: #b38b00;
@@ -1750,15 +1582,6 @@ header {
     font-size: 1.2em;
 }
 
-.payment-link {
-    margin-left: 0.5em;
-    color: #f1c40f;
-    font-size: 1.1em;
-    vertical-align: middle;
-}
-.payment-link:hover {
-    color: #ffe066;
-}
 .product-desc {
     margin-bottom: 0.2em;
     font-size: 0.98em;
@@ -1777,6 +1600,20 @@ header {
     font-weight: 700;
     font-size: 1.3em;
 }
+
+.release-modal-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+}
+
+.release-title-icon {
+    color: currentColor;
+    font-size: 0.92em;
+    line-height: 1;
+}
+
 .modal-error {
     color: #e74c3c;
     margin-bottom: 0.7em;
@@ -1798,8 +1635,9 @@ header {
     border-radius: 12px;
     box-shadow: 0 2px 16px #0008;
     padding: 1.5rem 1.5rem 1.25rem;
-    min-width: 320px;
-    max-width: min(900px, 98vw);
+    min-width: min(680px, 96vw);
+    width: min(980px, 96vw);
+    max-width: min(980px, 96vw);
     max-height: calc(100vh - 2rem);
     color: #fff;
     display: flex;
@@ -1809,13 +1647,133 @@ header {
 
 .modal-content {
     overflow-y: auto;
-    padding-right: 0.35rem;
+    overflow-x: hidden;
+    padding-right: 0;
+}
+
+.modal-content.release-modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-content.release-modal-content .release-modal-question {
+    width: min(920px, 100%);
+    text-align: left;
+    margin-bottom: 0.9rem;
+}
+
+.modal-content.release-modal-content .release-modal-layout {
+    display: grid;
+    grid-template-columns: minmax(330px, 0.52fr) minmax(330px, 0.48fr);
+    align-items: start;
+    gap: 1rem;
+    width: min(920px, 100%);
+    margin: 0 auto;
+}
+
+.modal-content.release-modal-content .release-modal-layout .release-summary-card.payment-details-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.modal-content.release-modal-content .release-modal-side {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    min-width: 0;
+}
+
+.modal-content.release-modal-content .release-modal-side .release-product-preview-wrapper {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+}
+
+.modal-content.release-modal-content .release-modal-side .release-product-preview-img {
+    width: min(230px, 100%);
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.modal-content.release-modal-content .release-modal-side .evidence-section {
+    margin-top: 0;
+}
+
+.modal-content.release-modal-content > .release-evidence-row {
+    width: min(920px, 100%);
+    margin-top: 0.85rem;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+    gap: 0.85rem;
+    justify-content: stretch;
+}
+
+.modal-content.release-modal-content > .release-evidence-row .evidence-card {
+    min-width: 0;
+    width: 100%;
 }
 .modal-content label {
     font-weight: 600;
     margin-top: 1em;
     display: block;
 }
+
+/* Fallback: garante estilo do resumo de repasse dentro de modais */
+.modal-content .release-summary-card.payment-details-card {
+    min-width: 0;
+    max-width: 100%;
+    width: 100%;
+    background: #23272f;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px #0004;
+    border: 1px solid #333a;
+    padding: 1.25rem 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.modal-content .release-summary-card .details-row {
+    display: grid;
+    grid-template-columns: 12.5rem minmax(0, 1fr);
+    align-items: start;
+    gap: 0.75rem;
+    margin-bottom: 0.45rem;
+}
+
+.modal-content .release-summary-card .details-row > span:last-child {
+    min-width: 0;
+    text-align: left;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.modal-content .release-summary-card .label {
+    width: 7em;
+    min-width: 7em;
+    display: inline-block;
+    text-align: left;
+    color: #f9a825;
+    font-weight: bold;
+}
+
+.modal-content .release-summary-card .details-row:last-child {
+    margin-bottom: 0;
+}
+
+@media (max-width: 980px) {
+    .modal-content.release-modal-content .release-modal-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content.release-modal-content > .release-evidence-row {
+        grid-template-columns: 1fr;
+    }
+}
+
 .modal-textarea {
     width: 100%;
     min-height: 60px;
@@ -1878,44 +1836,6 @@ header {
     padding: 0.7em 1em;
     background: #181c22;
     color: #fff;
-}
-
-.payment-link-btn {
-    display: inline-flex;
-    align-items: center;
-    background: #27ae60;
-    color: #fff;
-    border-radius: 6px;
-    padding: 0.45em 1.1em;
-    font-weight: 600;
-    text-decoration: none;
-    margin-left: 0.7em;
-    transition: background 0.2s, color 0.2s;
-    box-shadow: 0 2px 8px #0002;
-    border: none;
-    cursor: pointer;
-}
-.payment-link-btn:hover {
-    background: #219150;
-    color: #fff;
-}
-.payment-link-text {
-    margin-left: 0.7em;
-    display: flex;
-    align-items: center;
-    font-size: 1em;
-}
-.payment-address {
-    font-family: monospace;
-    background: #23272f;
-    color: #f9a825; /* Amarelo alaranjado do sistema */
-    border-radius: 4px;
-    padding: 0.2em 0.5em;
-    margin-right: 0.7em;
-    font-size: 0.97em;
-    display: inline-block;
-    word-break: break-all;
-    margin-top: 0.3rem;
 }
 
 .order-link-btn {
@@ -2090,26 +2010,6 @@ header {
 .private-key-actions {
     margin-top: 1em;
 }
-.payment-btn.payment-btn-success {
-    background: #27ae60;
-    color: #fff;
-    font-weight: bold;
-    border-radius: 8px;
-    padding: 0.7em 1.5em;
-    border: none;
-    font-size: 1.08em;
-    box-shadow: 0 2px 8px #0004;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5em;
-    transition: background 0.2s;
-    text-decoration: none;
-}
-.payment-btn.payment-btn-success:hover {
-    background: #219150;
-    color: #fff;
-}
-
 .evidence-section {
     display: flex;
     gap: 1.5em;
@@ -2268,16 +2168,6 @@ input:checked + .slider:before {
     color: #e53935;
 }
 
-.payment-details-container {
-    display: flex;
-    gap: 2rem;
-    justify-content: center;
-    align-items: stretch; 
-    min-height: 70vh;     
-}
-.payment-details-container > * {
-    align-self: stretch;
-}
 .product-summary {
     min-width: 320px;
     max-width: 400px;
@@ -2321,13 +2211,6 @@ input:checked + .slider:before {
     text-align: center;
     width: 100%;
 }
-.label {
-    color: #f9a825;
-    font-weight: bold;
-    width: 7em;         /* Força largura fixa */
-    min-width: 7em;
-    display: inline-block;
-}
 .card-content-center {
     flex: 1;
     display: flex;
@@ -2357,15 +2240,6 @@ input:checked + .slider:before {
     margin-bottom: 2rem;      
 }
 
-.payment-card > .payment-address-block,
-.payment-card > .payment-qrcode-block,
-.payment-card > .payment-amount-block,
-.payment-card > .payment-status-block {
-    margin-bottom: 0.3rem;    
-}
-.payment-card > .payment-status-block {
-    margin-bottom: 0;
-}
 .generate-invoice-block {
     display: flex;
     flex-direction: column;
@@ -2376,85 +2250,6 @@ input:checked + .slider:before {
     justify-content: center;
 }
 
-.payment-title {
-    color: #f9a825;
-    font-size: 2rem;
-    font-family: 'Montserrat', 'Poppins', 'Segoe UI', Arial, sans-serif;
-    font-weight: 700;
-    margin-bottom: 1.2rem;
-    letter-spacing: 0.5px;
-    text-align: center;
-}
-
-.gateway-label {
-    color: #f9a825;
-    font-size: 1.15rem;
-    font-weight: 600;
-    letter-spacing: 0.2px;
-    text-align: center;
-    display: block;
-}
-
-.big-btn {
-    font-size: 1.15rem;
-    padding: 0.8rem 2.2rem;
-    margin-top: 0.5rem;
-}
-
-.payment-btn-history {
-    background: #23272b;
-    color: #f9a825;
-    border: 1.5px solid #f9a825;
-    font-size: 1.08rem;
-    font-weight: 600;
-    border-radius: 8px;
-    margin-top: 10rem; /* aumente para um valor maior */
-    padding: 0.7rem 1.5rem;
-    transition: background 0.2s, color 0.2s;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5em;
-}
-.payment-btn-history:hover {
-    background: #f9a825;
-    color: #23272b;
-}
-
-.system-value {
-    font-size: 1.13em;
-    font-weight: 500;
-}
-.payment-details-card .label {
-    color: #f9a825;
-    font-weight: bold;
-    min-width: 90px;
-    text-align: left;
-    margin-bottom: 0;
-}
-.payment-details-card .system-value {
-    display: block;
-    width: 100%;
-    font-size: 1.13em;
-    font-weight: 500;
-    color: #fff;
-    padding: 0.4em 0.7em;
-    background: #181c22;
-    border-radius: 4px;
-    margin: 0.3em 0 0.2em 0;
-    box-sizing: border-box;
-}
-.payment-details-card .payment-address {
-    display: inline-block;
-    max-width: 100%;
-    font-size: 1.14em;
-    padding: 0.45em 1.2em;
-    margin: 0.3em 0 0.2em 0;
-    word-break: break-all;
-    background: #23272f;
-    color: #f9a825;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
 .clipboard-btn {
     background: #23272b;
     color: #f9a825;
@@ -2469,25 +2264,6 @@ input:checked + .slider:before {
 .clipboard-btn:hover {
     background: #f9a825;
     color: #23272b;
-}
-.payment-link-btn {
-    background: #43a047;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 0.7em 1.5em;
-    font-size: 1.08em;
-    font-weight: 600;
-    margin-right: 1em;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5em;
-    transition: background 0.2s;
-    text-decoration: none;
-}
-.payment-link-btn:hover {
-    background: #388e3c;
-    color: #fff;
 }
 .evidence-btn {
     background: #1976d2;
@@ -2508,91 +2284,6 @@ input:checked + .slider:before {
     color: #fff;
 }
 
-.payment-details-card .payment-row-flex .payment-address {
-    flex: 1 1 0;
-    min-width: 0;
-    font-size: 1.14em;
-    padding: 0.45em 1.2em;
-    margin: 0;
-    background: #23272f;
-    color: #f9a825;
-    border-radius: 4px;
-    box-sizing: border-box;
-    display: block;
-    white-space: nowrap;      /* NÃO quebra linha */
-    overflow-x: auto;         /* Barra de rolagem se necessário */
-    text-overflow: ellipsis;  /* ... se não couber tudo */
-    word-break: normal;       /* NÃO força quebra */
-}
-.payment-address-block {
-    display: block;
-    width: 100%;
-    font-size: 1.13em;
-    font-weight: 500;
-    color: #f9a825;
-    padding: 0.4em 0.7em;
-    background: #23272f;
-    border-radius: 4px;
-    margin: 0.3em 0 0.2em 0;
-    box-sizing: border-box;
-    word-break: break-all;
-    white-space: normal;
-}
-
-.payment-address-flex {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    gap: 0.5em;
-}
-
-.payment-address-flex .payment-address {
-    flex: 1 1 0;
-    min-width: 0;
-    white-space: nowrap;
-    overflow-x: auto;
-    text-overflow: ellipsis;
-    font-family: monospace;
-    background: #23272f;
-    color: #f9a825;
-    border-radius: 4px;
-    padding: 0.2em 0.5em;
-    font-size: 1.05em;
-    display: block;
-}
-.payment-details-card .details-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.5rem; 
-    margin-bottom: 0.7em;
-    justify-content: space-between;
-}
-.payment-details-card .label {
-    width: 7em;
-    min-width: 7em;
-    display: inline-block;
-    text-align: left;
-}
-.payment-details-card .payment-address {
-    display: inline-block;
-    max-width: 100%;
-    font-size: 1.14em;
-    padding: 0.45em 1.2em;
-    margin: 0.3em 0 0.2em 0;
-    word-break: break-all;
-    background: #23272f;
-    color: #f9a825;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-.details-actions-vertical {
-    display: flex;
-    flex-direction: column;
-    gap: 0.7em;
-    align-items: flex-start;
-    padding: 0;
-    margin: 0;
-}
-.evidence-btn, .payment-link-btn {
+.evidence-btn {
     margin-left: 0 !important;
 }

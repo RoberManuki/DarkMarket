@@ -22,6 +22,44 @@
     justify-content: center;
 }
 
+.payment-card {
+    background: #2c2f33;
+    border-radius: 12px;
+    padding: 2rem 1.5rem 1.5rem 1.5rem;
+    box-shadow: 0 1px 8px #0006;
+    min-width: 320px;
+    max-width: 400px;
+    flex: 1 1 0;
+    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1.1rem;
+}
+
+.payment-btn {
+    background: #f9a825;
+    color: #181818;
+    font-weight: bold;
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 0.7rem;
+    margin-bottom: 0.2rem;
+    margin-left: 0.5rem;
+    box-shadow: 0 2px 8px #0004;
+    transition: background 0.2s, color 0.2s;
+    display: inline-flex;
+    align-items: center;
+}
+
+.payment-btn:hover {
+    background: #c17900;
+}
+
 .payment-btn-success {
     background: #43a047;
     color: #fff;
@@ -66,8 +104,68 @@
     text-align: center;
 }
 
+.payment-address-block {
+    display: block;
+    width: 100%;
+    font-size: 1.13em;
+    font-weight: 500;
+    color: #f9a825;
+    padding: 0.4em 0.7em;
+    background: #23272f;
+    border-radius: 4px;
+    margin: 0.3em 0 0.2em 0;
+    box-sizing: border-box;
+    word-break: break-all;
+    white-space: normal;
+}
+
+.payment-qrcode-block {
+    margin: 1.2rem 0;
+}
+
 .payment-view-card .payment-status-block {
     margin-bottom: 0;
+}
+
+.label {
+    color: #f9a825;
+    font-weight: bold;
+    width: 7em;
+    min-width: 7em;
+    display: inline-block;
+}
+
+.payment-address {
+    font-family: monospace;
+    background: #23272f;
+    color: #f9a825;
+    border-radius: 4px;
+    padding: 0.2em 0.5em;
+    margin-right: 0.7em;
+    font-size: 0.97em;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    display: inline-block;
+    word-break: break-all;
+    margin-top: 0.3rem;
+}
+
+.payment-amount {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-left: 0.3rem;
+}
+
+.payment-status-ok {
+    color: #43a047;
+    font-weight: bold;
+    margin-left: 0.5rem;
+}
+
+.payment-status-wait {
+    color: #ff9800;
+    font-weight: bold;
+    margin-left: 0.5rem;
 }
 
 @media (max-width: 700px) {
