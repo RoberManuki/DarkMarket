@@ -83,7 +83,7 @@ else
                     </span>
                 </div>
                 <div class="details-row">
-                    <span class="label" style="visibility:hidden">Pagamento:</span>
+                    <span class="label hidden-payment-label">Pagamento:</span>
                     <span>
                         <a class="payment-link-btn" href="@($"/payments/details/{order.Payment.Id}")" title="Ver pagamento">
                             <span class="payment-link-text">Ver pagamento</span>
@@ -93,7 +93,7 @@ else
                 @if (isBuyer && !order.FundsReleased)
                 {
                     <div class="details-row">
-                        <span class="label" style="visibility:hidden">Pagamento:</span>
+                        <span class="label hidden-payment-label">Pagamento:</span>
                         <span>
                             <button class="evidence-btn" @onclick="()=>showConfirmModal=true">
                                 <i class="fa fa-upload"></i> Enviar evidência de recebimento
@@ -102,7 +102,7 @@ else
                     </div>
                 }
                 <div class="details-row">
-                    <span class="label" style="visibility:hidden">Pagamento:</span>
+                    <span class="label hidden-payment-label">Pagamento:</span>
                     <span>
                         <button class="back-btn" @onclick='GoBack'>Voltar</button>
                     </span>
@@ -225,10 +225,10 @@ else
             <div class="modal-card">
                 <h4 class="modal-title">Confirmar repasse</h4>
                 <div class="modal-content">
-                    <i class="fa fa-exclamation-triangle" style="color:#f9a825; font-size:1.5em; margin-bottom:0.5em;"></i>
+                    <i class="fa fa-exclamation-triangle modal-warning-icon"></i>
                     <p>Tem certeza que deseja repassar os fundos e finalizar o pedido?</p>
 
-                    <div class="payment-details-card wide-card" style="margin-bottom: 1rem;">
+                    <div class="payment-details-card wide-card release-summary-card">
                         <div class="details-row"><span class="label">Produto:</span><span>@order.Product?.Name</span></div>
                         <div class="details-row"><span class="label">Quantidade:</span><span>1</span></div>
                         <div class="details-row"><span class="label">Comprador:</span><span>@order.Buyer?.UserName</span></div>
@@ -241,8 +241,8 @@ else
 
                     @if (!string.IsNullOrWhiteSpace(order.Product?.ImagePath))
                     {
-                        <div style="margin-bottom: 0.75rem;">
-                            <img src="@order.Product.ImagePath" alt="@order.Product.Name" style="max-width: 180px; border-radius: 8px;" />
+                        <div class="release-product-preview-wrapper">
+                            <img src="@order.Product.ImagePath" alt="@order.Product.Name" class="release-product-preview-img" />
                         </div>
                     }
 

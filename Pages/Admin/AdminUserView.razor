@@ -30,11 +30,11 @@ else
         <p><b>Status:</b>
             @if (user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.Now)
             {
-                <span style="color:#e53935;font-weight:bold;">Bloqueado</span>
+                <span class="status-blocked">Bloqueado</span>
             }
             else
             {
-                <span style="color:#4caf50;font-weight:bold;">Ativo</span>
+                <span class="status-active">Ativo</span>
             }
         </p>
         <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin/users")'>Voltar</button>

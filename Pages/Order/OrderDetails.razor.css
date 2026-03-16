@@ -1,0 +1,22 @@
+.hidden-payment-label {
+    visibility: hidden;
+}
+
+.modal-warning-icon {
+    color: #f9a825;
+    font-size: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+.release-summary-card {
+    margin-bottom: 1rem;
+}
+
+.release-product-preview-wrapper {
+    margin-bottom: 0.75rem;
+}
+
+.release-product-preview-img {
+    max-width: 180px;
+    border-radius: 8px;
+}

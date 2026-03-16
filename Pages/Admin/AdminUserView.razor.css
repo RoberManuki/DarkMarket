@@ -1,0 +1,9 @@
+.status-blocked {
+    color: #e53935;
+    font-weight: bold;
+}
+
+.status-active {
+    color: #4caf50;
+    font-weight: bold;
+}

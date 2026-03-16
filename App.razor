@@ -17,34 +17,14 @@
         </Found>
         <NotFound>
             <LayoutView Layout="@typeof(DarkMarket.Shared.MainLayout)">
-                <div style="
-                    margin: 3rem auto;
-                    max-width: 480px;
-                    background: #23272b;
-                    color: #fff;
-                    border-radius: 16px;
-                    box-shadow: 0 2px 16px #000a;
-                    padding: 2.5rem 2rem;
-                    text-align: center;
-                ">
-                    <span style="font-size:3rem; color:#ff5252;">&#9888;</span>
-                    <h2 style="margin:1rem 0 0.5rem 0; color:#f9a825;">Página não encontrada</h2>
-                    <p style="color:#ccc; margin-bottom:2rem;">
+                <div class="not-found-card">
+                    <span class="not-found-icon">&#9888;</span>
+                    <h2 class="not-found-title">Página não encontrada</h2>
+                    <p class="not-found-description">
                         O endereço acessado não existe.<br>
                         Verifique a URL ou volte para a página inicial.
                     </p>
-                    <a href="/" style="
-                        display:inline-block;
-                        background:#f9a825;
-                        color:#23272b;
-                        font-weight:bold;
-                        padding:0.7rem 2rem;
-                        border-radius:8px;
-                        text-decoration:none;
-                        font-size:1.2rem;
-                        box-shadow:0 2px 8px #0004;
-                        transition:background 0.2s;
-                    " onmouseover="this.style.background='#ffe066'" onmouseout="this.style.background='#f9a825'">
+                    <a href="/" class="not-found-home-link">
                         &#8592; Voltar para Home
                     </a>
                 </div>

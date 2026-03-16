@@ -1,0 +1,31 @@
+.header {
+    background-color: #1a1a1a;
+    color: #f0f0f0;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-content {
+    display: flex;
+    align-items: center;
+}
+
+.header-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.social-button {
+    color: #f0f0f0;
+    text-decoration: none;
+    padding: 5px 10px;
+    border: 1px solid #f0f0f0;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.social-button:hover {
+    background-color: #333;
+}

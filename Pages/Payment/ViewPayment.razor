@@ -59,7 +59,7 @@
                 @if (payment.IsPaid)
                 {
                     <span class="payment-status-ok">Pagamento recebido!</span>
-                    <div class="details-actions" style="margin-top: 1.5rem;">
+                    <div class="details-actions">
                         <a class="payment-btn payment-btn-success" href="@($"/payments/details/{payment.Id}")">
                             <i class="fa fa-file-alt"></i> Ver detalhes do pagamento
                         </a>
@@ -174,70 +174,3 @@
         return BtcUsdFormatter.Format(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
     }
 }
-
-<style>
-    .payment-container {
-        max-width: 520px;
-        margin: 3rem auto;
-        background: #23272b;
-        color: #f0f0f0;
-        border-radius: 16px;
-        box-shadow: 0 2px 16px #000a;
-        padding: 2.5rem 2rem;
-        text-align: center;
-    }
-    .payment-title {
-        color: #f9a825;
-        font-size: 2rem;
-        margin-bottom: 2rem;
-    }
-    .details-actions {
-        margin-top: 1.5rem;
-        text-align: center;
-        display: flex;
-        justify-content: center;
-    }
-    .payment-btn-success {
-        background: #43a047;
-        color: #fff;
-        border: none;
-        border-radius: 8px;
-        padding: 0.7rem 1.5rem;
-        font-size: 1.08rem;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5em;
-        transition: background 0.2s;
-        text-decoration: none;
-    }
-    .payment-btn-success:hover {
-        background: #388e3c;
-        color: #fff;
-    }
-    .payment-view-card {
-        margin: 0 auto;
-        max-width: 420px;
-        min-width: 0;
-        padding: 2.2rem 1.5rem 1.7rem 1.5rem;
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        justify-content: flex-start;
-        gap: 1.3rem;
-        background: #2c2f33;
-        border-radius: 12px;
-        box-shadow: 0 1px 8px #0006;
-    }
-    .payment-view-card .payment-address-block,
-    .payment-view-card .payment-qrcode-block,
-    .payment-view-card .payment-amount-block,
-    .payment-view-card .payment-status-block {
-        margin-bottom: 1.1rem;
-        width: 100%;
-        text-align: center;
-    }
-    .payment-view-card .payment-status-block {
-        margin-bottom: 0;
-    }
-</style>

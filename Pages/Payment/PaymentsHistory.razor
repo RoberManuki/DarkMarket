@@ -60,16 +60,16 @@ else
         {
             <tr>
                 <td data-label="Produto">@p.ProductId</td>
-                <td data-label="Endereço" style="font-family:monospace;">@p.Address</td>
+                <td data-label="Endereço" class="address-monospace">@p.Address</td>
                 <td data-label="Valor">@FormatBtcWithUsd(p.Amount)</td>
                 <td data-label="Status">
                     @if (p.IsPaid)
                     {
-                        <span style="color:#4caf50;font-weight:bold;">Pago</span>
+                        <span class="status-paid">Pago</span>
                     }
                     else
                     {
-                        <span style="color:#ff9800;font-weight:bold;">Pendente</span>
+                        <span class="status-pending">Pendente</span>
                     }
                 </td>
                 <td data-label="Gateway">@p.PaymentMethod</td>

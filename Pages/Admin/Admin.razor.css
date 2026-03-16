@@ -1,0 +1,87 @@
+.admin-settings-card {
+    margin: 1rem 0 0.5rem 0;
+    background: #23272b;
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+}
+
+.fiat-select {
+    background: #181818;
+    color: #f0f0f0;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 0.35rem 0.6rem;
+}
+
+.fee-input {
+    width: 120px;
+    background: #181818;
+    color: #f0f0f0;
+    border: 1px solid #444;
+    border-radius: 6px;
+    padding: 0.35rem 0.6rem;
+}
+
+.operation-fee-card {
+    gap: 0.6rem;
+}
+
+.operation-fee-message.ok {
+    color: #81c784;
+}
+
+.operation-fee-message.error {
+    color: #ff8a80;
+}
+
+.admin-nav {
+    margin: 2rem 0 1.5rem 0;
+    display: flex;
+    gap: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.admin-nav a {
+    background: #23272b;
+    color: #f9a825;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+}
+
+.admin-nav a:hover {
+    background: #f9a825;
+    color: #23272b;
+}
+
+@media (max-width: 900px) {
+    .admin-nav {
+        gap: 0.7rem;
+    }
+
+    .admin-nav a {
+        flex: 1 1 calc(50% - 0.7rem);
+        text-align: center;
+    }
+}
+
+@media (max-width: 560px) {
+    .admin-settings-card {
+        padding: 0.8rem;
+    }
+
+    .admin-nav a {
+        flex: 1 1 100%;
+    }
+
+    .fee-input,
+    .fiat-select {
+        width: 100%;
+    }
+}

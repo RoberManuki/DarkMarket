@@ -105,10 +105,10 @@ else
         <div class="modal-card">
             <h4 class="modal-title">Confirmar repasse</h4>
             <div class="modal-content">
-                <i class="fa fa-exclamation-triangle" style="color:#f9a825; font-size:1.5em; margin-bottom:0.5em;"></i>
+                <i class="fa fa-exclamation-triangle modal-warning-icon"></i>
                 <p>Tem certeza que deseja repassar os fundos e finalizar o pedido?</p>
 
-                <div class="payment-details-card wide-card" style="margin-bottom: 1rem;">
+                <div class="payment-details-card wide-card release-summary-card">
                     <div class="details-row"><span class="label">Produto:</span><span>@selectedOrder.Product?.Name</span></div>
                     <div class="details-row"><span class="label">Quantidade:</span><span>1</span></div>
                     <div class="details-row"><span class="label">Comprador:</span><span>@selectedOrder.Buyer?.UserName</span></div>
@@ -121,8 +121,8 @@ else
 
                 @if (!string.IsNullOrWhiteSpace(selectedOrder.Product?.ImagePath))
                 {
-                    <div style="margin-bottom: 0.75rem;">
-                        <img src="@selectedOrder.Product.ImagePath" alt="@selectedOrder.Product.Name" style="max-width: 180px; border-radius: 8px;" />
+                    <div class="release-product-preview-wrapper">
+                        <img src="@selectedOrder.Product.ImagePath" alt="@selectedOrder.Product.Name" class="release-product-preview-img" />
                     </div>
                 }
 
