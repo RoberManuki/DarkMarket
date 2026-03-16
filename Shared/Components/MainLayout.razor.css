@@ -69,7 +69,11 @@ header {
 
 .main-content {
     flex: 1;
-    padding: 2rem;
+    padding: 2rem 1.35rem;
+}
+
+.main-content.main-content-route-padded {
+    padding: 2rem 1rem;
 }
 
 footer {
@@ -129,7 +133,11 @@ footer {
     }
 
     .main-content {
-        padding: 1.25rem;
+        padding: 1.2rem 1rem;
+    }
+
+    .main-content.main-content-route-padded {
+        padding: 1.1rem 0.85rem;
     }
 
     .header-actions {
@@ -174,6 +182,10 @@ footer {
     }
 
     .main-content {
-        padding: 0.8rem;
+        padding: 0.8rem 0.65rem;
+    }
+
+    .main-content.main-content-route-padded {
+        padding: 0.75rem 0.55rem;
     }
 }

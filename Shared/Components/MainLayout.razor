@@ -39,7 +39,7 @@
                     </AuthorizeView>
                 </div>
             </header>
-            <div class="main-content">
+            <div class="@MainContentCssClass">
                 <Breadcrumb />
                 @Body
             </div>
@@ -52,6 +52,23 @@
 
 @code {
     private Toast? ToastRef;
+
+    private string MainContentCssClass
+        => HasOwnContentPaddingRoute()
+            ? "main-content main-content-route-padded"
+            : "main-content";
+
+    private bool HasOwnContentPaddingRoute()
+    {
+        var path = NavigationManager
+            .ToBaseRelativePath(NavigationManager.Uri)
+            .Trim()
+            .ToLowerInvariant();
+
+        return string.IsNullOrEmpty(path)
+            || path.StartsWith("dashboard")
+            || path.StartsWith("marketplace");
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

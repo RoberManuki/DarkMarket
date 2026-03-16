@@ -8,6 +8,7 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web
 @using Microsoft.JSInterop
 @using DarkMarket.Shared.Helpers
 
@@ -83,7 +84,7 @@ else
                     </span>
                 </div>
                 <div class="details-row">
-                    <span class="label hidden-payment-label">Pagamento:</span>
+                    <span class="label hidden-payment-label" aria-hidden="true"></span>
                     <span>
                         <a class="payment-link-btn" href="@($"/payments/details/{order.Payment.Id}")" title="Ver pagamento">
                             <span class="payment-link-text">Ver pagamento</span>
@@ -93,7 +94,7 @@ else
                 @if (isBuyer && !order.FundsReleased)
                 {
                     <div class="details-row">
-                        <span class="label hidden-payment-label">Pagamento:</span>
+                        <span class="label hidden-payment-label" aria-hidden="true"></span>
                         <span>
                             <button class="evidence-btn" @onclick="()=>showConfirmModal=true">
                                 <i class="fa fa-upload"></i> Enviar evidência de recebimento
@@ -102,7 +103,7 @@ else
                     </div>
                 }
                 <div class="details-row">
-                    <span class="label hidden-payment-label">Pagamento:</span>
+                    <span class="label hidden-payment-label" aria-hidden="true"></span>
                     <span>
                         <button class="back-btn" @onclick='GoBack'>Voltar</button>
                     </span>
@@ -151,8 +152,8 @@ else
     @if (showConfirmModal)
     {
         <div class="modal-overlay">
-            <div class="modal-card">
-                <h4 class="modal-title">Confirmação de Recebimento</h4>
+            <div id="confirm-delivery-modal" class="modal-card" role="dialog" aria-modal="true" aria-labelledby="confirm-delivery-title" tabindex="0" @onkeydown="HandleModalKeydown" @onkeydown:stopPropagation="true">
+                <h4 class="modal-title modal-title-with-icon" id="confirm-delivery-title"><i class="fa fa-check-circle modal-title-icon"></i>Confirmação de Recebimento</h4>
                 <div class="modal-content">
                     @if (!string.IsNullOrEmpty(confirmError))
                     {
@@ -191,8 +192,8 @@ else
     @if (showSellerEvidenceModal)
     {
         <div class="modal-overlay">
-            <div class="modal-card">
-                <h4 class="modal-title">Evidência de Envio</h4>
+            <div id="seller-evidence-modal" class="modal-card" role="dialog" aria-modal="true" aria-labelledby="seller-evidence-title" tabindex="0" @onkeydown="HandleModalKeydown" @onkeydown:stopPropagation="true">
+                <h4 class="modal-title modal-title-with-icon" id="seller-evidence-title"><i class="fa fa-truck modal-title-icon"></i>Evidência de Envio</h4>
                 <div class="modal-content">
                     @if (!string.IsNullOrEmpty(sellerEvidenceError))
                     {
@@ -222,8 +223,8 @@ else
     @if (showReleaseModal)
     {
         <div class="modal-overlay">
-            <div class="modal-card release-modal-card">
-                <h4 class="modal-title release-modal-title"><i class="fa fa-exclamation-triangle release-title-icon"></i>Confirmar repasse ao vendedor</h4>
+            <div id="release-funds-modal" class="modal-card release-modal-card" role="dialog" aria-modal="true" aria-labelledby="release-funds-title" tabindex="0" @onkeydown="HandleModalKeydown" @onkeydown:stopPropagation="true">
+                <h4 class="modal-title modal-title-with-icon" id="release-funds-title"><i class="fa fa-exclamation-triangle modal-title-icon"></i>Confirmar repasse ao vendedor</h4>
                 <div class="modal-content release-modal-content">
                     <p class="release-modal-question">Tem certeza que deseja repassar os fundos e finalizar o pedido?</p>
 
@@ -343,9 +344,17 @@ else
     private string? sellerEvidenceError;
 
     private bool showReleaseModal = false;
+    private bool wasConfirmModalOpen;
+    private bool wasSellerEvidenceModalOpen;
+    private bool wasReleaseModalOpen;
     private decimal? btcUsdRate;
     private decimal? btcBrlRate;
     private OperationFeeBreakdown? releaseBreakdown;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await SyncModalAccessibilityAsync();
+    }
 
     protected override async Task OnInitializedAsync()
     {
@@ -496,6 +505,49 @@ else
     {
         showReleaseModal = false;
         await ReleaseFunds();
+    }
+
+    private void HandleModalKeydown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            showConfirmModal = false;
+            showSellerEvidenceModal = false;
+            showReleaseModal = false;
+        }
+    }
+
+    private async Task SyncModalAccessibilityAsync()
+    {
+        try
+        {
+            if (showConfirmModal && !wasConfirmModalOpen)
+            {
+                await JS.InvokeVoidAsync("darkMarketModal.open", "#confirm-delivery-modal");
+            }
+            else if (showSellerEvidenceModal && !wasSellerEvidenceModalOpen)
+            {
+                await JS.InvokeVoidAsync("darkMarketModal.open", "#seller-evidence-modal");
+            }
+            else if (showReleaseModal && !wasReleaseModalOpen)
+            {
+                await JS.InvokeVoidAsync("darkMarketModal.open", "#release-funds-modal");
+            }
+
+            if (!showConfirmModal && !showSellerEvidenceModal && !showReleaseModal
+                && (wasConfirmModalOpen || wasSellerEvidenceModalOpen || wasReleaseModalOpen))
+            {
+                await JS.InvokeVoidAsync("darkMarketModal.close");
+            }
+        }
+        catch
+        {
+            // No-op: fallback to native browser focus behavior if JS interop is unavailable.
+        }
+
+        wasConfirmModalOpen = showConfirmModal;
+        wasSellerEvidenceModalOpen = showSellerEvidenceModal;
+        wasReleaseModalOpen = showReleaseModal;
     }
 
     private static string FormatBtc(decimal amount)

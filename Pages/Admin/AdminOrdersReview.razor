@@ -7,6 +7,7 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.Web
 @using Microsoft.JSInterop
 @using System.Globalization
 @inject AppDbContext Db
@@ -102,8 +103,8 @@ else
 @if (showReleaseModal && selectedOrder != null)
 {
     <div class="modal-overlay">
-        <div class="modal-card release-modal-card">
-            <h4 class="modal-title release-modal-title"><i class="fa fa-exclamation-triangle release-title-icon"></i>Confirmar repasse ao vendedor</h4>
+        <div id="admin-release-funds-modal" class="modal-card release-modal-card" role="dialog" aria-modal="true" aria-labelledby="admin-release-funds-title" tabindex="0" @onkeydown="HandleModalKeydown" @onkeydown:stopPropagation="true">
+            <h4 class="modal-title modal-title-with-icon" id="admin-release-funds-title"><i class="fa fa-exclamation-triangle modal-title-icon"></i>Confirmar repasse ao vendedor</h4>
             <div class="modal-content release-modal-content">
                 <p class="release-modal-question">Tem certeza que deseja repassar os fundos e finalizar o pedido?</p>
 
@@ -183,6 +184,7 @@ else
     private int currentPage = 1;
     private const int pageSize = 8;
     private bool filtersLoaded;
+    private bool wasReleaseModalOpen;
     private bool showRestoredFiltersNotice;
     private OrderReviewSortColumn currentSortColumn = OrderReviewSortColumn.Amount;
     private bool sortAscending = false;
@@ -236,14 +238,14 @@ else
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender || filtersLoaded)
+        if (firstRender && !filtersLoaded)
         {
-            return;
+            await LoadFiltersFromStorageAsync();
+            filtersLoaded = true;
+            StateHasChanged();
         }
 
-        await LoadFiltersFromStorageAsync();
-        filtersLoaded = true;
-        StateHasChanged();
+        await SyncModalAccessibilityAsync();
     }
 
     private async Task ClearFiltersAsync()
@@ -313,6 +315,35 @@ else
     {
         showReleaseModal = false;
         await ReleaseFunds(releaseOrderId);
+    }
+
+    private void HandleModalKeydown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            showReleaseModal = false;
+        }
+    }
+
+    private async Task SyncModalAccessibilityAsync()
+    {
+        try
+        {
+            if (showReleaseModal && !wasReleaseModalOpen)
+            {
+                await JS.InvokeVoidAsync("darkMarketModal.open", "#admin-release-funds-modal");
+            }
+            else if (!showReleaseModal && wasReleaseModalOpen)
+            {
+                await JS.InvokeVoidAsync("darkMarketModal.close");
+            }
+        }
+        catch
+        {
+            // No-op: fallback to native browser focus behavior if JS interop is unavailable.
+        }
+
+        wasReleaseModalOpen = showReleaseModal;
     }
 
     private async Task ReleaseFunds(int orderId)
