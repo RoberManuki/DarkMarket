@@ -14,71 +14,73 @@
 @inject BitcoinQuoteService BitcoinQuoteService
 @inject CurrencyPreferenceService CurrencyPreferenceService
 
-<h2 class="page-title">Meus Produtos</h2>
+<div class="products-page">
+    <h2 class="page-title">Meus Produtos</h2>
 
-<button class="primary-btn" @onclick='() => Navigation.NavigateTo("/products/create")'>
-    Novo Produto
-</button>
+    <button class="primary-btn" @onclick='() => Navigation.NavigateTo("/products/create")'>
+        Novo Produto
+    </button>
 
-<div class="filter-bar">
-    <input type="text" placeholder="Buscar por nome..." @bind="filterName" @bind:event="oninput" />
-    <input type="number" placeholder="Preço mínimo" @bind="filterMinPrice" min="0" />
-    <input type="number" placeholder="Preço máximo" @bind="filterMaxPrice" min="0" />
-    <button @onclick="ApplyFilters">Filtrar</button>
-    <button @onclick="ClearFilters">Limpar</button>
-</div>
-
-
-@if (filteredProducts == null)
-{
-    <div class="loading-spinner">
-        <span class="oi oi-reload spinning"></span> Carregando produtos...
+    <div class="filter-bar">
+        <input type="text" placeholder="Buscar por nome..." @bind="filterName" @bind:event="oninput" />
+        <input type="number" placeholder="Preço mínimo" @bind="filterMinPrice" min="0" />
+        <input type="number" placeholder="Preço máximo" @bind="filterMaxPrice" min="0" />
+        <button @onclick="ApplyFilters">Filtrar</button>
+        <button @onclick="ClearFilters">Limpar</button>
     </div>
-}
-else if (!filteredProducts.Any())
-{
-    <p>Você ainda não cadastrou produtos.</p>
-}
-else
-{
-    <table class="product-table">
-        <thead>
-            <tr>
-                <th>Imagem</th>
-                <th>Nome</th>
-                <th>Preço</th>
-                <th>Criado em</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var p in filteredProducts?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<Product>())
-            {
+
+
+    @if (filteredProducts == null)
+    {
+        <div class="loading-spinner">
+            <span class="oi oi-reload spinning"></span> Carregando produtos...
+        </div>
+    }
+    else if (!filteredProducts.Any())
+    {
+        <p>Você ainda não cadastrou produtos.</p>
+    }
+    else
+    {
+        <table class="product-table">
+            <thead>
                 <tr>
-                    <td data-label="Imagem">
-                        @if (!string.IsNullOrEmpty(p.ImagePath))
-                        {
-                            <img src="@p.ImagePath" alt="Imagem" class="product-thumbnail" />
-                        }
-                    </td>
-                    <td data-label="Nome">@p.Name</td>
-                    <td data-label="Preço">@FormatBtcWithUsd(p.Price)</td>
-                    <td data-label="Criado em">@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
-                    <td data-label="Ações">
-                        <button class="edit-btn" @onclick='() => Navigation.NavigateTo($"/products/edit/{p.Id}")'>Editar</button>
-                        <button class="danger" @onclick='() => ConfirmDelete(p.Id)'>Remover</button>
-                    </td>
+                    <th>Imagem</th>
+                    <th>Nome</th>
+                    <th>Preço</th>
+                    <th>Criado em</th>
+                    <th>Ações</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var p in filteredProducts?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<Product>())
+                {
+                    <tr>
+                        <td data-label="Imagem">
+                            @if (!string.IsNullOrEmpty(p.ImagePath))
+                            {
+                                <img src="@p.ImagePath" alt="Imagem" class="product-thumbnail" />
+                            }
+                        </td>
+                        <td data-label="Nome">@p.Name</td>
+                        <td data-label="Preço">@FormatBtcWithUsd(p.Price)</td>
+                        <td data-label="Criado em">@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                        <td data-label="Ações">
+                            <button class="edit-btn" @onclick='() => Navigation.NavigateTo($"/products/edit/{p.Id}")'>Editar</button>
+                            <button class="danger" @onclick='() => ConfirmDelete(p.Id)'>Remover</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
 
-    <div class="pagination">
-        <button @onclick="PrevPage" disabled="@(!CanGoToPreviousPage)">Anterior</button>
-        <span class="pagination-info">Página @currentPage de @totalPages</span>
-        <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Próxima</button>
-    </div>
-}
+        <div class="pagination">
+            <button @onclick="PrevPage" disabled="@(!CanGoToPreviousPage)">Anterior</button>
+            <span class="pagination-info">Página @currentPage de @totalPages</span>
+            <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Próxima</button>
+        </div>
+    }
+</div>
 
 
 @code {

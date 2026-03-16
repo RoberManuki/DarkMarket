@@ -1,5 +1,6 @@
 @page "/admin"
 
+@using System.Globalization
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.JSInterop
 
@@ -10,50 +11,79 @@
 @inject AdminSettingsService AdminSettingsService
 @inject IJSRuntime JSRuntime
 
-<h2 class="page-title">Painel Administrativo</h2>
-<p>Bem-vindo, administrador!</p>
+<div class="admin-page">
+    <h2 class="page-title">Painel Administrativo</h2>
+    <p>Bem-vindo, administrador!</p>
 
-<nav class="admin-nav">
-    <a href="/admin/users">Usuários</a>
-    <a href="/admin/products">Produtos</a>
-    <a href="/admin/payments">Pagamentos</a>
-    <a href="/admin/orders">Pedidos</a>
-    <a href="/admin/gateways">Gateways</a>
-    <a href="/admin/orders-review">Revisão/Repasse</a>
-    <a href="/admin/logs">Logs</a>
-</nav>
+    <nav class="admin-nav">
+        <a href="/admin/users">Usuários</a>
+        <a href="/admin/products">Produtos</a>
+        <a href="/admin/payments">Pagamentos</a>
+        <a href="/admin/orders">Pedidos</a>
+        <a href="/admin/gateways">Gateways</a>
+        <a href="/admin/orders-review">Revisão/Repasse</a>
+        <a href="/admin/logs">Logs</a>
+    </nav>
 
-<div class="admin-settings-card">
-    <label for="fiat-select"><b>Moeda de cotação padrão:</b></label>
-    <select id="fiat-select" class="fiat-select" @bind="selectedFiat" @bind:after="ApplyCurrencyPreferenceAsync">
-        <option value="USD">USD</option>
-        <option value="BRL">BRL</option>
-    </select>
-</div>
+    <div class="admin-kpi-grid" aria-label="Métricas operacionais">
+        <a class="admin-kpi-card" href="/admin/users" aria-label="Abrir gestão de usuários">
+            <span class="admin-kpi-label">Usuários</span>
+            <span class="admin-kpi-value">@usersCount</span>
+            <span class="admin-kpi-cta">Ver detalhes</span>
+        </a>
+        <a class="admin-kpi-card" href="/admin/orders" aria-label="Abrir lista de pedidos">
+            <span class="admin-kpi-label">Vendas pagas</span>
+            <span class="admin-kpi-value">@paidSalesCount</span>
+            <span class="admin-kpi-cta">Ver detalhes</span>
+        </a>
+        <a class="admin-kpi-card" href="/admin/orders" aria-label="Abrir lista de pedidos para ver volume pago">
+            <span class="admin-kpi-label">Volume pago (BTC)</span>
+            <span class="admin-kpi-value">@FormatBtc(paidSalesVolumeBtc)</span>
+            <span class="admin-kpi-cta">Ver detalhes</span>
+        </a>
+        <a class="admin-kpi-card" href="/admin/orders-review" aria-label="Abrir pedidos pendentes para revisão">
+            <span class="admin-kpi-label">Pedidos pendentes</span>
+            <span class="admin-kpi-value">@pendingOrdersCount</span>
+            <span class="admin-kpi-cta">Ver detalhes</span>
+        </a>
+    </div>
 
-<div class="admin-settings-card">
-    <span><b>Consultas de cotação (total):</b> @quoteQueriesCount</span>
-</div>
+    <div class="admin-settings-card">
+        <label for="fiat-select"><b>Moeda de cotação padrão:</b></label>
+        <select id="fiat-select" class="fiat-select" @bind="selectedFiat" @bind:after="ApplyCurrencyPreferenceAsync">
+            <option value="USD">USD</option>
+            <option value="BRL">BRL</option>
+        </select>
+    </div>
 
-<div class="admin-settings-card operation-fee-card">
-    <label for="operation-fee"><b>Taxa operacional (%):</b></label>
-    <input id="operation-fee"
-           class="fee-input"
-           type="number"
-           min="0"
-           max="100"
-           step="0.01"
-           @bind="operationFeePercent" />
-    <button class="details-btn" @onclick="SaveOperationFeeAsync">Salvar taxa</button>
-    @if (!string.IsNullOrWhiteSpace(operationFeeMessage))
-    {
-        <span class="operation-fee-message @(operationFeeSaved ? "ok" : "error")">@operationFeeMessage</span>
-    }
+    <div class="admin-settings-card">
+        <span><b>Consultas de cotação (total):</b> @quoteQueriesCount</span>
+    </div>
+
+    <div class="admin-settings-card operation-fee-card">
+        <label for="operation-fee"><b>Taxa operacional (%):</b></label>
+        <input id="operation-fee"
+               class="fee-input"
+               type="number"
+               min="0"
+               max="100"
+               step="0.01"
+               @bind="operationFeePercent" />
+        <button class="details-btn" @onclick="SaveOperationFeeAsync">Salvar taxa</button>
+        @if (!string.IsNullOrWhiteSpace(operationFeeMessage))
+        {
+            <span class="operation-fee-message @(operationFeeSaved ? "ok" : "error")">@operationFeeMessage</span>
+        }
+    </div>
 </div>
 
 @code {
     private string selectedFiat = "USD";
     private int quoteQueriesCount;
+    private int usersCount;
+    private int paidSalesCount;
+    private int pendingOrdersCount;
+    private decimal paidSalesVolumeBtc;
     private decimal operationFeePercent;
     private string? operationFeeMessage;
     private bool operationFeeSaved;
@@ -62,8 +92,17 @@
     {
         selectedFiat = CurrencyPreferenceService.SelectedFiatCurrency;
         var snapshot = await DashboardMetricsService.GetSnapshotAsync();
+        usersCount = snapshot.UsersCount;
+        paidSalesCount = snapshot.PaidSalesCount;
+        paidSalesVolumeBtc = snapshot.PaidSalesVolumeBtc;
+        pendingOrdersCount = snapshot.PendingOrdersCount;
         quoteQueriesCount = snapshot.QuoteQueriesCount;
         operationFeePercent = await AdminSettingsService.GetOperationFeePercentAsync();
+    }
+
+    private static string FormatBtc(decimal amount)
+    {
+        return amount.ToString("0.########", CultureInfo.InvariantCulture);
     }
 
     private async Task ApplyCurrencyPreferenceAsync()

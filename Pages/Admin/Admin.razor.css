@@ -60,6 +60,60 @@
     color: #23272b;
 }
 
+.admin-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(140px, 1fr));
+    gap: 0.75rem;
+    margin: 0.75rem 0 1.1rem;
+}
+
+.admin-kpi-card {
+    background: linear-gradient(180deg, #252a31 0%, #1f252c 100%);
+    border: 1px solid #343f4b;
+    border-radius: 10px;
+    padding: 0.75rem 0.9rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    text-decoration: none;
+    transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-kpi-card:hover {
+    border-color: #4c5c6f;
+    box-shadow: 0 4px 14px #0006;
+    transform: translateY(-1px);
+}
+
+.admin-kpi-card:focus-visible {
+    outline: 2px solid #8ab4f8;
+    outline-offset: 2px;
+}
+
+.admin-kpi-label {
+    color: #a8b3bf;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.admin-kpi-value {
+    color: #f9a825;
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+}
+
+.admin-kpi-cta {
+    margin-top: 0.1rem;
+    color: #9ec3ff;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.admin-kpi-card:hover .admin-kpi-cta {
+    color: #c7dcff;
+}
+
 @media (max-width: 900px) {
     .admin-nav {
         gap: 0.7rem;
@@ -68,6 +122,10 @@
     .admin-nav a {
         flex: 1 1 calc(50% - 0.7rem);
         text-align: center;
+    }
+
+    .admin-kpi-grid {
+        grid-template-columns: repeat(2, minmax(120px, 1fr));
     }
 }
 
@@ -83,5 +141,9 @@
     .fee-input,
     .fiat-select {
         width: 100%;
+    }
+
+    .admin-kpi-grid {
+        grid-template-columns: 1fr;
     }
 }

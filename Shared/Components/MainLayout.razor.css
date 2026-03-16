@@ -118,3 +118,62 @@ footer {
     margin-left: 0.3rem;
     color: #9ec3ff;
 }
+
+@media (max-width: 980px) {
+    .sidebar {
+        width: 180px;
+    }
+
+    .main {
+        margin-left: 180px;
+    }
+
+    .main-content {
+        padding: 1.25rem;
+    }
+
+    .header-actions {
+        position: static;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 0.6rem;
+    }
+}
+
+@media (max-width: 700px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
+        padding: 0.4rem 0;
+        border-bottom: 1px solid #333;
+    }
+
+    .main {
+        margin-left: 0;
+    }
+
+    header h1 {
+        font-size: 1.5rem;
+        margin: 0;
+    }
+
+    .header-actions {
+        gap: 0.5rem;
+    }
+
+    .logout-btn {
+        margin-left: 0;
+        padding: 0.35rem 0.8rem;
+        font-size: 0.92rem;
+    }
+
+    .currency-indicator {
+        font-size: 0.75rem;
+        padding: 0.15rem 0.5rem;
+    }
+
+    .main-content {
+        padding: 0.8rem;
+    }
+}

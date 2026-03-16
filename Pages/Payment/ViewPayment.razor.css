@@ -69,3 +69,27 @@
 .payment-view-card .payment-status-block {
     margin-bottom: 0;
 }
+
+@media (max-width: 700px) {
+    .payment-container {
+        margin: 1rem 0.5rem;
+        padding: 1.2rem 0.9rem;
+    }
+
+    .payment-title {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .payment-view-card {
+        padding: 1rem 0.8rem;
+        gap: 0.8rem;
+    }
+
+    .payment-btn-success {
+        width: 100%;
+        justify-content: center;
+        font-size: 1rem;
+        padding: 0.65rem 0.8rem;
+    }
+}

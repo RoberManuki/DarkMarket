@@ -24,3 +24,24 @@ nav ul li a.active {
 nav ul li a:hover {
     background: #444;
 }
+
+@media (max-width: 700px) {
+    nav ul {
+        display: flex;
+        gap: 0.4rem;
+        overflow-x: auto;
+        padding: 0.25rem 0.5rem;
+        scrollbar-width: thin;
+    }
+
+    nav ul li {
+        margin: 0;
+        flex: 0 0 auto;
+    }
+
+    nav ul li a {
+        white-space: nowrap;
+        padding: 0.45rem 0.7rem;
+        font-size: 0.9rem;
+    }
+}

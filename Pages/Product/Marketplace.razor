@@ -8,90 +8,92 @@
 
 @using Microsoft.AspNetCore.Components.Authorization
 
-<h2 class="page-title">Marketplace</h2>
+<div class="marketplace-page">
+    <h2 class="page-title">Marketplace</h2>
 
-<div class="filter-bar filter-marketplace">
-    <input type="text" placeholder="Buscar por nome..." @bind="filterName" @bind:event="oninput" />
-    <input type="number" placeholder="Preço mínimo" @bind="filterMinPrice" min="0" />
-    <input type="number" placeholder="Preço máximo" @bind="filterMaxPrice" min="0" />
-    <input type="text" placeholder="Vendedor..." @bind="filterSeller" @bind:event="oninput" />
-    <button @onclick="ApplyFilters">Filtrar</button>
-    <button @onclick="ClearFilters">Limpar</button>
-</div>
-
-@if (filteredProducts == null)
-{
-    <div class="loading-spinner">
-        <span class="oi oi-reload spinning"></span> Carregando produtos...
+    <div class="filter-bar filter-marketplace">
+        <input type="text" placeholder="Buscar por nome..." @bind="filterName" @bind:event="oninput" />
+        <input type="number" placeholder="Preço mínimo" @bind="filterMinPrice" min="0" />
+        <input type="number" placeholder="Preço máximo" @bind="filterMaxPrice" min="0" />
+        <input type="text" placeholder="Vendedor..." @bind="filterSeller" @bind:event="oninput" />
+        <button @onclick="ApplyFilters">Filtrar</button>
+        <button @onclick="ClearFilters">Limpar</button>
     </div>
-}
-else if (!filteredProducts.Any())
-{
-    <p>Nenhum produto disponível.</p>
-}
-else
-{
-    <div class="product-list">
-        @foreach (var p in filteredProducts?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<Product>())
-        {
-            <div class="marketplace-product-card">
-                <!-- 1. Imagem -->
-                <div class="product-img-block">
-                    @if (!string.IsNullOrEmpty(p.ImagePath))
-                    {
-                        <img src="@p.ImagePath" alt="Imagem" />
-                    }
-                </div>
-                <!-- 2. Nome + Preço -->
-                <div class="product-main">
-                    <div class="product-title">@p.Name</div>
-                    <div class="product-price">@FormatBtcWithUsd(p.Price)</div>
-                </div>
-                <!-- 3. Descrição -->
-                <div class="product-desc-block">
-                    <div class="label">Descrição:</div>
-                    <div class="product-desc">@p.Description</div>
-                </div>
-                <!-- 4. Vendedor -->
-                <div class="product-seller-block">
-                    <div class="label">Vendedor:</div>
-                    <div class="product-user">
-                        @if (p.User != null)
+
+    @if (filteredProducts == null)
+    {
+        <div class="loading-spinner">
+            <span class="oi oi-reload spinning"></span> Carregando produtos...
+        </div>
+    }
+    else if (!filteredProducts.Any())
+    {
+        <p>Nenhum produto disponível.</p>
+    }
+    else
+    {
+        <div class="product-list">
+            @foreach (var p in filteredProducts?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<Product>())
+            {
+                <div class="marketplace-product-card">
+                    <!-- 1. Imagem -->
+                    <div class="product-img-block">
+                        @if (!string.IsNullOrEmpty(p.ImagePath))
                         {
-                            <a class="evidence-link" href="@($"/profile/{p.User.Id}")">@p.User.UserName</a>
+                            <img src="@p.ImagePath" alt="Imagem" />
                         }
                     </div>
-                </div>
-                <!-- 5. Botão de compra -->
-                <div class="product-actions">
-                    <AuthorizeView>
-                        <Authorized>
-                            @if (p.UserId != userId)
+                    <!-- 2. Nome + Preço -->
+                    <div class="product-main">
+                        <div class="product-title">@p.Name</div>
+                        <div class="product-price">@FormatBtcWithUsd(p.Price)</div>
+                    </div>
+                    <!-- 3. Descrição -->
+                    <div class="product-desc-block">
+                        <div class="label">Descrição:</div>
+                        <div class="product-desc">@p.Description</div>
+                    </div>
+                    <!-- 4. Vendedor -->
+                    <div class="product-seller-block">
+                        <div class="label">Vendedor:</div>
+                        <div class="product-user">
+                            @if (p.User != null)
                             {
-                                <button class="buy-btn" @onclick='() => Navigation.NavigateTo($"/marketplace/buy/{p.Id}")'>
-                                    Comprar
-                                </button>
+                                <a class="evidence-link" href="@($"/profile/{p.User.Id}")">@p.User.UserName</a>
                             }
-                            else
-                            {
-                                <span class="own-product-label">Seu produto</span>
-                            }
-                        </Authorized>
-                        <NotAuthorized>
-                            <span class="own-product-label">Faça login para comprar</span>
-                        </NotAuthorized>
-                    </AuthorizeView>
+                        </div>
+                    </div>
+                    <!-- 5. Botão de compra -->
+                    <div class="product-actions">
+                        <AuthorizeView>
+                            <Authorized>
+                                @if (p.UserId != userId)
+                                {
+                                    <button class="buy-btn" @onclick='() => Navigation.NavigateTo($"/marketplace/buy/{p.Id}")'>
+                                        Comprar
+                                    </button>
+                                }
+                                else
+                                {
+                                    <span class="own-product-label">Seu produto</span>
+                                }
+                            </Authorized>
+                            <NotAuthorized>
+                                <span class="own-product-label">Faça login para comprar</span>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </div>
                 </div>
-            </div>
-        }
-    </div>
+            }
+        </div>
 
-    <div class="pagination marketplace-pagination">
-        <button @onclick="PrevPage" disabled="@(!CanGoToPreviousPage)">Anterior</button>
-        <span class="pagination-info">Página @currentPage de @totalPages</span>
-        <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Próxima</button>
-    </div>
-}
+        <div class="pagination marketplace-pagination">
+            <button @onclick="PrevPage" disabled="@(!CanGoToPreviousPage)">Anterior</button>
+            <span class="pagination-info">Página @currentPage de @totalPages</span>
+            <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Próxima</button>
+        </div>
+    }
+</div>
 
 @code {
     private List<Product>? products;

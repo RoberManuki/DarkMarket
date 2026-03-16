@@ -3,3 +3,31 @@
     font-size: 0.95rem;
     margin-top: 0.5rem;
 }
+
+@media (max-width: 700px) {
+    .generate-invoice-block {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        align-items: stretch;
+    }
+
+    .generate-invoice-block .gateway-select,
+    .generate-invoice-block .payment-btn {
+        width: 100%;
+        justify-content: center;
+        margin-left: 0;
+    }
+
+    .payment-address {
+        font-size: 0.9rem;
+        word-break: break-all;
+    }
+
+    .private-key-value code {
+        display: block;
+        max-width: 100%;
+        overflow-x: auto;
+        white-space: pre;
+    }
+}
