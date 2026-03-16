@@ -49,12 +49,14 @@ public static class AdminLogFiltering
 
         if (criteria.StartDate.HasValue)
         {
-            query = query.Where(log => log.Timestamp.Date >= criteria.StartDate.Value.Date);
+            var startUtc = DateTime.SpecifyKind(criteria.StartDate.Value.Date, DateTimeKind.Utc);
+            query = query.Where(log => log.Timestamp >= startUtc);
         }
 
         if (criteria.EndDate.HasValue)
         {
-            query = query.Where(log => log.Timestamp.Date <= criteria.EndDate.Value.Date);
+            var endExclusiveUtc = DateTime.SpecifyKind(criteria.EndDate.Value.Date.AddDays(1), DateTimeKind.Utc);
+            query = query.Where(log => log.Timestamp < endExclusiveUtc);
         }
 
         return query;
