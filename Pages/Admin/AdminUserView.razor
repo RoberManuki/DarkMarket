@@ -22,23 +22,12 @@ else if (user == null)
 else
 {
     <div class="form-card">
-        <p><b>ID:</b> @user.Id</p>
-        <p><b>Usuário:</b> @user.UserName</p>
-        <p><b>Email:</b> @user.Email</p>
-        <p><b>Nome Completo:</b> @user.FullName</p>
-        <p><b>Data de Nascimento:</b> @(user.BirthDate?.ToString("dd/MM/yyyy") ?? "-")</p>
-        <p><b>Status:</b>
-            @if (user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.Now)
-            {
-                <span class="status-blocked">Bloqueado</span>
-            }
-            else
-            {
-                <span class="status-active">Ativo</span>
-            }
-        </p>
-        <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin/users")'>Voltar</button>
-        <button class="edit-btn" @onclick='() => NavigationManager.NavigateTo($"/admin/users/edit/{user.Id}")'>Editar</button>
+        <UserSummaryCard User="user" ShowUserId="true" ShowRoles="false" ShowStatus="true" />
+
+        <div class="admin-user-actions">
+            <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin/users")'>Voltar</button>
+            <button class="edit-btn" @onclick='() => NavigationManager.NavigateTo($"/admin/users/edit/{user.Id}")'>Editar</button>
+        </div>
     </div>
 }
 

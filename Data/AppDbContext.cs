@@ -15,6 +15,7 @@ namespace DarkMarket.Data
         public DbSet<OrderModel> Orders { get; set; }
         public DbSet<OrderMessage> OrderMessages { get; set; }
         public DbSet<AppSetting> AppSettings { get; set; }
+        public DbSet<DeliveryAgent> DeliveryAgents { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -43,6 +44,18 @@ namespace DarkMarket.Data
                 .WithOne(o => o.Payment)
                 .HasForeignKey<OrderModel>(o => o.PaymentId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<PaymentRecord>()
+                .HasOne(p => p.DeliveryAgent)
+                .WithMany()
+                .HasForeignKey(p => p.DeliveryAgentId)
+                .OnDelete(DeleteBehavior.SetNull);
+
+            modelBuilder.Entity<OrderModel>()
+                .HasOne(o => o.DeliveryAgent)
+                .WithMany()
+                .HasForeignKey(o => o.DeliveryAgentId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

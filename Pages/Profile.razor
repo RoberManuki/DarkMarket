@@ -25,24 +25,7 @@ else if (user == null)
 else
 {
     <div class="profile-grid">
-        <div class="profile-card">
-            <div class="avatar-section">
-                @if (!string.IsNullOrWhiteSpace(avatarUrl))
-                {
-                    <img class="avatar-img" src="@avatarUrl" alt="Avatar" />
-                }
-                else
-                {
-                    <div class="avatar-fallback">@GetInitial(user.UserName)</div>
-                }
-            </div>
-
-            <h3>@user.UserName</h3>
-            <p><b>Email:</b> @user.Email</p>
-            <p><b>Nome completo:</b> @(string.IsNullOrWhiteSpace(user.FullName) ? "Não informado" : user.FullName)</p>
-            <p><b>Data de nascimento:</b> @(user.BirthDate.HasValue ? user.BirthDate.Value.ToString("dd/MM/yyyy") : "Não informada")</p>
-            <p><b>Permissões:</b> @(roles.Count > 0 ? string.Join(", ", roles) : "user")</p>
-        </div>
+        <UserSummaryCard User="user" AvatarUrl="avatarUrl" Roles="roles" ShowRoles="true" />
 
         @if (canEdit)
         {
@@ -221,11 +204,4 @@ else
         return null;
     }
 
-    private static string GetInitial(string? text)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-            return "?";
-
-        return text.Trim()[0].ToString().ToUpperInvariant();
-    }
 }

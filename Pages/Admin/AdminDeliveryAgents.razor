@@ -1,0 +1,217 @@
+@page "/admin/delivery-agents"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using DarkMarket.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.EntityFrameworkCore
+
+@inject AppDbContext Db
+@inject NavigationManager NavigationManager
+
+<h2 class="page-title">Entregadores</h2>
+
+<div class="filter-bar admin-filter-card">
+    <input type="text" placeholder="Buscar por nome..." @bind="searchTerm" @bind:event="oninput" @bind:after="OnSearchChanged" />
+    <button @onclick="LoadAgentsAsync">Atualizar</button>
+</div>
+
+<div class="form-card">
+    <h3>@(editingAgentId.HasValue ? "Editar entregador" : "Novo entregador")</h3>
+    <div class="filter-bar delivery-agent-form-row">
+        <input type="text" placeholder="Nome" @bind="formName" />
+        <input type="text" placeholder="Contato" @bind="formContact" />
+        <input type="number" min="1" max="60" placeholder="Prazo (dias úteis)" @bind="formEstimatedBusinessDays" />
+        <label class="switch-toggle">
+            <input type="checkbox" @bind="formIsActive" />
+            <span class="slider"></span>
+        </label>
+        <span class="gateway-status-label @(formIsActive ? "active" : "inactive")">@(formIsActive ? "Ativo" : "Desativado")</span>
+        <button class="success-btn" @onclick="SaveAsync">@(editingAgentId.HasValue ? "Salvar" : "Criar")</button>
+        @if (editingAgentId.HasValue)
+        {
+            <button class="back-btn" @onclick="CancelEdit">Cancelar</button>
+        }
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(formMessage))
+    {
+        <p class="@(formError ? "error-msg" : "success-msg")">@formMessage</p>
+    }
+</div>
+
+@if (!filteredAgents.Any())
+{
+    <p>Nenhum entregador encontrado.</p>
+}
+else
+{
+    <table class="product-table">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Contato</th>
+                <th>Prazo (dias úteis)</th>
+                <th>Status</th>
+                <th>Criado em</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var agent in filteredAgents)
+        {
+            <tr>
+                <td data-label="Nome">@agent.Name</td>
+                <td data-label="Contato">@(string.IsNullOrWhiteSpace(agent.Contact) ? "-" : agent.Contact)</td>
+                <td data-label="Prazo">@agent.EstimatedBusinessDays</td>
+                <td data-label="Status">
+                    <span class="gateway-status-label @(agent.IsActive ? "active" : "inactive")">@(agent.IsActive ? "Ativo" : "Desativado")</span>
+                </td>
+                <td data-label="Criado em">@agent.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                <td data-label="Ações">
+                    <button class="edit-btn action-btn" @onclick="() => StartEdit(agent)">Editar</button>
+                    <button class="warning-btn action-btn" @onclick="() => ToggleStatusAsync(agent)">@(agent.IsActive ? "Desativar" : "Ativar")</button>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+<button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
+
+@code {
+    private List<DeliveryAgent> allAgents = new();
+    private List<DeliveryAgent> filteredAgents = new();
+
+    private string searchTerm = string.Empty;
+    private int? editingAgentId;
+    private string formName = string.Empty;
+    private string? formContact;
+    private int formEstimatedBusinessDays = 2;
+    private bool formIsActive = true;
+    private string? formMessage;
+    private bool formError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAgentsAsync();
+    }
+
+    private async Task LoadAgentsAsync()
+    {
+        allAgents = await Db.DeliveryAgents
+            .AsNoTracking()
+            .OrderBy(d => d.Name)
+            .ToListAsync();
+
+        ApplySearch();
+    }
+
+    private void ApplySearch()
+    {
+        filteredAgents = allAgents
+            .Where(d => string.IsNullOrWhiteSpace(searchTerm)
+                || d.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                || (d.Contact?.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ?? false))
+            .ToList();
+    }
+
+    private Task OnSearchChanged()
+    {
+        ApplySearch();
+        return Task.CompletedTask;
+    }
+
+    private async Task SaveAsync()
+    {
+        formMessage = null;
+        formError = false;
+
+        if (string.IsNullOrWhiteSpace(formName))
+        {
+            formError = true;
+            formMessage = "Informe o nome do entregador.";
+            return;
+        }
+
+        if (formEstimatedBusinessDays < 1 || formEstimatedBusinessDays > 60)
+        {
+            formError = true;
+            formMessage = "Informe um prazo entre 1 e 60 dias úteis.";
+            return;
+        }
+
+        if (editingAgentId.HasValue)
+        {
+            var existing = await Db.DeliveryAgents.FindAsync(editingAgentId.Value);
+            if (existing == null)
+            {
+                formError = true;
+                formMessage = "Entregador não encontrado.";
+                return;
+            }
+
+            existing.Name = formName.Trim();
+            existing.Contact = string.IsNullOrWhiteSpace(formContact) ? null : formContact.Trim();
+            existing.EstimatedBusinessDays = formEstimatedBusinessDays;
+            existing.IsActive = formIsActive;
+        }
+        else
+        {
+            Db.DeliveryAgents.Add(new DeliveryAgent
+            {
+                Name = formName.Trim(),
+                Contact = string.IsNullOrWhiteSpace(formContact) ? null : formContact.Trim(),
+                EstimatedBusinessDays = formEstimatedBusinessDays,
+                IsActive = formIsActive,
+                CreatedAt = DateTime.UtcNow
+            });
+        }
+
+        await Db.SaveChangesAsync();
+        formMessage = editingAgentId.HasValue ? "Entregador atualizado com sucesso." : "Entregador criado com sucesso.";
+        ResetForm();
+        await LoadAgentsAsync();
+    }
+
+    private void StartEdit(DeliveryAgent agent)
+    {
+        editingAgentId = agent.Id;
+        formName = agent.Name;
+        formContact = agent.Contact;
+        formEstimatedBusinessDays = agent.EstimatedBusinessDays;
+        formIsActive = agent.IsActive;
+        formMessage = null;
+        formError = false;
+    }
+
+    private async Task ToggleStatusAsync(DeliveryAgent agent)
+    {
+        var existing = await Db.DeliveryAgents.FindAsync(agent.Id);
+        if (existing == null)
+        {
+            return;
+        }
+
+        existing.IsActive = !existing.IsActive;
+        await Db.SaveChangesAsync();
+        await LoadAgentsAsync();
+    }
+
+    private void CancelEdit()
+    {
+        ResetForm();
+        formMessage = null;
+        formError = false;
+    }
+
+    private void ResetForm()
+    {
+        editingAgentId = null;
+        formName = string.Empty;
+        formContact = null;
+        formEstimatedBusinessDays = 2;
+        formIsActive = true;
+    }
+}

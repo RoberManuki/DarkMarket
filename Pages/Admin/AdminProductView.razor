@@ -24,6 +24,12 @@ else
         <p><b>Nome:</b> @product.Name</p>
         <p><b>Usuário:</b> @product.UserId</p>
         <p><b>Preço:</b> @product.Price.ToString("C")</p>
+        <p><b>Tipo:</b>
+            <span class="product-delivery-badge @(product.RequiresDelivery ? "physical" : "digital")">
+                @(product.RequiresDelivery ? "Físico" : "Digital")
+            </span>
+        </p>
+        <p><b>Necessita entrega:</b> @(product.RequiresDelivery ? "Sim" : "Não (infoproduto)")</p>
         <p><b>Criado em:</b> @product.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</p>
         <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin/products")'>Voltar</button>
         <button class="edit-btn" @onclick='() => NavigationManager.NavigateTo($"/admin/products/edit/{product.Id}")'>Editar</button>

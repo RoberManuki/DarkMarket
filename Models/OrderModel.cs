@@ -25,6 +25,10 @@ public class OrderModel
     public int? PaymentId { get; set; }
     public PaymentRecord? Payment { get; set; }
 
+    public int? DeliveryAgentId { get; set; }
+    public DeliveryAgent? DeliveryAgent { get; set; }
+    public int? EstimatedDeliveryDays { get; set; }
+
     public PaymentStatus Status { get; set; } = PaymentStatus.Pendente;
     public DateTime? DeliveredAt { get; set; }
     public DateTime? FinishedAt { get; set; }

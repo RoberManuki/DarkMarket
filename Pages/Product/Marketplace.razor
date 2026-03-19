@@ -47,6 +47,11 @@
                     <div class="product-main">
                         <div class="product-title">@p.Name</div>
                         <div class="product-price">@FormatBtcWithUsd(p.Price)</div>
+                        <div class="product-delivery-badge-wrap">
+                            <span class="product-delivery-badge @(p.RequiresDelivery ? "physical" : "digital")">
+                                @(p.RequiresDelivery ? "Físico" : "Digital")
+                            </span>
+                        </div>
                     </div>
                     <!-- 3. Descrição -->
                     <div class="product-desc-block">

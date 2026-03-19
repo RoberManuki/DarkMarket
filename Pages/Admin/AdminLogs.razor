@@ -19,11 +19,11 @@
 
 <h2 class="page-title">Logs do Sistema</h2>
 
-<p style="margin-bottom:1rem;">
+<p class="logs-total-count">
     <b>Total de logs:</b> @totalLogs
 </p>
 
-<div class="filter-bar">
+<div class="filter-bar logs-main-filter-bar">
     <input type="text" placeholder="Busca geral (usuário/fonte/mensagem)..." value="@filterGlobalSearch" @oninput="OnGlobalSearchInput" />
     <input type="text" placeholder="Usuário..." @bind="filterUserId" @bind:event="oninput" />
     <input type="text" placeholder="Fonte..." @bind="filterSource" @bind:event="oninput" />
@@ -36,9 +36,12 @@
     </select>
     <input type="date" @bind="filterStartDate" />
     <input type="date" @bind="filterEndDate" />
-    <FilterActionButtons OnApply="ApplyFilters" OnClear="ClearFilters" />
-    <button @onclick="ExportCsvAsync" disabled="@(totalLogs == 0 || HasInvalidDateRange)">Exportar CSV</button>
-    <button @onclick="ExportJsonAsync" disabled="@(totalLogs == 0 || HasInvalidDateRange)">Exportar JSON</button>
+
+    <div class="logs-main-actions">
+        <FilterActionButtons OnApply="ApplyFilters" OnClear="ClearFilters" />
+        <button class="logs-export-btn" @onclick="ExportCsvAsync" disabled="@(totalLogs == 0 || HasInvalidDateRange)">Exportar CSV</button>
+        <button class="logs-export-btn" @onclick="ExportJsonAsync" disabled="@(totalLogs == 0 || HasInvalidDateRange)">Exportar JSON</button>
+    </div>
 </div>
 
 @if (!string.IsNullOrWhiteSpace(exportNotice))
@@ -50,18 +53,24 @@
 }
 
 <div class="filter-bar logs-quick-range-bar">
-    <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.Today)" @onclick="SetTodayRangeAsync">Hoje</button>
-    <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.Last7Days)" @onclick="() => SetLastDaysRangeAsync(7)">Últimos 7 dias</button>
-    <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.Last30Days)" @onclick="() => SetLastDaysRangeAsync(30)">Últimos 30 dias</button>
-    <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.CurrentMonth)" @onclick="SetCurrentMonthRangeAsync">Mês atual</button>
-    <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.None)" @onclick="ClearDateRangeAsync">Limpar período</button>
+    <span class="logs-filter-group-label">Período rápido:</span>
+    <div class="logs-chip-group">
+        <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.Today)" @onclick="SetTodayRangeAsync">Hoje</button>
+        <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.Last7Days)" @onclick="() => SetLastDaysRangeAsync(7)">Últimos 7 dias</button>
+        <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.Last30Days)" @onclick="() => SetLastDaysRangeAsync(30)">Últimos 30 dias</button>
+        <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.CurrentMonth)" @onclick="SetCurrentMonthRangeAsync">Mês atual</button>
+        <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.None)" @onclick="ClearDateRangeAsync">Limpar período</button>
+    </div>
 </div>
 
 <div class="filter-bar logs-audit-filter-bar">
-    <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.All)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.All)">Todos (@auditCountAll)</button>
-    <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseOnly)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseOnly)">Somente repasses (@auditCountReleaseOnly)</button>
-    <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseSuccess)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseSuccess)">Repasses OK (@auditCountReleaseSuccess)</button>
-    <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseRefused)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseRefused)">Repasses recusados (@auditCountReleaseRefused)</button>
+    <span class="logs-filter-group-label">Visão de auditoria:</span>
+    <div class="logs-chip-group">
+        <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.All)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.All)">Todos (@auditCountAll)</button>
+        <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseOnly)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseOnly)">Somente repasses (@auditCountReleaseOnly)</button>
+        <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseSuccess)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseSuccess)">Repasses OK (@auditCountReleaseSuccess)</button>
+        <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseRefused)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseRefused)">Repasses recusados (@auditCountReleaseRefused)</button>
+    </div>
 </div>
 
 @if (HasInvalidDateRange)
@@ -125,15 +134,15 @@ else
                     <td data-label="Nível">
                         @if (log.Level == "Error")
                         {
-                            <span style="color:#e53935;font-weight:bold;">@log.Level</span>
+                            <span class="log-level-badge log-level-error">@log.Level</span>
                         }
                         else if (log.Level == "Warning")
                         {
-                            <span style="color:#f9a825;font-weight:bold;">@log.Level</span>
+                            <span class="log-level-badge log-level-warning">@log.Level</span>
                         }
                         else
                         {
-                            <span style="color:#8ab4f8;font-weight:bold;">@log.Level</span>
+                            <span class="log-level-badge log-level-info">@log.Level</span>
                         }
                     </td>
                     <td data-label="Fonte">
@@ -156,7 +165,7 @@ else
                         }
                     </td>
                     <td data-label="Mensagem">@log.Message</td>
-                    <td data-label="Exceção" style="max-width:300px;overflow-x:auto;white-space:pre-wrap;">@log.Exception</td>
+                    <td data-label="Exceção" class="logs-exception-cell">@log.Exception</td>
                 </tr>
             }
         </tbody>

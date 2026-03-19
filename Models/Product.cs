@@ -27,5 +27,6 @@ namespace DarkMarket.Models
 
         public string? ShortDescription { get; set; }
         public string? Category { get; set; }
+        public bool RequiresDelivery { get; set; } = true;
     }
 }

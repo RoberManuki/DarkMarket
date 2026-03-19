@@ -43,6 +43,11 @@ else
             <img class="product-img" src="@order.Product?.ImagePath" alt="@order.Product?.Name" />
             <div class="product-info">
                 <div class="product-name">@order.Product?.Name</div>
+                <div class="product-delivery-badge-wrap">
+                    <span class="product-delivery-badge @(order.Product?.RequiresDelivery == true ? "physical" : "digital")">
+                        @(order.Product?.RequiresDelivery == true ? "Físico" : "Digital")
+                    </span>
+                </div>
                 <div class="product-price">@FormatBtcWithUsd(order.Amount)</div>
                 <div class="product-desc">@order.Product?.ShortDescription</div>
             </div>
@@ -59,6 +64,14 @@ else
                 <span>
                     <a class="evidence-link" href="@($"/profile/{order.SellerId}")">@order.Seller?.UserName</a>
                 </span>
+            </div>
+            <div class="details-row">
+                <span class="label">Entregador:</span>
+                <span class="system-value align-right">@(order.DeliveryAgent?.Name ?? "A definir")</span>
+            </div>
+            <div class="details-row">
+                <span class="label">Prazo:</span>
+                <span class="system-value align-right">@(order.EstimatedDeliveryDays.HasValue ? $"{order.EstimatedDeliveryDays} dia{(order.EstimatedDeliveryDays == 1 ? string.Empty : "s")} úteis" : "A definir")</span>
             </div>
             <div class="details-row">
                 <span class="label">Status:</span>
@@ -231,6 +244,7 @@ else
                     <div class="release-modal-layout">
                         <div class="payment-details-card wide-card release-summary-card">
                             <div class="details-row"><span class="label">Produto:</span><span>@order.Product?.Name</span></div>
+                            <div class="details-row"><span class="label">Tipo:</span><span>@(order.Product?.RequiresDelivery == true ? "Físico" : "Digital")</span></div>
                             <div class="details-row"><span class="label">Quantidade:</span><span>1</span></div>
                             <div class="details-row"><span class="label">Comprador:</span><span>@order.Buyer?.UserName</span></div>
                             <div class="details-row"><span class="label">Vendedor:</span><span>@order.Seller?.UserName</span></div>
@@ -372,6 +386,7 @@ else
             .Include(o => o.Product)
             .Include(o => o.Buyer)
             .Include(o => o.Seller)
+            .Include(o => o.DeliveryAgent)
             .Include(o => o.Payment) 
             .FirstOrDefaultAsync(o => o.Id == Id);
 

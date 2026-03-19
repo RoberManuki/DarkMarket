@@ -1,9 +1,6 @@
-.status-blocked {
-    color: #e53935;
-    font-weight: bold;
-}
-
-.status-active {
-    color: #4caf50;
-    font-weight: bold;
+.admin-user-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    margin-top: 1rem;
 }

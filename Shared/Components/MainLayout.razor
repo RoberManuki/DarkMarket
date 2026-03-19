@@ -67,7 +67,10 @@
 
         return string.IsNullOrEmpty(path)
             || path.StartsWith("dashboard")
-            || path.StartsWith("marketplace");
+            || path.StartsWith("marketplace")
+            || path.StartsWith("products")
+            || path.StartsWith("payments")
+            || path.StartsWith("orders");
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)

@@ -34,6 +34,7 @@ namespace DarkMarket.Services
             await SeedRolesAndAdminAsync();
             await SeedGatewaysAsync();
             await SeedAdminSettingsAsync();
+            await SeedDeliveryAgentsAsync();
         }
 
         private async Task SeedRolesAndAdminAsync()
@@ -118,6 +119,33 @@ namespace DarkMarket.Services
 
                 await _db.SaveChangesAsync();
             }
+        }
+
+        private async Task SeedDeliveryAgentsAsync()
+        {
+            if (await _db.DeliveryAgents.AnyAsync())
+            {
+                return;
+            }
+
+            _db.DeliveryAgents.AddRange(
+                new DeliveryAgent
+                {
+                    Name = "Equipe Centro",
+                    Contact = "centro@darkmarket.local",
+                    EstimatedBusinessDays = 2,
+                    IsActive = true
+                },
+                new DeliveryAgent
+                {
+                    Name = "Equipe Express",
+                    Contact = "express@darkmarket.local",
+                    EstimatedBusinessDays = 1,
+                    IsActive = true
+                }
+            );
+
+            await _db.SaveChangesAsync();
         }
     }
 }

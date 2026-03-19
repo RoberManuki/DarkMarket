@@ -17,7 +17,7 @@
 
 <h2 class="page-title">Pedidos aguardando revisão do ADM</h2>
 
-<div class="filter-bar">
+<div class="filter-bar admin-filter-card">
     <input type="text" placeholder="Filtrar por comprador..." @bind="buyerFilter" @bind:event="oninput" @bind:after="OnFiltersChangedAsync" />
     <input type="text" placeholder="Filtrar por produto..." @bind="productFilter" @bind:event="oninput" @bind:after="OnFiltersChangedAsync" />
     <input type="number" placeholder="Valor mínimo (BTC)" @bind="minAmountFilter" @bind:after="OnFiltersChangedAsync" min="0" step="0.00000001" />
@@ -111,6 +111,7 @@ else
                 <div class="release-modal-layout">
                     <div class="payment-details-card wide-card release-summary-card">
                         <div class="details-row"><span class="label">Produto:</span><span>@selectedOrder.Product?.Name</span></div>
+                        <div class="details-row"><span class="label">Tipo:</span><span>@(selectedOrder.Product?.RequiresDelivery == true ? "Físico" : "Digital")</span></div>
                         <div class="details-row"><span class="label">Quantidade:</span><span>1</span></div>
                         <div class="details-row"><span class="label">Comprador:</span><span>@selectedOrder.Buyer?.UserName</span></div>
                         <div class="details-row"><span class="label">Vendedor:</span><span>@selectedOrder.Seller?.UserName</span></div>

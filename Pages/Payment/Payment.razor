@@ -33,6 +33,11 @@
                     </div>
                     <div class="product-main">
                         <div class="product-title">@product.Name</div>
+                        <div class="product-delivery-badge-wrap">
+                            <span class="product-delivery-badge @(product.RequiresDelivery ? "physical" : "digital")">
+                                @(product.RequiresDelivery ? "Físico" : "Digital")
+                            </span>
+                        </div>
                     </div>
                     <div class="product-desc-block">
                         <div class="label">Descrição:</div>
@@ -50,8 +55,16 @@
                     <div class="delivery-block">
                         <div class="label">Entrega:</div>
                         <div class="delivery-details system-value">
-                            Entregador: <b>João da Entrega</b> <br />
-                            Previsão: <b>2 dias úteis</b>
+                            @if (product.RequiresDelivery)
+                            {
+                                <span>Entregador: <b>@SelectedDeliveryAgentName</b></span>
+                                <br />
+                                <span>Previsão: <b>@SelectedDeliveryAgentEstimateText</b></span>
+                            }
+                            else
+                            {
+                                <span>Este produto é digital e não requer entrega física.</span>
+                            }
                         </div>
                     </div>
                 </div>
@@ -71,6 +84,33 @@
                 else if (string.IsNullOrEmpty(Address))
                 {
                     <div class="generate-invoice-block">
+                        @if (product.RequiresDelivery)
+                        {
+                            <label class="gateway-label" for="delivery-agent">Selecione o entregador:</label>
+                            <select id="delivery-agent" class="gateway-select" @bind="SelectedDeliveryAgentId" aria-label="Selecionar entregador">
+                                @if (!ActiveDeliveryAgents.Any())
+                                {
+                                    <option value="">Nenhum entregador ativo</option>
+                                }
+                                else
+                                {
+                                    @foreach (var deliveryAgent in ActiveDeliveryAgents)
+                                    {
+                                        <option value="@deliveryAgent.Id">@deliveryAgent.Name (@deliveryAgent.EstimatedBusinessDays dias úteis)</option>
+                                    }
+                                }
+                            </select>
+
+                            @if (!ActiveDeliveryAgents.Any())
+                            {
+                                <div class="no-gateways-hint">Nenhum entregador ativo cadastrado. O pedido será criado sem entregador definido.</div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="no-gateways-hint">Infoproduto selecionado: sem entrega física.</div>
+                        }
+
                         <label class="gateway-label" for="payment-method">Selecione o gateway:</label>
                         <select id="payment-method" class="gateway-select" @bind="SelectedMethod" aria-label="Selecionar gateway de pagamento">
                             @foreach (var gateway in ActiveGateways)
@@ -176,6 +216,13 @@
     private HubConnection? hubConnection;
 
     private List<GatewayInfo> ActiveGateways = new();
+    private List<DeliveryAgent> ActiveDeliveryAgents = new();
+    private int? SelectedDeliveryAgentId;
+    private string SelectedDeliveryAgentName => SelectedDeliveryAgent?.Name ?? "A definir";
+    private string SelectedDeliveryAgentEstimateText => SelectedDeliveryAgent?.EstimatedBusinessDays is int days
+        ? $"{days} dia{(days == 1 ? string.Empty : "s")} úteis"
+        : "Prazo a definir";
+    private DeliveryAgent? SelectedDeliveryAgent => ActiveDeliveryAgents.FirstOrDefault(d => d.Id == SelectedDeliveryAgentId);
 
     protected override async Task OnInitializedAsync()
     {
@@ -196,6 +243,23 @@
         SelectedMethod = ActiveGateways.Any(g => g.Name == "BTCPayServer")
             ? "BTCPayServer"
             : ActiveGateways.FirstOrDefault()?.Name ?? "";
+
+        if (product?.RequiresDelivery == true)
+        {
+            ActiveDeliveryAgents = await Db.DeliveryAgents
+                .AsNoTracking()
+                .Where(d => d.IsActive)
+                .OrderBy(d => d.EstimatedBusinessDays)
+                .ThenBy(d => d.Name)
+                .ToListAsync();
+
+            SelectedDeliveryAgentId = ActiveDeliveryAgents.FirstOrDefault()?.Id;
+        }
+        else
+        {
+            ActiveDeliveryAgents.Clear();
+            SelectedDeliveryAgentId = null;
+        }
 
         hubConnection = new HubConnectionBuilder()
             .WithUrl(NavigationManager.ToAbsoluteUri("/paymentHub"))
@@ -273,7 +337,9 @@
                 IsPaid = false,
                 CreatedAt = DateTime.UtcNow,
                 PaymentMethod = SelectedMethod,
-                PrivateKey = privateKey 
+                PrivateKey = privateKey,
+                DeliveryAgentId = product?.RequiresDelivery == true ? SelectedDeliveryAgentId : null,
+                EstimatedDeliveryDays = product?.RequiresDelivery == true ? SelectedDeliveryAgent?.EstimatedBusinessDays : null
             };
 
             Db.Payments.Add(paymentRecord);

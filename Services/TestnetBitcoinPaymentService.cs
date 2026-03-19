@@ -146,6 +146,8 @@ namespace DarkMarket.Services
                 Amount = payment.Amount,
                 IsPaid = true,
                 PaymentId = payment.Id,
+                DeliveryAgentId = payment.DeliveryAgentId,
+                EstimatedDeliveryDays = payment.EstimatedDeliveryDays,
                 Status = PaymentStatus.AguardandoEntrega,
                 CreatedAt = DateTime.UtcNow
             };

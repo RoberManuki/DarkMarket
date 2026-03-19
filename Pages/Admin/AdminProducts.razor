@@ -15,7 +15,7 @@
 
 <h2 class="page-title">Produtos</h2>
 
-<div class="filter-bar">
+<div class="filter-bar admin-filter-card">
     <input type="number" placeholder="ID..." @bind="filterId" min="0" />
     <input type="text" placeholder="Nome..." @bind="filterName" @bind:event="oninput" />
     <input type="text" placeholder="Usuário..." @bind="filterUserId" @bind:event="oninput" />
@@ -39,6 +39,7 @@
                 <th>Nome</th>
                 <th>Usuário</th>
                 <th>Preço</th>
+                <th>Tipo</th>
                 <th>Criado em</th>
                 <th>Ações</th>
             </tr>
@@ -55,6 +56,11 @@
                 </td>
                 <td data-label="Preço">
                     @FormatBtcWithUsd(p.Price)
+                </td>
+                <td data-label="Tipo">
+                    <span class="product-delivery-badge @(p.RequiresDelivery ? "physical" : "digital")">
+                        @(p.RequiresDelivery ? "Físico" : "Digital")
+                    </span>
                 </td>
                 <td data-label="Criado em">@p.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
                 <td data-label="Ações">
