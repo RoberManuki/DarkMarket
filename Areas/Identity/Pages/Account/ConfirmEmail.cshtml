@@ -1,0 +1,12 @@
+@page
+@model DarkMarket.Areas.Identity.Pages.Account.ConfirmEmailModel
+@{
+    ViewData["Title"] = "Confirmacao de e-mail";
+}
+
+<h2>Confirmacao de e-mail</h2>
+<p class="identity-muted">@Model.StatusMessage</p>
+
+<div class="identity-actions">
+    <a asp-page="./Login">Ir para login</a>
+</div>

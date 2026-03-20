@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.Identity;
 using DarkMarket.Models;
 using DarkMarket.Services;
 using DarkMarket.Config;
+using DarkMarket.Configuration;
 using DarkMarket.Hubs;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddUserSecrets<Program>(optional: true);
@@ -51,6 +53,8 @@ builder.Services.AddScoped<AdminUsersFilterStateService>();
 builder.Services.AddScoped<AdminPaymentsFilterStateService>();
 builder.Services.AddScoped<AdminOrdersFilterStateService>();
 builder.Services.AddScoped<AdminProductsFilterStateService>();
+builder.Services.AddScoped<IEmailSender, IdentityEmailSender>();
+builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
 
 var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
 if (string.IsNullOrWhiteSpace(defaultConnection) || defaultConnection.Contains("__SET_VIA_USER_SECRETS__"))
@@ -64,7 +68,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(defaultConnection));
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-    .AddEntityFrameworkStores<AppDbContext>();
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.Configure<BtcPayOptions>(builder.Configuration.GetSection("BtcPay"));
 

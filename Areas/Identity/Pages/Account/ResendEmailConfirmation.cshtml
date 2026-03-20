@@ -1,0 +1,33 @@
+@page
+@model DarkMarket.Areas.Identity.Pages.Account.ResendEmailConfirmationModel
+@{
+    ViewData["Title"] = "Reenviar confirmacao";
+}
+
+<h2>Reenviar confirmacao de e-mail</h2>
+<p class="identity-muted">Informe o e-mail usado no cadastro para receber um novo link de confirmacao.</p>
+
+@if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+{
+    <p class="identity-muted">@Model.StatusMessage</p>
+}
+
+<div asp-validation-summary="All" class="text-danger"></div>
+
+<form method="post">
+    <div>
+        <label asp-for="Input.Email"></label>
+        <input asp-for="Input.Email" autocomplete="username" />
+        <span asp-validation-for="Input.Email" class="text-danger"></span>
+    </div>
+
+    <button type="submit">Reenviar e-mail</button>
+</form>
+
+<div class="identity-actions">
+    <a asp-page="./Login">Voltar para login</a>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

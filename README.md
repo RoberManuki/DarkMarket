@@ -9,6 +9,7 @@ DarkMarket é um marketplace descentralizado focado em transações com Bitcoin,
 ## Funcionalidades
 
 - Cadastro e autenticação de usuários (roles: admin, user)
+- Fluxos de conta Identity: login, registro, recuperar senha, redefinir senha, reenviar confirmação, confirmar e-mail e alterar senha
 - Cadastro, edição e listagem de produtos
 - Integração com gateways Bitcoin (BTCPayServer, Testnet, etc)
 - Geração de QR Code para pagamentos
@@ -57,6 +58,24 @@ DarkMarket é um marketplace descentralizado focado em transações com Bitcoin,
 3. **Configure o `appsettings.json`**
    
    Ajuste a string de conexão se necessário e configure as chaves dos gateways Bitcoin desejados.
+
+   Para habilitar envio real de e-mails do Identity (recuperação de senha e confirmação), configure a seção `Email`:
+
+   ```json
+   "Email": {
+     "Enabled": true,
+     "Host": "smtp.seuprovedor.com",
+     "Port": 587,
+     "UseSsl": true,
+     "Username": "__SET_VIA_USER_SECRETS__",
+     "Password": "__SET_VIA_USER_SECRETS__",
+     "FromEmail": "no-reply@seusite.com",
+     "FromName": "DarkMarket"
+   }
+   ```
+
+   Em ambiente local, se `Enabled=false` ou sem credenciais, o sistema usa fallback em log sem quebrar os fluxos.
+   Nesse modo de fallback, os e-mails tambem sao salvos em arquivos `.html` e `.txt` em `wwwroot/uploads/dev-emails` para facilitar testes locais dos links.
 
 4. **Execute as migrações do banco de dados**
    ```bash

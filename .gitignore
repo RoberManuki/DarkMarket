@@ -16,3 +16,6 @@ obj/
 # OS files
 .DS_Store
 Thumbs.db
+
+# Local development email fallbacks
+wwwroot/uploads/dev-emails/

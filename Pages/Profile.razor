@@ -67,6 +67,10 @@ else
                     <button class="save-btn" type="submit" disabled="@saving">
                         @(saving ? "Salvando..." : "Salvar perfil")
                     </button>
+
+                    <div class="profile-actions">
+                        <a class="profile-action-link" href="/Identity/Account/ChangePassword">Alterar senha</a>
+                    </div>
                 </EditForm>
             </div>
         }

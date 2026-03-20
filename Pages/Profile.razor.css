@@ -43,6 +43,22 @@
     cursor: not-allowed;
 }
 
+.profile-actions {
+    margin-top: 0.8rem;
+    display: flex;
+    justify-content: center;
+}
+
+.profile-action-link {
+    color: #8ab4f8;
+    text-decoration: underline;
+    font-size: 0.95rem;
+}
+
+.profile-action-link:hover {
+    color: #a7c7fb;
+}
+
 .success-msg {
     color: #8bc34a;
     font-weight: 600;
