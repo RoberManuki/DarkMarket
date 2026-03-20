@@ -2,6 +2,7 @@ using DarkMarket.Data;
 using DarkMarket.Models;
 using DarkMarket.Services;
 using Microsoft.Extensions.DependencyInjection;
+using System.Security.Claims;
 
 namespace DarkMarket.Tests;
 
@@ -94,6 +95,65 @@ public class AdminLogsQueryServiceIntegrationTests : IClassFixture<IntegrationTe
         Assert.Single(data.Logs);
         Assert.Equal(2, data.AuditCounts.All);
         Assert.Equal(2, data.AuditCounts.ReleaseOnly);
+    }
+
+    [Fact]
+    public async Task GetPageDataAsync_ReturnsSecurityPolicyAuditLogs_AfterPolicyChange()
+    {
+        var marker = Guid.NewGuid().ToString("N");
+
+        using (var updateScope = _factory.Services.CreateScope())
+        {
+            var policyService = updateScope.ServiceProvider.GetRequiredService<AdminSecurityPolicyService>();
+            var admin = CreateAdminPrincipal($"admin-security-{marker}");
+
+            var saved = await policyService.SetRuntimePolicyForAdminAsync(
+                admin,
+                new RuntimeSecurityPolicy(
+                    RequireConfirmedEmail: false,
+                    LockoutMaxFailedAccessAttempts: 4,
+                    LockoutMinutes: 22));
+
+            Assert.True(saved);
+        }
+
+        using var queryScope = _factory.Services.CreateScope();
+        var service = queryScope.ServiceProvider.GetRequiredService<AdminLogsQueryService>();
+
+        var data = await service.GetPageDataAsync(
+            primaryCriteria: new AdminLogFilterCriteria
+            {
+                Source = AdminAuditSources.SecurityPolicy,
+                UserId = $"admin-security-{marker}"
+            },
+            auditCountsCriteria: new AdminLogFilterCriteria
+            {
+                Source = AdminAuditSources.SecurityPolicy,
+                UserId = $"admin-security-{marker}"
+            },
+            sortColumn: AdminLogSortColumn.Timestamp,
+            sortAscending: false,
+            requestedPage: 1,
+            pageSize: 10);
+
+        Assert.True(data.TotalLogs >= 1);
+        Assert.True(data.AuditCounts.SecurityPolicy >= 1);
+        Assert.Contains(data.Logs, log =>
+            log.Source == AdminAuditSources.SecurityPolicy &&
+            log.UserId == $"admin-security-{marker}" &&
+            log.Message.Contains("Security policy updated.", StringComparison.Ordinal));
+    }
+
+    private static ClaimsPrincipal CreateAdminPrincipal(string userId)
+    {
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, userId),
+            new(ClaimTypes.Name, userId),
+            new(ClaimTypes.Role, "admin")
+        };
+
+        return new ClaimsPrincipal(new ClaimsIdentity(claims, "test-auth"));
     }
 
     private async Task<int> SeedLogAsync(
