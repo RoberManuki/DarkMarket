@@ -2,6 +2,7 @@ using DarkMarket.Data;
 using DarkMarket.Models;
 using DarkMarket.Services;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace DarkMarket.Tests;
 
@@ -60,6 +61,56 @@ public class AdminSettingsServiceTests
         Assert.False(savedNegative);
         Assert.False(savedAboveHundred);
         Assert.Empty(db.AppSettings);
+    }
+
+    [Fact]
+    public async Task GetOperationFeePercentForAdminAsync_Throws_WhenUserIsNotAdmin()
+    {
+        await using var db = CreateDbContext();
+        var service = new AdminSettingsService(db);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+            service.GetOperationFeePercentForAdminAsync(CreatePrincipal(userId: "u-1", roles: "user")));
+    }
+
+    [Fact]
+    public async Task SetOperationFeePercentForAdminAsync_Throws_WhenUserIsNotAdmin()
+    {
+        await using var db = CreateDbContext();
+        var service = new AdminSettingsService(db);
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() =>
+            service.SetOperationFeePercentForAdminAsync(CreatePrincipal(userId: "u-2", roles: "user"), 1.5m));
+    }
+
+    [Fact]
+    public async Task SetOperationFeePercentForAdminAsync_Succeeds_WhenUserIsAdmin()
+    {
+        await using var db = CreateDbContext();
+        var service = new AdminSettingsService(db);
+
+        var saved = await service.SetOperationFeePercentForAdminAsync(CreatePrincipal(userId: "a-1", roles: "admin"), 4.5m);
+        var fee = await service.GetOperationFeePercentForAdminAsync(CreatePrincipal(userId: "a-1", roles: "admin"));
+
+        Assert.True(saved);
+        Assert.Equal(4.5m, fee);
+    }
+
+    private static ClaimsPrincipal CreatePrincipal(string userId, params string[] roles)
+    {
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.NameIdentifier, userId),
+            new(ClaimTypes.Name, userId)
+        };
+
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+
+        var identity = new ClaimsIdentity(claims, authenticationType: "test-auth");
+        return new ClaimsPrincipal(identity);
     }
 
     private static AppDbContext CreateDbContext()

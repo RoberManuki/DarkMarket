@@ -78,6 +78,28 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
         AssertOkAndContains(result, "Painel Administrativo");
     }
 
+    [Theory]
+    [InlineData("/admin")]
+    [InlineData("/admin/users")]
+    [InlineData("/admin/users/view/user-123")]
+    [InlineData("/admin/users/edit/user-123")]
+    [InlineData("/admin/products")]
+    [InlineData("/admin/products/view/1")]
+    [InlineData("/admin/products/edit/1")]
+    [InlineData("/admin/payments")]
+    [InlineData("/admin/payments/view/1")]
+    [InlineData("/admin/orders")]
+    [InlineData("/admin/orders-review")]
+    [InlineData("/admin/gateways")]
+    [InlineData("/admin/delivery-agents")]
+    [InlineData("/admin/logs")]
+    public async Task AdminRoutes_ShowNotAuthorized_ForNonAdminUser(string route)
+    {
+        var client = CreateAuthenticatedClient(userId: "user-int-admin-surface", userName: "user", roles: "user");
+        var result = await GetPageAsync(client, route);
+        AssertOkAndContains(result, "Você não tem permissão para acessar esta página.");
+    }
+
     [Fact]
     public async Task OrderDetails_ShowsAccessDenied_ForUnrelatedUser()
     {

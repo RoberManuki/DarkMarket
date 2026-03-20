@@ -40,6 +40,11 @@ public static class AdminLogsFilterInference
 
     public static AdminLogsAuditQuickFilter InferAuditQuickFilter(string? source, string? level)
     {
+        if (string.Equals(source, AdminAuditSources.SecurityPolicy, StringComparison.Ordinal))
+        {
+            return AdminLogsAuditQuickFilter.SecurityPolicy;
+        }
+
         if (!string.Equals(source, AdminAuditSources.OrdersReview, StringComparison.Ordinal))
         {
             return AdminLogsAuditQuickFilter.All;

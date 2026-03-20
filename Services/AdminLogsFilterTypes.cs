@@ -15,5 +15,6 @@ public enum AdminLogsAuditQuickFilter
     All,
     ReleaseOnly,
     ReleaseSuccess,
-    ReleaseRefused
+    ReleaseRefused,
+    SecurityPolicy
 }

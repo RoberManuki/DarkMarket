@@ -1,7 +1,10 @@
 @page "/admin"
 
 @using System.Globalization
+@using System.Security.Claims
+@using DarkMarket.Configuration
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.JSInterop
 
 @attribute [Authorize(Roles = "admin")]
@@ -9,6 +12,9 @@
 @inject CurrencyPreferenceService CurrencyPreferenceService
 @inject DashboardMetricsService DashboardMetricsService
 @inject AdminSettingsService AdminSettingsService
+@inject AdminSecurityPolicyService AdminSecurityPolicyService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IWebHostEnvironment WebHostEnvironment
 @inject IJSRuntime JSRuntime
 
 <div class="admin-page">
@@ -76,6 +82,48 @@
             <span class="operation-fee-message @(operationFeeSaved ? "ok" : "error")">@operationFeeMessage</span>
         }
     </div>
+
+    <div class="admin-settings-card security-settings-card">
+        <h3>Segurança</h3>
+        <p><b>Ambiente:</b> @(WebHostEnvironment.IsDevelopment() ? "Development" : "Production")</p>
+        <p><b>Senha mínima (base do ambiente):</b> @securityPolicy.PasswordRequiredLength caracteres</p>
+        <p><b>Senha exige número:</b> @(securityPolicy.PasswordRequireDigit ? "Sim" : "Não")</p>
+        <p><b>Senha exige minúscula:</b> @(securityPolicy.PasswordRequireLowercase ? "Sim" : "Não")</p>
+        <p><b>Senha exige maiúscula:</b> @(securityPolicy.PasswordRequireUppercase ? "Sim" : "Não")</p>
+        <p><b>Senha exige símbolo:</b> @(securityPolicy.PasswordRequireNonAlphanumeric ? "Sim" : "Não")</p>
+        <p><b>Senha exige chars únicos:</b> @securityPolicy.PasswordRequiredUniqueChars</p>
+        <p><b>Tempo de sessão (base do ambiente):</b> @securityPolicy.SessionTimeoutMinutes min</p>
+
+        <div class="operation-fee-card" style="margin-top:12px;">
+            <label for="security-require-confirmed"><b>Exigir e-mail confirmado no login:</b></label>
+            <input id="security-require-confirmed" type="checkbox" @bind="runtimeRequireConfirmedEmail" />
+
+            <label for="security-lockout-attempts" style="margin-top:8px;"><b>Lockout após tentativas inválidas:</b></label>
+            <input id="security-lockout-attempts"
+                   class="fee-input"
+                   type="number"
+                   min="1"
+                   max="20"
+                   step="1"
+                   @bind="runtimeLockoutMaxAttempts" />
+
+            <label for="security-lockout-minutes" style="margin-top:8px;"><b>Duração do lockout (min):</b></label>
+            <input id="security-lockout-minutes"
+                   class="fee-input"
+                   type="number"
+                   min="1"
+                   max="1440"
+                   step="1"
+                   @bind="runtimeLockoutMinutes" />
+
+            <button class="details-btn" @onclick="SaveSecurityPolicyAsync">Salvar política de segurança</button>
+
+            @if (!string.IsNullOrWhiteSpace(securityPolicyMessage))
+            {
+                <span class="operation-fee-message @(securityPolicySaved ? "ok" : "error")">@securityPolicyMessage</span>
+            }
+        </div>
+    </div>
 </div>
 
 @code {
@@ -88,9 +136,19 @@
     private decimal operationFeePercent;
     private string? operationFeeMessage;
     private bool operationFeeSaved;
+    private SecurityPolicySnapshot securityPolicy = SecurityPolicyDefaults.Create(isDevelopment: false);
+    private bool runtimeRequireConfirmedEmail;
+    private int runtimeLockoutMaxAttempts;
+    private int runtimeLockoutMinutes;
+    private string? securityPolicyMessage;
+    private bool securityPolicySaved;
+    private ClaimsPrincipal? currentUser;
 
     protected override async Task OnInitializedAsync()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        currentUser = authState.User;
+
         selectedFiat = CurrencyPreferenceService.SelectedFiatCurrency;
         var snapshot = await DashboardMetricsService.GetSnapshotAsync();
         usersCount = snapshot.UsersCount;
@@ -98,7 +156,13 @@
         paidSalesVolumeBtc = snapshot.PaidSalesVolumeBtc;
         pendingOrdersCount = snapshot.PendingOrdersCount;
         quoteQueriesCount = snapshot.QuoteQueriesCount;
-        operationFeePercent = await AdminSettingsService.GetOperationFeePercentAsync();
+        operationFeePercent = await AdminSettingsService.GetOperationFeePercentForAdminAsync(currentUser);
+        securityPolicy = SecurityPolicyDefaults.Create(WebHostEnvironment.IsDevelopment());
+
+        var runtimePolicy = await AdminSecurityPolicyService.GetRuntimePolicyForAdminAsync(currentUser);
+        runtimeRequireConfirmedEmail = runtimePolicy.RequireConfirmedEmail;
+        runtimeLockoutMaxAttempts = runtimePolicy.LockoutMaxFailedAccessAttempts;
+        runtimeLockoutMinutes = runtimePolicy.LockoutMinutes;
     }
 
     private static string FormatBtc(decimal amount)
@@ -114,16 +178,56 @@
 
     private async Task SaveOperationFeeAsync()
     {
-        var saved = await AdminSettingsService.SetOperationFeePercentAsync(operationFeePercent);
-        operationFeeSaved = saved;
-
-        if (saved)
+        try
         {
-            operationFeeMessage = "Taxa operacional salva com sucesso.";
-            operationFeePercent = await AdminSettingsService.GetOperationFeePercentAsync();
-            return;
-        }
+            var saved = await AdminSettingsService.SetOperationFeePercentForAdminAsync(currentUser, operationFeePercent);
+            operationFeeSaved = saved;
 
-        operationFeeMessage = "Informe uma taxa entre 0 e 100.";
+            if (saved)
+            {
+                operationFeeMessage = "Taxa operacional salva com sucesso.";
+                operationFeePercent = await AdminSettingsService.GetOperationFeePercentForAdminAsync(currentUser);
+                return;
+            }
+
+            operationFeeMessage = "Informe uma taxa entre 0 e 100.";
+        }
+        catch (UnauthorizedAccessException)
+        {
+            operationFeeSaved = false;
+            operationFeeMessage = "Acesso negado para alterar configurações.";
+        }
+    }
+
+    private async Task SaveSecurityPolicyAsync()
+    {
+        try
+        {
+            var saved = await AdminSecurityPolicyService.SetRuntimePolicyForAdminAsync(
+                currentUser,
+                new RuntimeSecurityPolicy(
+                    runtimeRequireConfirmedEmail,
+                    runtimeLockoutMaxAttempts,
+                    runtimeLockoutMinutes));
+
+            securityPolicySaved = saved;
+
+            if (saved)
+            {
+                securityPolicyMessage = "Política de segurança salva com sucesso.";
+                var runtimePolicy = await AdminSecurityPolicyService.GetRuntimePolicyForAdminAsync(currentUser);
+                runtimeRequireConfirmedEmail = runtimePolicy.RequireConfirmedEmail;
+                runtimeLockoutMaxAttempts = runtimePolicy.LockoutMaxFailedAccessAttempts;
+                runtimeLockoutMinutes = runtimePolicy.LockoutMinutes;
+                return;
+            }
+
+            securityPolicyMessage = "Valores inválidos. Tentativas: 1-20, lockout: 1-1440 min.";
+        }
+        catch (UnauthorizedAccessException)
+        {
+            securityPolicySaved = false;
+            securityPolicyMessage = "Acesso negado para alterar a política de segurança.";
+        }
     }
 }

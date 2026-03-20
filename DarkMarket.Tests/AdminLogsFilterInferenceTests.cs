@@ -83,4 +83,12 @@ public class AdminLogsFilterInferenceTests
 
         Assert.Equal(AdminLogsAuditQuickFilter.ReleaseOnly, result);
     }
+
+    [Fact]
+    public void InferAuditQuickFilter_WhenSourceMatchesSecurityPolicy_ReturnsSecurityPolicy()
+    {
+        var result = AdminLogsFilterInference.InferAuditQuickFilter(AdminAuditSources.SecurityPolicy, AdminAuditLevels.Success);
+
+        Assert.Equal(AdminLogsAuditQuickFilter.SecurityPolicy, result);
+    }
 }

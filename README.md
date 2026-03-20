@@ -77,6 +77,17 @@ DarkMarket é um marketplace descentralizado focado em transações com Bitcoin,
    Em ambiente local, se `Enabled=false` ou sem credenciais, o sistema usa fallback em log sem quebrar os fluxos.
    Nesse modo de fallback, os e-mails tambem sao salvos em arquivos `.html` e `.txt` em `wwwroot/uploads/dev-emails` para facilitar testes locais dos links.
 
+   Padrões de segurança de autenticação atualmente configurados:
+   - Lockout após 5 tentativas inválidas.
+   - Duração do lockout: 15 minutos.
+    - Cookie de autenticação com renovação por atividade (sliding expiration).
+    - Expiração de sessão: 60 minutos em Development e 30 minutos em Production/Staging.
+    - Cookie `Secure` exige HTTPS em Production/Staging.
+   - Em Production/Staging, login exige e-mail confirmado; em Development o fluxo permanece flexível para testes locais.
+    - Política de senha:
+       - Development: mínimo 6 caracteres, com dígito e minúscula.
+       - Production/Staging: mínimo 10 caracteres, exigindo maiúscula, minúscula, dígito, símbolo e 3 caracteres únicos.
+
 4. **Execute as migrações do banco de dados**
    ```bash
    dotnet ef database update

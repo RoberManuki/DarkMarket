@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Security.Claims;
 using DarkMarket.Data;
 using DarkMarket.Models;
 using Microsoft.EntityFrameworkCore;
@@ -36,6 +37,12 @@ public class AdminSettingsService
         return Math.Clamp(parsed, 0m, 100m);
     }
 
+    public Task<decimal> GetOperationFeePercentForAdminAsync(ClaimsPrincipal? user)
+    {
+        EnsureAdmin(user);
+        return GetOperationFeePercentAsync();
+    }
+
     public async Task<bool> SetOperationFeePercentAsync(decimal operationFeePercent)
     {
         if (operationFeePercent < 0m || operationFeePercent > 100m)
@@ -64,5 +71,19 @@ public class AdminSettingsService
 
         await _db.SaveChangesAsync();
         return true;
+    }
+
+    public Task<bool> SetOperationFeePercentForAdminAsync(ClaimsPrincipal? user, decimal operationFeePercent)
+    {
+        EnsureAdmin(user);
+        return SetOperationFeePercentAsync(operationFeePercent);
+    }
+
+    private static void EnsureAdmin(ClaimsPrincipal? user)
+    {
+        if (user?.Identity?.IsAuthenticated != true || !user.IsInRole("admin"))
+        {
+            throw new UnauthorizedAccessException("Apenas administradores podem alterar configurações administrativas.");
+        }
     }
 }

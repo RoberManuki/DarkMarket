@@ -70,6 +70,7 @@
         <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseOnly)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseOnly)">Somente repasses (@auditCountReleaseOnly)</button>
         <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseSuccess)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseSuccess)">Repasses OK (@auditCountReleaseSuccess)</button>
         <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseRefused)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseRefused)">Repasses recusados (@auditCountReleaseRefused)</button>
+        <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.SecurityPolicy)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.SecurityPolicy)">Política de segurança (@auditCountSecurityPolicy)</button>
     </div>
 </div>
 
@@ -183,6 +184,7 @@ else
     private int auditCountReleaseOnly;
     private int auditCountReleaseSuccess;
     private int auditCountReleaseRefused;
+    private int auditCountSecurityPolicy;
     private int pageSize = 10;
     private int currentPage = 1;
     private int totalPages => Math.Max(1, (int)Math.Ceiling((double)totalLogs / pageSize));
@@ -241,6 +243,7 @@ else
         auditCountReleaseOnly = data.AuditCounts.ReleaseOnly;
         auditCountReleaseSuccess = data.AuditCounts.ReleaseSuccess;
         auditCountReleaseRefused = data.AuditCounts.ReleaseRefused;
+        auditCountSecurityPolicy = data.AuditCounts.SecurityPolicy;
         logs = data.Logs;
 
         if (currentPage != data.EffectivePage)
@@ -369,6 +372,10 @@ else
             case AdminLogsAuditQuickFilter.ReleaseRefused:
                 filterSource = AdminAuditSources.OrdersReview;
                 filterLevel = AdminAuditLevels.Refused;
+                break;
+            case AdminLogsAuditQuickFilter.SecurityPolicy:
+                filterSource = AdminAuditSources.SecurityPolicy;
+                filterLevel = string.Empty;
                 break;
             default:
                 filterSource = string.Empty;

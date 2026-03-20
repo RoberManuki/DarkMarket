@@ -1,6 +1,8 @@
 using DarkMarket.Data;
+using DarkMarket.Configuration;
 using DarkMarket.Models;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
@@ -12,6 +14,7 @@ namespace DarkMarket.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
+        private readonly IWebHostEnvironment _environment;
         private readonly AppDbContext _db;
         private readonly ILogger<AppInitializationService> _logger;
 
@@ -19,12 +22,14 @@ namespace DarkMarket.Services
             RoleManager<IdentityRole> roleManager,
             UserManager<ApplicationUser> userManager,
             IConfiguration configuration,
+            IWebHostEnvironment environment,
             AppDbContext db,
             ILogger<AppInitializationService> logger)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _configuration = configuration;
+            _environment = environment;
             _db = db;
             _logger = logger;
         }
@@ -119,6 +124,29 @@ namespace DarkMarket.Services
 
                 await _db.SaveChangesAsync();
             }
+
+            var defaults = SecurityPolicyDefaults.Create(_environment.IsDevelopment());
+
+            await EnsureAppSettingAsync(AdminSecurityPolicyService.RequireConfirmedEmailKey, defaults.RequireConfirmedEmail ? "true" : "false");
+            await EnsureAppSettingAsync(AdminSecurityPolicyService.LockoutMaxAttemptsKey, defaults.LockoutMaxFailedAccessAttempts.ToString(CultureInfo.InvariantCulture));
+            await EnsureAppSettingAsync(AdminSecurityPolicyService.LockoutMinutesKey, defaults.LockoutMinutes.ToString(CultureInfo.InvariantCulture));
+
+            await _db.SaveChangesAsync();
+        }
+
+        private async Task EnsureAppSettingAsync(string key, string value)
+        {
+            var exists = await _db.AppSettings.AnyAsync(s => s.Key == key);
+            if (exists)
+            {
+                return;
+            }
+
+            _db.AppSettings.Add(new AppSetting
+            {
+                Key = key,
+                Value = value
+            });
         }
 
         private async Task SeedDeliveryAgentsAsync()

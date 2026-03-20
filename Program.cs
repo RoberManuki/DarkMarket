@@ -8,6 +8,7 @@ using DarkMarket.Config;
 using DarkMarket.Configuration;
 using DarkMarket.Hubs;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddUserSecrets<Program>(optional: true);
@@ -54,6 +55,7 @@ builder.Services.AddScoped<AdminPaymentsFilterStateService>();
 builder.Services.AddScoped<AdminOrdersFilterStateService>();
 builder.Services.AddScoped<AdminProductsFilterStateService>();
 builder.Services.AddScoped<IEmailSender, IdentityEmailSender>();
+builder.Services.AddScoped<AdminSecurityPolicyService>();
 builder.Services.Configure<EmailOptions>(builder.Configuration.GetSection("Email"));
 
 var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -67,9 +69,36 @@ if (string.IsNullOrWhiteSpace(defaultConnection) || defaultConnection.Contains("
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(defaultConnection));
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+var isDevelopment = builder.Environment.IsDevelopment();
+var securityPolicy = SecurityPolicyDefaults.Create(isDevelopment);
+
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+        options.SignIn.RequireConfirmedEmail = securityPolicy.RequireConfirmedEmail;
+
+        options.Password.RequiredLength = securityPolicy.PasswordRequiredLength;
+        options.Password.RequireDigit = securityPolicy.PasswordRequireDigit;
+        options.Password.RequireLowercase = securityPolicy.PasswordRequireLowercase;
+        options.Password.RequireUppercase = securityPolicy.PasswordRequireUppercase;
+        options.Password.RequireNonAlphanumeric = securityPolicy.PasswordRequireNonAlphanumeric;
+        options.Password.RequiredUniqueChars = securityPolicy.PasswordRequiredUniqueChars;
+
+        options.Lockout.AllowedForNewUsers = true;
+        options.Lockout.MaxFailedAccessAttempts = securityPolicy.LockoutMaxFailedAccessAttempts;
+        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(securityPolicy.LockoutMinutes);
+    })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = isDevelopment ? CookieSecurePolicy.SameAsRequest : CookieSecurePolicy.Always;
+    options.SlidingExpiration = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(securityPolicy.SessionTimeoutMinutes);
+    options.LoginPath = "/Identity/Account/Login";
+    options.AccessDeniedPath = "/Identity/Account/Login";
+});
 
 builder.Services.Configure<BtcPayOptions>(builder.Configuration.GetSection("BtcPay"));
 

@@ -20,6 +20,7 @@ public class AdminLogsQueryServiceIntegrationTests : IClassFixture<IntegrationTe
         var marker = Guid.NewGuid().ToString("N");
         _ = await SeedLogAsync(AdminAuditSources.OrdersReview, $"msg {marker}", level: AdminAuditLevels.Success, userId: $"user-b-{marker}", timestampUtc: new DateTime(2026, 3, 10, 8, 0, 0, DateTimeKind.Utc));
         _ = await SeedLogAsync(AdminAuditSources.OrdersReview, $"msg {marker}", level: AdminAuditLevels.Refused, userId: $"user-c-{marker}", timestampUtc: new DateTime(2026, 3, 11, 8, 0, 0, DateTimeKind.Utc));
+        _ = await SeedLogAsync(AdminAuditSources.SecurityPolicy, $"msg {marker}", level: AdminAuditLevels.Success, userId: $"user-d-{marker}", timestampUtc: new DateTime(2026, 3, 11, 10, 0, 0, DateTimeKind.Utc));
         _ = await SeedLogAsync("Webhook", $"msg {marker}", level: "Info", userId: $"user-a-{marker}", timestampUtc: new DateTime(2026, 3, 12, 8, 0, 0, DateTimeKind.Utc));
 
         using var scope = _factory.Services.CreateScope();
@@ -33,13 +34,14 @@ public class AdminLogsQueryServiceIntegrationTests : IClassFixture<IntegrationTe
             requestedPage: 1,
             pageSize: 2);
 
-        Assert.Equal(3, data.TotalLogs);
+        Assert.Equal(4, data.TotalLogs);
         Assert.Equal(1, data.EffectivePage);
         Assert.Equal(2, data.Logs.Count);
-        Assert.Equal(3, data.AuditCounts.All);
+        Assert.Equal(4, data.AuditCounts.All);
         Assert.Equal(2, data.AuditCounts.ReleaseOnly);
         Assert.Equal(1, data.AuditCounts.ReleaseSuccess);
         Assert.Equal(1, data.AuditCounts.ReleaseRefused);
+        Assert.Equal(1, data.AuditCounts.SecurityPolicy);
 
         Assert.Contains($"user-a-{marker}", data.Logs[0].UserId);
         Assert.Contains($"user-b-{marker}", data.Logs[1].UserId);

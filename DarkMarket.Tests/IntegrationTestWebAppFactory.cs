@@ -25,7 +25,7 @@ public sealed class IntegrationTestWebAppFactory : WebApplicationFactory<Program
             {
                 ["ConnectionStrings:DefaultConnection"] = "Host=localhost;Port=5432;Database=darkmarket_tests;Username=test;Password=test",
                 ["AdminSeed:Email"] = "admin@test.local",
-                ["AdminSeed:Password"] = "Admin123!",
+                ["AdminSeed:Password"] = "Admin123!Aa",
                 ["AdminSeed:FullName"] = "Admin Test",
                 ["BtcPay:WebhookSecret"] = "expected-secret",
                 ["BtcPay:WebhookMaxBodyBytes"] = "256"

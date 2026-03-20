@@ -1,0 +1,15 @@
+@page
+@model DarkMarket.Areas.Identity.Pages.Account.RegisterConfirmationModel
+@{
+    ViewData["Title"] = "Confirme seu cadastro";
+}
+
+<h2>Cadastro realizado</h2>
+<p class="identity-muted">
+    Enviamos um link de confirmacao para <b>@Model.Email</b>. Confirme o e-mail antes de fazer login.
+</p>
+
+<div class="identity-actions">
+    <a asp-page="./Login">Ir para login</a>
+    <a asp-page="./ResendEmailConfirmation">Reenviar confirmacao</a>
+</div>

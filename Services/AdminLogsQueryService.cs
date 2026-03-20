@@ -8,7 +8,8 @@ public sealed record AdminLogsAuditCounts(
     int All,
     int ReleaseOnly,
     int ReleaseSuccess,
-    int ReleaseRefused);
+    int ReleaseRefused,
+    int SecurityPolicy);
 
 public sealed record AdminLogsPageData(
     int TotalLogs,
@@ -56,17 +57,19 @@ public class AdminLogsQueryService
                 All = g.Count(),
                 ReleaseOnly = g.Count(log => log.Source == AdminAuditSources.OrdersReview),
                 ReleaseSuccess = g.Count(log => log.Source == AdminAuditSources.OrdersReview && log.Level == AdminAuditLevels.Success),
-                ReleaseRefused = g.Count(log => log.Source == AdminAuditSources.OrdersReview && log.Level == AdminAuditLevels.Refused)
+                ReleaseRefused = g.Count(log => log.Source == AdminAuditSources.OrdersReview && log.Level == AdminAuditLevels.Refused),
+                SecurityPolicy = g.Count(log => log.Source == AdminAuditSources.SecurityPolicy)
             })
             .FirstOrDefaultAsync();
 
         var counts = countsProjection is null
-            ? new AdminLogsAuditCounts(0, 0, 0, 0)
+            ? new AdminLogsAuditCounts(0, 0, 0, 0, 0)
             : new AdminLogsAuditCounts(
                 All: countsProjection.All,
                 ReleaseOnly: countsProjection.ReleaseOnly,
                 ReleaseSuccess: countsProjection.ReleaseSuccess,
-                ReleaseRefused: countsProjection.ReleaseRefused);
+                ReleaseRefused: countsProjection.ReleaseRefused,
+                SecurityPolicy: countsProjection.SecurityPolicy);
 
         return new AdminLogsPageData(totalLogs, effectivePage, logs, counts);
     }
