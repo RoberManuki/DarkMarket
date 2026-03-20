@@ -2,14 +2,10 @@
 
 @attribute [Authorize]
 
-@using DarkMarket.Models.Admin
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components.Forms
-@using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Identity
 
 @inject UserManager<ApplicationUser> UserManager
-@inject AuthenticationStateProvider AuthProvider
 @inject IWebHostEnvironment Environment
 
 <h2 class="page-title">Perfil do Usuário</h2>
@@ -27,69 +23,22 @@ else
     <div class="profile-grid">
         <UserSummaryCard User="user" AvatarUrl="avatarUrl" Roles="roles" ShowRoles="true" />
 
-        @if (canEdit)
-        {
-            <div class="profile-card">
-                <h3>Editar perfil</h3>
-
-                @if (!string.IsNullOrEmpty(successMessage))
-                {
-                    <p class="success-msg">@successMessage</p>
-                }
-                @if (!string.IsNullOrEmpty(errorMessage))
-                {
-                    <p class="error-msg">@errorMessage</p>
-                }
-
-                <EditForm Model="editModel" OnValidSubmit="SaveAsync">
-                    <DataAnnotationsValidator />
-                    <ValidationSummary />
-
-                    <div class="form-row">
-                        <label>Nome completo</label>
-                        <InputText class="form-input" @bind-Value="editModel.FullName" />
-                    </div>
-
-                    <div class="form-row">
-                        <label>Data de nascimento</label>
-                        <InputDate class="form-input" @bind-Value="editModel.BirthDate" />
-                    </div>
-
-                    <div class="form-row">
-                        <label>Avatar (JPG, JPEG, PNG ou WEBP - máx. 2MB)</label>
-                        <InputFile OnChange="OnAvatarSelected" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" />
-                        @if (!string.IsNullOrWhiteSpace(selectedAvatarName))
-                        {
-                            <small>Selecionado: @selectedAvatarName</small>
-                        }
-                    </div>
-
-                    <button class="save-btn" type="submit" disabled="@saving">
-                        @(saving ? "Salvando..." : "Salvar perfil")
-                    </button>
-
-                    <div class="profile-actions">
-                        <a class="profile-action-link" href="/Identity/Account/ChangePassword">Alterar senha</a>
-                    </div>
-                </EditForm>
+        <div class="profile-card">
+            <h3>Conta</h3>
+            <p class="profile-note">A edição de dados cadastrais é feita no painel administrativo.</p>
+            <div class="profile-actions">
+                <a class="profile-action-link" href="/Identity/Account/ChangePassword">Alterar senha</a>
             </div>
-        }
+        </div>
     </div>
 }
 
 @code {
     [Parameter] public string Id { get; set; } = string.Empty;
     private ApplicationUser? user;
-    private readonly EditUserModel editModel = new();
     private bool loading = true;
-    private bool canEdit;
-    private bool saving;
     private IList<string> roles = new List<string>();
-    private string? successMessage;
-    private string? errorMessage;
     private string? avatarUrl;
-    private IBrowserFile? selectedAvatar;
-    private string? selectedAvatarName;
     private static readonly HashSet<string> AllowedAvatarExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
         ".jpg", ".jpeg", ".png", ".webp"
@@ -102,95 +51,10 @@ else
         if (user != null)
         {
             roles = await UserManager.GetRolesAsync(user);
-
-            var authState = await AuthProvider.GetAuthenticationStateAsync();
-            var currentUserId = UserManager.GetUserId(authState.User);
-            var isAdmin = authState.User.IsInRole("admin");
-
-            canEdit = isAdmin || currentUserId == user.Id;
-
-            editModel.FullName = user.FullName;
-            editModel.BirthDate = user.BirthDate;
             avatarUrl = ResolveAvatarUrl(user.Id);
         }
 
         loading = false;
-    }
-
-    private async Task SaveAsync()
-    {
-        if (user == null || !canEdit)
-        {
-            errorMessage = "Você não tem permissão para editar este perfil.";
-            successMessage = null;
-            return;
-        }
-
-        saving = true;
-        errorMessage = null;
-        successMessage = null;
-
-        user.FullName = editModel.FullName;
-        user.BirthDate = editModel.BirthDate;
-
-        var result = await UserManager.UpdateAsync(user);
-
-        if (result.Succeeded && selectedAvatar != null)
-        {
-            var avatarResult = await SaveAvatarAsync(user.Id, selectedAvatar);
-            if (!avatarResult.Success)
-            {
-                result = IdentityResult.Failed(new IdentityError { Description = avatarResult.ErrorMessage ?? "Falha ao salvar avatar." });
-            }
-        }
-
-        if (!result.Succeeded)
-        {
-            errorMessage = string.Join(" ", result.Errors.Select(error => error.Description));
-        }
-        else
-        {
-            successMessage = "Perfil atualizado com sucesso.";
-            avatarUrl = ResolveAvatarUrl(user.Id);
-            selectedAvatar = null;
-            selectedAvatarName = null;
-        }
-
-        saving = false;
-    }
-
-    private void OnAvatarSelected(InputFileChangeEventArgs args)
-    {
-        var file = args.File;
-        selectedAvatar = file;
-        selectedAvatarName = file.Name;
-    }
-
-    private async Task<(bool Success, string? ErrorMessage)> SaveAvatarAsync(string userId, IBrowserFile file)
-    {
-        var extension = Path.GetExtension(file.Name);
-        if (string.IsNullOrWhiteSpace(extension) || !AllowedAvatarExtensions.Contains(extension))
-            return (false, "Formato de avatar inválido. Use JPG, JPEG, PNG ou WEBP.");
-
-        if (file.Size > 2 * 1024 * 1024)
-            return (false, "Avatar excede o limite de 2MB.");
-
-        var avatarsDirectory = Path.Combine(Environment.WebRootPath, "uploads", "avatars");
-        if (!Directory.Exists(avatarsDirectory))
-            Directory.CreateDirectory(avatarsDirectory);
-
-        foreach (var ext in AllowedAvatarExtensions)
-        {
-            var existingPath = Path.Combine(avatarsDirectory, $"{userId}{ext}");
-            if (File.Exists(existingPath))
-                File.Delete(existingPath);
-        }
-
-        var filePath = Path.Combine(avatarsDirectory, $"{userId}{extension.ToLowerInvariant()}");
-        await using var fileStream = File.Create(filePath);
-        await file.OpenReadStream(2 * 1024 * 1024).CopyToAsync(fileStream);
-
-        return (true, null);
     }
 
     private string? ResolveAvatarUrl(string userId)

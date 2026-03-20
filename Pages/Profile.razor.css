@@ -13,34 +13,10 @@
     box-shadow: 0 2px 8px #0006;
 }
 
-.form-row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
+.profile-note {
+    color: #c8ced8;
+    margin-top: 0.4rem;
     margin-bottom: 0.9rem;
-}
-
-.form-input {
-    background: #181818;
-    color: #f0f0f0;
-    border: 1px solid #444;
-    border-radius: 6px;
-    padding: 0.55rem 0.65rem;
-}
-
-.save-btn {
-    background: #8ab4f8;
-    color: #111;
-    border: none;
-    border-radius: 6px;
-    padding: 0.55rem 0.9rem;
-    font-weight: 700;
-    cursor: pointer;
-}
-
-.save-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
 }
 
 .profile-actions {
@@ -57,16 +33,6 @@
 
 .profile-action-link:hover {
     color: #a7c7fb;
-}
-
-.success-msg {
-    color: #8bc34a;
-    font-weight: 600;
-}
-
-.error-msg {
-    color: #ff6b6b;
-    font-weight: 600;
 }
 
 @media (max-width: 700px) {
