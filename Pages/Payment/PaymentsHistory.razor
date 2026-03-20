@@ -97,9 +97,9 @@ else
     </table>
 
     <div class="pagination">
-        <button @onclick="PrevPage" disabled="@(!CanGoToPreviousPage)">Anterior</button>
+        <button type="button" @onclick="@(() => PrevPage())" disabled="@(!CanGoToPreviousPage)">Anterior</button>
         <span class="pagination-info">Página @currentPage de @totalPages</span>
-        <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Próxima</button>
+        <button type="button" @onclick="@(() => NextPage())" disabled="@(!CanGoToNextPage)">Próxima</button>
     </div>
 }
 
@@ -118,7 +118,7 @@ else
 
     private int pageSize = 10;
     private int currentPage = 1;
-    private int totalPages => filteredPayments == null ? 1 : (int)Math.Ceiling((double)filteredPayments.Count / pageSize);
+    private int totalPages => filteredPayments == null ? 1 : Math.Max(1, (int)Math.Ceiling((double)filteredPayments.Count / pageSize));
 
     private bool CanGoToNextPage => currentPage < totalPages;
     private bool CanGoToPreviousPage => currentPage > 1;
@@ -177,8 +177,6 @@ else
                 (string.IsNullOrWhiteSpace(filterGateway) || (p.PaymentMethod?.Contains(filterGateway, StringComparison.OrdinalIgnoreCase) ?? false)) &&
                 (!filterDate.HasValue || p.CreatedAt.Date == filterDate.Value.Date)
             )
-            .Skip((currentPage - 1) * pageSize)
-            .Take(pageSize)
             .ToList();
     }
 

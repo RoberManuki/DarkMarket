@@ -84,44 +84,100 @@
     </div>
 
     <div class="admin-settings-card security-settings-card">
-        <h3>Segurança</h3>
-        <p><b>Ambiente:</b> @(WebHostEnvironment.IsDevelopment() ? "Development" : "Production")</p>
-        <p><b>Senha mínima (base do ambiente):</b> @securityPolicy.PasswordRequiredLength caracteres</p>
-        <p><b>Senha exige número:</b> @(securityPolicy.PasswordRequireDigit ? "Sim" : "Não")</p>
-        <p><b>Senha exige minúscula:</b> @(securityPolicy.PasswordRequireLowercase ? "Sim" : "Não")</p>
-        <p><b>Senha exige maiúscula:</b> @(securityPolicy.PasswordRequireUppercase ? "Sim" : "Não")</p>
-        <p><b>Senha exige símbolo:</b> @(securityPolicy.PasswordRequireNonAlphanumeric ? "Sim" : "Não")</p>
-        <p><b>Senha exige chars únicos:</b> @securityPolicy.PasswordRequiredUniqueChars</p>
-        <p><b>Tempo de sessão (base do ambiente):</b> @securityPolicy.SessionTimeoutMinutes min</p>
+        <div class="security-header">
+            <h3>Segurança</h3>
+            <p>Configuração da autenticação, lockout e baseline de proteção por ambiente.</p>
+        </div>
 
-        <div class="operation-fee-card" style="margin-top:12px;">
-            <label for="security-require-confirmed"><b>Exigir e-mail confirmado no login:</b></label>
-            <input id="security-require-confirmed" type="checkbox" @bind="runtimeRequireConfirmedEmail" />
+        <div class="security-panels">
+            <section class="security-panel" aria-label="Base do ambiente">
+                <h4>Base do ambiente</h4>
+                <div class="security-baseline-meta">
+                    <span class="security-label">Ambiente</span>
+                    <span class="security-value security-env-pill">@(WebHostEnvironment.IsDevelopment() ? "Development" : "Production")</span>
+                </div>
 
-            <label for="security-lockout-attempts" style="margin-top:8px;"><b>Lockout após tentativas inválidas:</b></label>
-            <input id="security-lockout-attempts"
-                   class="fee-input"
-                   type="number"
-                   min="1"
-                   max="20"
-                   step="1"
-                   @bind="runtimeLockoutMaxAttempts" />
+                <div class="security-baseline-group">
+                    <h5>Credenciais</h5>
+                    <div class="security-baseline-grid">
+                        <div class="security-baseline-row">
+                            <span class="security-label">Senha mínima</span>
+                            <span class="security-value">@securityPolicy.PasswordRequiredLength caracteres</span>
+                        </div>
 
-            <label for="security-lockout-minutes" style="margin-top:8px;"><b>Duração do lockout (min):</b></label>
-            <input id="security-lockout-minutes"
-                   class="fee-input"
-                   type="number"
-                   min="1"
-                   max="1440"
-                   step="1"
-                   @bind="runtimeLockoutMinutes" />
+                        <div class="security-baseline-row">
+                            <span class="security-label">Chars únicos</span>
+                            <span class="security-value">@securityPolicy.PasswordRequiredUniqueChars</span>
+                        </div>
 
-            <button class="details-btn" @onclick="SaveSecurityPolicyAsync">Salvar política de segurança</button>
+                        <div class="security-baseline-row">
+                            <span class="security-label">Exige número</span>
+                            <span class="security-boolean-badge @(securityPolicy.PasswordRequireDigit ? "on" : "off")">@(securityPolicy.PasswordRequireDigit ? "Sim" : "Não")</span>
+                        </div>
 
-            @if (!string.IsNullOrWhiteSpace(securityPolicyMessage))
-            {
-                <span class="operation-fee-message @(securityPolicySaved ? "ok" : "error")">@securityPolicyMessage</span>
-            }
+                        <div class="security-baseline-row">
+                            <span class="security-label">Exige minúscula</span>
+                            <span class="security-boolean-badge @(securityPolicy.PasswordRequireLowercase ? "on" : "off")">@(securityPolicy.PasswordRequireLowercase ? "Sim" : "Não")</span>
+                        </div>
+
+                        <div class="security-baseline-row">
+                            <span class="security-label">Exige maiúscula</span>
+                            <span class="security-boolean-badge @(securityPolicy.PasswordRequireUppercase ? "on" : "off")">@(securityPolicy.PasswordRequireUppercase ? "Sim" : "Não")</span>
+                        </div>
+
+                        <div class="security-baseline-row">
+                            <span class="security-label">Exige símbolo</span>
+                            <span class="security-boolean-badge @(securityPolicy.PasswordRequireNonAlphanumeric ? "on" : "off")">@(securityPolicy.PasswordRequireNonAlphanumeric ? "Sim" : "Não")</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="security-baseline-group">
+                    <h5>Sessão</h5>
+                    <div class="security-baseline-grid">
+                        <div class="security-baseline-row">
+                            <span class="security-label">Tempo de sessão</span>
+                            <span class="security-value">@securityPolicy.SessionTimeoutMinutes min</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="security-panel security-runtime-panel" aria-label="Controles em runtime">
+                <h4>Controles em runtime</h4>
+
+                <label class="security-toggle" for="security-require-confirmed">
+                    <input id="security-require-confirmed" type="checkbox" @bind="runtimeRequireConfirmedEmail" />
+                    <span>Exigir e-mail confirmado no login</span>
+                </label>
+
+                <div class="security-input-grid">
+                    <label for="security-lockout-attempts">Lockout após tentativas inválidas</label>
+                    <input id="security-lockout-attempts"
+                           class="fee-input"
+                           type="number"
+                           min="1"
+                           max="20"
+                           step="1"
+                           @bind="runtimeLockoutMaxAttempts" />
+
+                    <label for="security-lockout-minutes">Duração do lockout (min)</label>
+                    <input id="security-lockout-minutes"
+                           class="fee-input"
+                           type="number"
+                           min="1"
+                           max="1440"
+                           step="1"
+                           @bind="runtimeLockoutMinutes" />
+                </div>
+
+                <button class="details-btn" @onclick="SaveSecurityPolicyAsync">Salvar política de segurança</button>
+
+                @if (!string.IsNullOrWhiteSpace(securityPolicyMessage))
+                {
+                    <span class="operation-fee-message @(securityPolicySaved ? "ok" : "error")">@securityPolicyMessage</span>
+                }
+            </section>
         </div>
     </div>
 </div>

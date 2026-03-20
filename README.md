@@ -132,6 +132,46 @@ sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE darkmarket TO freeza;
 dotnet ef database update
 ```
 
+### Nota importante sobre paginação e componentização
+
+Decisão atual do projeto:
+- As paginações foram mantidas em código local das páginas (sem componente compartilhado de paginação) por estabilidade operacional.
+
+Evidências observadas no projeto:
+- Na tela `"/admin/logs"`, a versão componentizada da paginação apresentou cliques sem avanço de página em ambiente real.
+- Ao substituir por botões locais na própria página, o comportamento voltou ao normal imediatamente.
+- O comportamento foi percebido em histórico anterior do projeto e reproduzido novamente no ciclo atual.
+
+Registro cronológico recente (refatoração/auditoria):
+- Cenário inicial estável: .NET 9 + paginação local na tela de logs.
+- Tentativa de padronização com componente de paginação: regressão de clique sem avanço em logs.
+- Mitigação imediata: descomponentização da paginação em logs e posteriormente em todas as rotas paginadas.
+- Tentativa de atualização para .NET 10 para eliminar hipótese de bug de versão: compilou, mas o comportamento reportado em ambiente real não estabilizou.
+- Decisão operacional: rollback completo para .NET 9 (`global.json`, `TargetFramework` da aplicação e testes), preservando paginação local.
+- Estado validado após rollback: comportamento voltou a funcionar no fluxo reportado.
+
+Risco conhecido e lição aprendida:
+- Risco: regressão silenciosa de interatividade em paginações durante recomposição/upgrade.
+- Lição: preferir estabilidade observável em runtime real antes de consolidar abstrações compartilhadas.
+- Regra prática: abstração só permanece quando o comportamento final for equivalente em todas as rotas críticas.
+
+Escopo atual da decisão:
+- Páginas administrativas e de usuário com paginação usam implementação local.
+- O componente `Shared/Components/PaginationControls.razor` não é obrigatório para os fluxos atuais.
+- Ações críticas de filtros (`Filtrar`/`Limpar`) em páginas admin também usam botões locais (sem componente intermediário de ação) para reduzir risco de regressão de callback.
+
+Diretriz para futura recomposição:
+- Só reintroduzir paginação componentizada com teste manual obrigatório nas rotas: `/admin/logs`, `/admin/users`, `/admin/products`, `/admin/payments`, `/admin/orders`, `/admin/orders-review`, `/orders`, `/payments`, `/products`, `/marketplace`.
+- Registrar evidência do teste (data, versão .NET, navegador e resultado por rota) antes de consolidar a recomposição.
+- Em caso de regressão em qualquer rota, voltar para paginação local nessa rota.
+- Recomendação para PR de recomposição: incluir checklist de validação de clique, persistência de página atual e comportamento após filtro/ordenação.
+
+Referências para debate na comunidade:
+- Issue tracker ASP.NET Core: https://github.com/dotnet/aspnetcore/issues
+- Discussões ASP.NET Core: https://github.com/dotnet/aspnetcore/discussions
+- Docs de EventCallback: https://learn.microsoft.com/en-us/aspnet/core/blazor/components/event-handling
+- Docs de render modes/interatividade: https://learn.microsoft.com/en-us/aspnet/core/blazor/components/render-modes
+
 ---
 
 ## Estrutura de Pastas

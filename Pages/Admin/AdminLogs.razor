@@ -38,7 +38,8 @@
     <input type="date" @bind="filterEndDate" />
 
     <div class="logs-main-actions">
-        <FilterActionButtons OnApply="ApplyFilters" OnClear="ClearFilters" />
+        <button type="button" @onclick="@(async () => await ApplyFilters())">Filtrar</button>
+        <button type="button" @onclick="@(async () => await ClearFilters())">Limpar</button>
         <button class="logs-export-btn" @onclick="ExportCsvAsync" disabled="@(totalLogs == 0 || HasInvalidDateRange)">Exportar CSV</button>
         <button class="logs-export-btn" @onclick="ExportJsonAsync" disabled="@(totalLogs == 0 || HasInvalidDateRange)">Exportar JSON</button>
     </div>
@@ -173,7 +174,11 @@ else
     </table>
 }
 
-<PaginationControls CurrentPage="@currentPage" TotalPages="@totalPages" OnPrevious="PrevPage" OnNext="NextPage" />
+<div class="pagination">
+    <button type="button" @onclick="@(async () => await PrevPage())" disabled="@(currentPage <= 1)">Anterior</button>
+    <span class="pagination-info">Página @currentPage de @totalPages</span>
+    <button type="button" @onclick="@(async () => await NextPage())" disabled="@(currentPage >= totalPages)">Próxima</button>
+</div>
 
 <button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
 

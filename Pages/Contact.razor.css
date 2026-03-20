@@ -1,22 +1,104 @@
-.info-page-container {
-    max-width: 900px;
+.contact-page {
+    --contact-surface: #151e26;
+    --contact-card: #202a34;
+    --contact-line: #334658;
+    --contact-accent: #20c997;
+    --contact-ink: #ecf3f8;
+    --contact-muted: #bac8d4;
+
+    max-width: 1020px;
     margin: 0 auto;
+    padding: 1.2rem 0.4rem 0.2rem;
+    color: var(--contact-ink);
+    font-family: "Space Grotesk", "Segoe UI", "Trebuchet MS", sans-serif;
 }
 
-.info-card {
-    background: #23272b;
-    color: #f0f0f0;
-    border-radius: 10px;
-    padding: 1.25rem 1.4rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 10px #0006;
+.contact-hero {
+    background:
+        radial-gradient(circle at 100% -20%, #1d4f5d 0%, transparent 45%),
+        linear-gradient(150deg, #172028 0%, var(--contact-surface) 70%, #131a21 100%);
+    border: 1px solid var(--contact-line);
+    border-radius: 18px;
+    padding: 1.35rem 1.35rem 1.2rem;
+    box-shadow: 0 14px 30px #00000045;
 }
 
-.info-card h4 {
-    margin-top: 0;
-    color: #8ab4f8;
+.contact-kicker {
+    margin: 0;
+    color: #7ae5c7;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 700;
 }
 
-.info-card ul {
-    margin: 0.5rem 0 0 1.2rem;
+.contact-hero h1 {
+    margin: 0.3rem 0 0;
+    font-size: clamp(1.85rem, 5vw, 2.55rem);
+}
+
+.contact-hero p {
+    margin: 0.65rem 0 0;
+    color: var(--contact-muted);
+    max-width: 72ch;
+    line-height: 1.6;
+}
+
+.contact-grid {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+}
+
+.contact-card {
+    background: linear-gradient(165deg, #24313d 0%, var(--contact-card) 100%);
+    border: 1px solid #3a4f63;
+    border-radius: 14px;
+    padding: 1rem 1rem 0.95rem;
+}
+
+.contact-card h3 {
+    margin: 0;
+    color: #d8fff2;
+    font-size: 1.03rem;
+}
+
+.contact-highlight {
+    margin: 0.52rem 0 0;
+    color: var(--contact-accent);
+    font-weight: 700;
+}
+
+.contact-card p {
+    margin: 0.46rem 0 0;
+    color: var(--contact-muted);
+    line-height: 1.56;
+    font-size: 0.95rem;
+}
+
+.contact-checklist {
+    margin-top: 1rem;
+    background: #1b2630;
+    border: 1px solid #355264;
+    border-radius: 12px;
+    padding: 0.95rem 1rem;
+}
+
+.contact-checklist h2 {
+    margin: 0;
+    font-size: 1.08rem;
+}
+
+.contact-checklist ul {
+    margin: 0.55rem 0 0;
+    padding-left: 1.2rem;
+    color: var(--contact-muted);
+    line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
 }

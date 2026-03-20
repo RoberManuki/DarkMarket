@@ -29,7 +29,8 @@
         <option value="Pendente">Pendente</option>
     </select>
     <input type="date" @bind="filterDate" />
-    <FilterActionButtons OnApply="ApplyFiltersAndPersist" OnClear="ClearFilters" />
+    <button type="button" @onclick="@(async () => await ApplyFiltersAndPersist())">Filtrar</button>
+    <button type="button" @onclick="@(async () => await ClearFilters())">Limpar</button>
 </div>
 
 @if (showRestoredFiltersNotice)
@@ -108,7 +109,11 @@
         </tbody>
     </table>
 
-    <PaginationControls CurrentPage="@currentPage" TotalPages="@totalPages" OnPrevious="PrevPage" OnNext="NextPage" />
+    <div class="pagination">
+        <button type="button" @onclick="@(async () => await PrevPage())" disabled="@(currentPage <= 1)">Anterior</button>
+        <span class="pagination-info">Página @currentPage de @totalPages</span>
+        <button type="button" @onclick="@(async () => await NextPage())" disabled="@(currentPage >= totalPages)">Próxima</button>
+    </div>
 </AdminDataState>
 
 <button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>

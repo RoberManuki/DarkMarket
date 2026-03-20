@@ -38,6 +38,156 @@
     color: #ff8a80;
 }
 
+.security-settings-card {
+    display: block;
+}
+
+.security-header h3 {
+    margin: 0;
+    color: #f3f7fb;
+    letter-spacing: 0.2px;
+}
+
+.security-header p {
+    margin: 0.35rem 0 0;
+    color: #aeb8c2;
+    font-size: 0.92rem;
+}
+
+.security-panels {
+    margin-top: 0.9rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+}
+
+.security-panel {
+    border: 1px solid #343f4b;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #252a31 0%, #1f252c 100%);
+    padding: 0.85rem 0.95rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.security-panel h4 {
+    margin: 0;
+    font-size: 0.96rem;
+    color: #f9a825;
+    font-weight: 700;
+}
+
+.security-baseline-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+}
+
+.security-baseline-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.7rem;
+    border-bottom: 1px dashed #323a43;
+    padding-bottom: 0.35rem;
+}
+
+.security-baseline-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.security-env-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: #1d3347;
+    border: 1px solid #365876;
+    font-size: 0.82rem;
+}
+
+.security-baseline-group {
+    border-top: 1px solid #313942;
+    padding-top: 0.65rem;
+}
+
+.security-baseline-group h5 {
+    margin: 0 0 0.55rem;
+    color: #d8e3ee;
+    font-size: 0.86rem;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
+}
+
+.security-label {
+    color: #a7b2be;
+    font-size: 0.9rem;
+}
+
+.security-value {
+    color: #f3f7fb;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-align: right;
+}
+
+.security-boolean-badge {
+    display: inline-flex;
+    justify-content: center;
+    min-width: 48px;
+    padding: 0.16rem 0.5rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.78rem;
+    border: 1px solid transparent;
+}
+
+.security-boolean-badge.on {
+    color: #b7f4cd;
+    background: #173629;
+    border-color: #2a6a4f;
+}
+
+.security-boolean-badge.off {
+    color: #ffc3b8;
+    background: #3b1f1f;
+    border-color: #694040;
+}
+
+.security-runtime-panel .details-btn {
+    width: fit-content;
+}
+
+.security-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: #f3f7fb;
+    font-weight: 600;
+}
+
+.security-toggle input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #f9a825;
+}
+
+.security-input-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+}
+
+.security-input-grid label {
+    color: #d6dde5;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
 .admin-nav {
     margin: 2rem 0 1.5rem 0;
     display: flex;
@@ -132,6 +282,30 @@
 @media (max-width: 560px) {
     .admin-settings-card {
         padding: 0.8rem;
+    }
+
+    .security-panels {
+        grid-template-columns: 1fr;
+    }
+
+    .security-baseline-grid {
+        grid-template-columns: 1fr;
+        gap: 0.2rem;
+    }
+
+    .security-baseline-row {
+        flex-direction: column;
+        align-items: flex-start;
+        border-bottom: 0;
+        padding-bottom: 0.2rem;
+    }
+
+    .security-value {
+        text-align: left;
+    }
+
+    .security-input-grid {
+        grid-template-columns: 1fr;
     }
 
     .admin-nav a {

@@ -81,9 +81,9 @@
         </table>
 
         <div class="pagination">
-            <button @onclick="PrevPage" disabled="@(!CanGoToPreviousPage)">Anterior</button>
+            <button type="button" @onclick="@(() => PrevPage())" disabled="@(!CanGoToPreviousPage)">Anterior</button>
             <span class="pagination-info">Página @currentPage de @totalPages</span>
-            <button @onclick="NextPage" disabled="@(!CanGoToNextPage)">Próxima</button>
+            <button type="button" @onclick="@(() => NextPage())" disabled="@(!CanGoToNextPage)">Próxima</button>
         </div>
     }
 </div>
@@ -97,7 +97,7 @@
     private decimal? filterMaxPrice;
     private int pageSize = 5;
     private int currentPage = 1;
-    private int totalPages => filteredProducts == null ? 1 : (int)Math.Ceiling((double)filteredProducts.Count / pageSize);
+    private int totalPages => filteredProducts == null ? 1 : Math.Max(1, (int)Math.Ceiling((double)filteredProducts.Count / pageSize));
     private decimal? btcUsdRate;
     private decimal? btcBrlRate;
 
@@ -126,8 +126,6 @@
                 (!filterMinPrice.HasValue || p.Price >= filterMinPrice.Value) &&
                 (!filterMaxPrice.HasValue || p.Price <= filterMaxPrice.Value)
             )
-            .Skip((currentPage - 1) * pageSize)
-            .Take(pageSize)
             .ToList();
     }
 

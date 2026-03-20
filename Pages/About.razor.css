@@ -1,22 +1,98 @@
-.info-page-container {
-    max-width: 900px;
+.about-page {
+    --about-bg: #11161d;
+    --about-panel: #1b242d;
+    --about-line: #2f3f50;
+    --about-accent: #f7b733;
+    --about-ink: #edf3f8;
+    --about-muted: #b5c4d2;
+
+    max-width: 1020px;
     margin: 0 auto;
+    padding: 1.2rem 0.4rem 0.2rem;
+    color: var(--about-ink);
+    font-family: "Space Grotesk", "Segoe UI", "Trebuchet MS", sans-serif;
 }
 
-.info-card {
-    background: #23272b;
-    color: #f0f0f0;
-    border-radius: 10px;
-    padding: 1.25rem 1.4rem;
-    margin-bottom: 1rem;
-    box-shadow: 0 2px 10px #0006;
+.about-hero {
+    background:
+        radial-gradient(circle at 10% -10%, #22415f 0%, transparent 45%),
+        linear-gradient(145deg, #141c24 0%, var(--about-bg) 56%, #0f141a 100%);
+    border: 1px solid var(--about-line);
+    border-radius: 18px;
+    padding: 1.35rem 1.35rem 1.2rem;
+    box-shadow: 0 14px 28px #00000045;
 }
 
-.info-card h4 {
-    margin-top: 0;
-    color: #8ab4f8;
+.about-kicker {
+    margin: 0;
+    color: var(--about-accent);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 700;
 }
 
-.info-card ul {
-    margin: 0.5rem 0 0 1.2rem;
+.about-hero h1 {
+    margin: 0.3rem 0 0;
+    font-size: clamp(1.85rem, 5vw, 2.55rem);
+    letter-spacing: 0.01em;
+}
+
+.about-hero p {
+    margin: 0.65rem 0 0;
+    color: var(--about-muted);
+    max-width: 72ch;
+    line-height: 1.6;
+}
+
+.about-grid {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+}
+
+.about-panel {
+    background: linear-gradient(165deg, #202b35 0%, var(--about-panel) 100%);
+    border: 1px solid #314253;
+    border-radius: 14px;
+    padding: 1rem 1rem 0.95rem;
+}
+
+.about-panel h3 {
+    margin: 0;
+    color: #ffe4a7;
+    font-size: 1.03rem;
+}
+
+.about-panel p {
+    margin: 0.58rem 0 0;
+    color: var(--about-muted);
+    line-height: 1.58;
+    font-size: 0.95rem;
+}
+
+.about-roadmap-note {
+    margin-top: 1rem;
+    background: linear-gradient(90deg, #1a222b 0%, #16212a 100%);
+    border-left: 5px solid var(--about-accent);
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+}
+
+.about-roadmap-note h2 {
+    margin: 0;
+    font-size: 1.08rem;
+}
+
+.about-roadmap-note p {
+    margin: 0.45rem 0 0;
+    color: var(--about-muted);
+    line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+    .about-grid {
+        grid-template-columns: 1fr;
+    }
 }

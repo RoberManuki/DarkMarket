@@ -1011,6 +1011,46 @@ body {
     color: #c7dcff;
 }
 
+.admin-page .admin-settings-card.security-settings-card {
+    display: block;
+}
+
+.admin-page .security-baseline-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.7rem;
+    border-bottom: 1px dashed #323a43;
+    padding-bottom: 0.35rem;
+}
+
+.admin-page .security-value {
+    text-align: right;
+}
+
+.admin-page .security-boolean-badge {
+    display: inline-flex;
+    justify-content: center;
+    min-width: 48px;
+    padding: 0.16rem 0.5rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.78rem;
+    border: 1px solid transparent;
+}
+
+.admin-page .security-boolean-badge.on {
+    color: #b7f4cd;
+    background: #173629;
+    border-color: #2a6a4f;
+}
+
+.admin-page .security-boolean-badge.off {
+    color: #ffc3b8;
+    background: #3b1f1f;
+    border-color: #694040;
+}
+
 .dashboard-container,
 .marketplace-page,
 .products-page {
@@ -1019,6 +1059,124 @@ body {
     margin-right: auto;
     width: 100%;
     box-sizing: border-box;
+}
+
+/* About/Contact fallback styles (non-isolated backup) */
+.about-page {
+    --about-bg: #11161d;
+    --about-panel: #1b242d;
+    --about-line: #2f3f50;
+    --about-accent: #f7b733;
+    --about-ink: #edf3f8;
+    --about-muted: #b5c4d2;
+    max-width: 1020px;
+    margin: 0 auto;
+    padding: 1.2rem 0.4rem 0.2rem;
+    color: var(--about-ink);
+}
+
+.about-hero {
+    background: radial-gradient(circle at 10% -10%, #22415f 0%, transparent 45%), linear-gradient(145deg, #141c24 0%, var(--about-bg) 56%, #0f141a 100%);
+    border: 1px solid var(--about-line);
+    border-radius: 18px;
+    padding: 1.35rem 1.35rem 1.2rem;
+    box-shadow: 0 14px 28px #00000045;
+}
+
+.about-kicker {
+    margin: 0;
+    color: var(--about-accent);
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 700;
+}
+
+.about-grid {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+}
+
+.about-panel {
+    background: linear-gradient(165deg, #202b35 0%, var(--about-panel) 100%);
+    border: 1px solid #314253;
+    border-radius: 14px;
+    padding: 1rem 1rem 0.95rem;
+}
+
+.about-roadmap-note {
+    margin-top: 1rem;
+    background: linear-gradient(90deg, #1a222b 0%, #16212a 100%);
+    border-left: 5px solid var(--about-accent);
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+}
+
+.contact-page {
+    --contact-surface: #151e26;
+    --contact-card: #202a34;
+    --contact-line: #334658;
+    --contact-accent: #20c997;
+    --contact-ink: #ecf3f8;
+    --contact-muted: #bac8d4;
+    max-width: 1020px;
+    margin: 0 auto;
+    padding: 1.2rem 0.4rem 0.2rem;
+    color: var(--contact-ink);
+}
+
+.contact-hero {
+    background: radial-gradient(circle at 100% -20%, #1d4f5d 0%, transparent 45%), linear-gradient(150deg, #172028 0%, var(--contact-surface) 70%, #131a21 100%);
+    border: 1px solid var(--contact-line);
+    border-radius: 18px;
+    padding: 1.35rem 1.35rem 1.2rem;
+    box-shadow: 0 14px 30px #00000045;
+}
+
+.contact-kicker {
+    margin: 0;
+    color: #7ae5c7;
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-weight: 700;
+}
+
+.contact-grid {
+    margin-top: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.8rem;
+}
+
+.contact-card {
+    background: linear-gradient(165deg, #24313d 0%, var(--contact-card) 100%);
+    border: 1px solid #3a4f63;
+    border-radius: 14px;
+    padding: 1rem 1rem 0.95rem;
+}
+
+.contact-highlight {
+    margin: 0.52rem 0 0;
+    color: var(--contact-accent);
+    font-weight: 700;
+}
+
+.contact-checklist {
+    margin-top: 1rem;
+    background: #1b2630;
+    border: 1px solid #355264;
+    border-radius: 12px;
+    padding: 0.95rem 1rem;
+}
+
+@media (max-width: 900px) {
+    .about-grid,
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .products-page .primary-btn {
@@ -1185,6 +1343,17 @@ body {
 
     .admin-page .admin-kpi-grid {
         grid-template-columns: repeat(2, minmax(120px, 1fr));
+    }
+
+    .admin-page .security-baseline-row {
+        flex-direction: column;
+        align-items: flex-start;
+        border-bottom: 0;
+        padding-bottom: 0.2rem;
+    }
+
+    .admin-page .security-value {
+        text-align: left;
     }
 }
 
