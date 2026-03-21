@@ -3,6 +3,7 @@
 @namespace DarkMarket.Pages
 
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
 
 @{
     Layout = null;
@@ -14,8 +15,8 @@
     <meta charset="utf-8" />
     <title>DarkMarket</title>
     <base href="~/" />
-    <link rel="stylesheet" href="/css/site.css" />
-    <link rel="stylesheet" href="/DarkMarket.styles.css" />
+    <link rel="stylesheet" href="/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/DarkMarket.styles.css" asp-append-version="true" />
     <link rel="icon" href="favicon.ico" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
@@ -24,6 +25,66 @@
         <component type="typeof(App)" render-mode="ServerPrerendered" />
     </app>
     <script src="/js/ui-preferences.js"></script>
+    <script>
+        window.darkMarketIsDevelopment = @(HostEnvironment.IsDevelopment() ? "true" : "false");
+    </script>
+    <script>
+        window.darkMarketCookieConsent = window.darkMarketCookieConsent || {
+            init: function () {
+                var banner = document.getElementById("cookie-consent-banner");
+                var modal = document.getElementById("cookie-consent-modal");
+                if (banner) {
+                    banner.classList.remove("is-hidden");
+                }
+                if (modal) {
+                    modal.classList.add("is-hidden");
+                }
+            },
+            openPreferences: function () {
+                var modal = document.getElementById("cookie-consent-modal");
+                if (modal) {
+                    modal.classList.remove("is-hidden");
+                }
+            },
+            closePreferences: function () {
+                var modal = document.getElementById("cookie-consent-modal");
+                if (modal) {
+                    modal.classList.add("is-hidden");
+                }
+            },
+            acceptAll: function () {
+                var banner = document.getElementById("cookie-consent-banner");
+                var modal = document.getElementById("cookie-consent-modal");
+                if (banner) {
+                    banner.classList.add("is-hidden");
+                }
+                if (modal) {
+                    modal.classList.add("is-hidden");
+                }
+            },
+            rejectOptional: function () {
+                var banner = document.getElementById("cookie-consent-banner");
+                var modal = document.getElementById("cookie-consent-modal");
+                if (banner) {
+                    banner.classList.add("is-hidden");
+                }
+                if (modal) {
+                    modal.classList.add("is-hidden");
+                }
+            },
+            savePreferences: function () {
+                var banner = document.getElementById("cookie-consent-banner");
+                var modal = document.getElementById("cookie-consent-modal");
+                if (banner) {
+                    banner.classList.add("is-hidden");
+                }
+                if (modal) {
+                    modal.classList.add("is-hidden");
+                }
+            }
+        };
+    </script>
+    <script src="/js/cookie-consent.js" asp-append-version="true"></script>
     <script src="/js/admin-downloads.js"></script>
     <script src="/js/modal-a11y.js"></script>
     <script src="/_framework/blazor.server.js"></script>
