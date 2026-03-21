@@ -5,42 +5,50 @@
 @inject AuthenticationStateProvider AuthProvider
 @inject BitcoinQuoteService BitcoinQuoteService
 @inject CurrencyPreferenceService CurrencyPreferenceService
+@inject UiTextService T
 
 @using Microsoft.AspNetCore.Components.Authorization
 
-<div class="marketplace-page">
-    <h2 class="page-title">Marketplace</h2>
+<div class="entity-shell marketplace-page">
+    <section class="entity-shell-hero">
+        <p class="entity-shell-kicker">@T["Marketplace.Kicker"]</p>
+        <h1>@T["Marketplace.Title"]</h1>
+        <p class="entity-shell-subtitle">@T["Marketplace.Subtitle"]</p>
+    </section>
 
-    <div class="filter-bar filter-marketplace">
-        <input type="text" placeholder="Buscar por nome..." @bind="filterName" @bind:event="oninput" />
-        <input type="number" placeholder="Preço mínimo" @bind="filterMinPrice" min="0" />
-        <input type="number" placeholder="Preço máximo" @bind="filterMaxPrice" min="0" />
-        <input type="text" placeholder="Vendedor..." @bind="filterSeller" @bind:event="oninput" />
-        <button @onclick="ApplyFilters">Filtrar</button>
-        <button @onclick="ClearFilters">Limpar</button>
-    </div>
+    <section class="entity-shell-grid" aria-label="@T["Marketplace.Aria.Products"]">
+        <article class="entity-shell-card entity-shell-main">
 
-    @if (filteredProducts == null)
-    {
-        <div class="loading-spinner">
-            <span class="oi oi-reload spinning"></span> Carregando produtos...
-        </div>
-    }
-    else if (!filteredProducts.Any())
-    {
-        <p>Nenhum produto disponível.</p>
-    }
-    else
-    {
-        <div class="product-list">
-            @foreach (var p in filteredProducts?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<Product>())
+            <div class="filter-bar filter-marketplace">
+                <input type="text" placeholder="@T["Marketplace.Filter.Name"]" @bind="filterName" @bind:event="oninput" />
+                <input type="number" placeholder="@T["Marketplace.Filter.MinPrice"]" @bind="filterMinPrice" min="0" />
+                <input type="number" placeholder="@T["Marketplace.Filter.MaxPrice"]" @bind="filterMaxPrice" min="0" />
+                <input type="text" placeholder="@T["Marketplace.Filter.Seller"]" @bind="filterSeller" @bind:event="oninput" />
+                <button @onclick="ApplyFilters">@T["Common.Filter"]</button>
+                <button @onclick="ClearFilters">@T["Common.Clear"]</button>
+            </div>
+
+            @if (filteredProducts == null)
             {
-                <div class="marketplace-product-card">
+                <div class="loading-spinner">
+                    <span class="oi oi-reload spinning"></span> @T["Marketplace.LoadingProducts"]
+                </div>
+            }
+            else if (!filteredProducts.Any())
+            {
+                <p>@T["Marketplace.Empty"]</p>
+            }
+            else
+            {
+                <div class="product-list">
+                    @foreach (var p in filteredProducts?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<Product>())
+                    {
+                        <div class="marketplace-product-card">
                     <!-- 1. Imagem -->
                     <div class="product-img-block">
                         @if (!string.IsNullOrEmpty(p.ImagePath))
                         {
-                            <img src="@p.ImagePath" alt="Imagem" />
+                            <img src="@p.ImagePath" alt="@T["Marketplace.ImageAlt"]" />
                         }
                     </div>
                     <!-- 2. Nome + Preço -->
@@ -49,18 +57,18 @@
                         <div class="product-price">@FormatBtcWithUsd(p.Price)</div>
                         <div class="product-delivery-badge-wrap">
                             <span class="product-delivery-badge @(p.RequiresDelivery ? "physical" : "digital")">
-                                @(p.RequiresDelivery ? "Físico" : "Digital")
+                                @(p.RequiresDelivery ? T["Marketplace.Badge.Physical"] : T["Marketplace.Badge.Digital"])
                             </span>
                         </div>
                     </div>
                     <!-- 3. Descrição -->
                     <div class="product-desc-block">
-                        <div class="label">Descrição:</div>
+                        <div class="label">@T["Common.Description"]:</div>
                         <div class="product-desc">@p.Description</div>
                     </div>
                     <!-- 4. Vendedor -->
                     <div class="product-seller-block">
-                        <div class="label">Vendedor:</div>
+                        <div class="label">@T["Common.Seller"]:</div>
                         <div class="product-user">
                             @if (p.User != null)
                             {
@@ -75,29 +83,31 @@
                                 @if (p.UserId != userId)
                                 {
                                     <button class="buy-btn" @onclick='() => Navigation.NavigateTo($"/marketplace/buy/{p.Id}")'>
-                                        Comprar
+                                        @T["Common.Buy"]
                                     </button>
                                 }
                                 else
                                 {
-                                    <span class="own-product-label">Seu produto</span>
+                                    <span class="own-product-label">@T["Marketplace.OwnProduct"]</span>
                                 }
                             </Authorized>
                             <NotAuthorized>
-                                <span class="own-product-label">Faça login para comprar</span>
+                                <span class="own-product-label">@T["Marketplace.LoginToBuy"]</span>
                             </NotAuthorized>
                         </AuthorizeView>
                     </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="pagination marketplace-pagination">
+                    <button type="button" @onclick="@(() => PrevPage())" disabled="@(!CanGoToPreviousPage)">@T["Common.Previous"]</button>
+                    <span class="pagination-info">@T["Common.Page"] @currentPage @T["Common.Of"] @totalPages</span>
+                    <button type="button" @onclick="@(() => NextPage())" disabled="@(!CanGoToNextPage)">@T["Common.Next"]</button>
                 </div>
             }
-        </div>
-
-        <div class="pagination marketplace-pagination">
-            <button type="button" @onclick="@(() => PrevPage())" disabled="@(!CanGoToPreviousPage)">Anterior</button>
-            <span class="pagination-info">Página @currentPage de @totalPages</span>
-            <button type="button" @onclick="@(() => NextPage())" disabled="@(!CanGoToNextPage)">Próxima</button>
-        </div>
-    }
+        </article>
+    </section>
 </div>
 
 @code {

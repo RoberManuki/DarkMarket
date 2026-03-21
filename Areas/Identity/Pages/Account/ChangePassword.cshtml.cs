@@ -26,18 +26,18 @@ namespace DarkMarket.Areas.Identity.Pages.Account
         {
             [Required]
             [DataType(DataType.Password)]
-            [Display(Name = "Senha atual")]
+            [Display(Name = "Current password")]
             public string CurrentPassword { get; set; } = string.Empty;
 
             [Required]
-            [StringLength(100, ErrorMessage = "A senha deve ter no minimo {2} e no maximo {1} caracteres.", MinimumLength = 6)]
+            [StringLength(100, ErrorMessage = "Password must be between {2} and {1} characters.", MinimumLength = 6)]
             [DataType(DataType.Password)]
-            [Display(Name = "Nova senha")]
+            [Display(Name = "New password")]
             public string NewPassword { get; set; } = string.Empty;
 
             [DataType(DataType.Password)]
-            [Display(Name = "Confirmar nova senha")]
-            [Compare("NewPassword", ErrorMessage = "A nova senha e a confirmacao nao coincidem.")]
+            [Display(Name = "Confirm new password")]
+            [Compare("NewPassword", ErrorMessage = "New password and confirmation do not match.")]
             public string ConfirmPassword { get; set; } = string.Empty;
         }
 

@@ -14,111 +14,122 @@
 @inject OperationFeeCalculatorService OperationFeeCalculatorService
 @inject AdminOrderReleaseService AdminOrderReleaseService
 @inject IJSRuntime JS
+@inject UiTextService T
 
-<h2 class="page-title">Pedidos aguardando revisão do ADM</h2>
+<div class="entity-shell">
+    <section class="entity-shell-hero">
+        <p class="entity-shell-kicker">@T["AdminOrdersReview.Kicker"]</p>
+        <h1>@T["AdminOrdersReview.Title"]</h1>
+        <p class="entity-shell-subtitle">@T["AdminOrdersReview.Subtitle"]</p>
+    </section>
 
-<div class="filter-bar admin-filter-card">
-    <input type="text" placeholder="Filtrar por comprador..." @bind="buyerFilter" @bind:event="oninput" @bind:after="OnFiltersChangedAsync" />
-    <input type="text" placeholder="Filtrar por produto..." @bind="productFilter" @bind:event="oninput" @bind:after="OnFiltersChangedAsync" />
-    <input type="number" placeholder="Valor mínimo (BTC)" @bind="minAmountFilter" @bind:after="OnFiltersChangedAsync" min="0" step="0.00000001" />
-    <input type="number" placeholder="Valor máximo (BTC)" @bind="maxAmountFilter" @bind:after="OnFiltersChangedAsync" min="0" step="0.00000001" />
-    <button @onclick="ClearFiltersAsync">Limpar filtros</button>
-    <button class="sort-reset-btn" @onclick="ResetSortingAsync" disabled="@IsDefaultSort">Resetar ordenação</button>
-</div>
+    <section class="entity-shell-grid" aria-label="@T["AdminOrdersReview.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            <div class="filter-bar admin-filter-card">
+                <input type="text" placeholder="@T["AdminOrdersReview.Filter.Buyer"]" @bind="buyerFilter" @bind:event="oninput" @bind:after="OnFiltersChangedAsync" />
+                <input type="text" placeholder="@T["AdminOrdersReview.Filter.Product"]" @bind="productFilter" @bind:event="oninput" @bind:after="OnFiltersChangedAsync" />
+                <input type="number" placeholder="@T["AdminOrdersReview.Filter.Min"]" @bind="minAmountFilter" @bind:after="OnFiltersChangedAsync" min="0" step="0.00000001" />
+                <input type="number" placeholder="@T["AdminOrdersReview.Filter.Max"]" @bind="maxAmountFilter" @bind:after="OnFiltersChangedAsync" min="0" step="0.00000001" />
+                <button @onclick="ClearFiltersAsync">@T["AdminOrdersReview.ClearFilters"]</button>
+                <button class="sort-reset-btn" @onclick="ResetSortingAsync" disabled="@IsDefaultSort">@T["AdminOrdersReview.ResetSort"]</button>
+            </div>
 
-@if (showRestoredFiltersNotice)
-{
-    <div class="orders-review-restored-notice">
-        <span>Filtros restaurados da sessão anterior.</span>
-        <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="Fechar aviso">×</button>
-    </div>
-}
+            @if (showRestoredFiltersNotice)
+            {
+                <div class="orders-review-restored-notice">
+                    <span>@T["AdminOrdersReview.RestoredFilters"]</span>
+                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">×</button>
+                </div>
+            }
 
-@if (orders == null)
-{
-    <p>Carregando...</p>
-}
-else if (!orders.Any())
-{
-    <p>Nenhum pedido aguardando revisão.</p>
-}
-else if (!FilteredOrders.Any())
-{
-    <p>Nenhum pedido encontrado para os filtros informados.</p>
-}
-else
-{
-    <div class="orders-review-sort-summary">Ordenado por @CurrentSortLabel</div>
+            @if (orders == null)
+            {
+                <p>@T["Common.Loading"]</p>
+            }
+            else if (!orders.Any())
+            {
+                <p>@T["AdminOrdersReview.EmptyPending"]</p>
+            }
+            else if (!FilteredOrders.Any())
+            {
+                <p>@T["AdminOrdersReview.EmptyFiltered"]</p>
+            }
+            else
+            {
+                <div class="orders-review-sort-summary">@T["AdminOrdersReview.SortedBy"] @CurrentSortLabel</div>
 
-    <table class="product-table">
+                <table class="product-table">
         <thead>
             <tr>
                 <th>
                     <button class="@(SortButtonClass(OrderReviewSortColumn.Buyer))" @onclick="() => ApplySortAsync(OrderReviewSortColumn.Buyer)">
-                        Comprador @SortIndicator(OrderReviewSortColumn.Buyer)
+                        @T["AdminOrders.Buyer"] @SortIndicator(OrderReviewSortColumn.Buyer)
                     </button>
                 </th>
                 <th>
                     <button class="@(SortButtonClass(OrderReviewSortColumn.Product))" @onclick="() => ApplySortAsync(OrderReviewSortColumn.Product)">
-                        Produto @SortIndicator(OrderReviewSortColumn.Product)
+                        @T["AdminOrders.Product"] @SortIndicator(OrderReviewSortColumn.Product)
                     </button>
                 </th>
                 <th>
                     <button class="@(SortButtonClass(OrderReviewSortColumn.Amount))" @onclick="() => ApplySortAsync(OrderReviewSortColumn.Amount)">
-                        Valor @SortIndicator(OrderReviewSortColumn.Amount)
+                        @T["Common.Value"] @SortIndicator(OrderReviewSortColumn.Amount)
                     </button>
                 </th>
-                <th>Status</th>
-                <th>Ações</th>
+                <th>@T["Common.Status"]</th>
+                <th>@T["Common.Actions"]</th>
             </tr>
         </thead>
         <tbody>
         @foreach (var order in PagedOrders)
         {
             <tr>
-                <td data-label="Comprador">@order.Buyer?.UserName</td>
-                <td data-label="Produto">@order.Product?.Name</td>
-                <td data-label="Valor">@FormatBtc(order.Amount)</td>
-                <td data-label="Status">
-                    <span class="order-status-badge aguardandorevisaoadm">Aguardando revisão ADM</span>
+                <td data-label="@T["AdminOrders.Buyer"]">@order.Buyer?.UserName</td>
+                <td data-label="@T["AdminOrders.Product"]">@order.Product?.Name</td>
+                <td data-label="@T["Common.Value"]">@FormatBtc(order.Amount)</td>
+                <td data-label="@T["Common.Status"]">
+                    <span class="order-status-badge aguardandorevisaoadm">@T["AdminOrdersReview.StatusAwaiting"]</span>
                 </td>
-                <td data-label="Ações">
+                <td data-label="@T["Common.Actions"]">
                     <div class="order-review-actions">
-                        <a class="details-btn" href="@($"/orders/{order.Id}")">Detalhes</a>
-                        <button class="success-btn" @onclick="() => ShowReleaseModalAsync(order.Id)">Repassar</button>
+                        <a class="details-btn" href="@($"/orders/{order.Id}")">@T["Common.Details"]</a>
+                        <button class="success-btn" @onclick="() => ShowReleaseModalAsync(order.Id)">@T["AdminOrdersReview.Release"]</button>
                     </div>
                 </td>
             </tr>
         }
         </tbody>
-    </table>
+                </table>
 
-    <div class="pagination">
-        <button @onclick="PrevPageAsync" disabled="@(currentPage <= 1)">Anterior</button>
-        <span class="pagination-info">Página @currentPage de @TotalPages</span>
-        <button @onclick="NextPageAsync" disabled="@(currentPage >= TotalPages)">Próxima</button>
-    </div>
-}
+                <div class="pagination">
+                    <button @onclick="PrevPageAsync" disabled="@(currentPage <= 1)">@T["Common.Previous"]</button>
+                    <span class="pagination-info">@T["Common.Page"] @currentPage @T["Common.Of"] @TotalPages</span>
+                    <button @onclick="NextPageAsync" disabled="@(currentPage >= TotalPages)">@T["Common.Next"]</button>
+                </div>
+            }
+        </article>
+    </section>
+</div>
 
 @if (showReleaseModal && selectedOrder != null)
 {
     <div class="modal-overlay">
         <div id="admin-release-funds-modal" class="modal-card release-modal-card" role="dialog" aria-modal="true" aria-labelledby="admin-release-funds-title" tabindex="0" @onkeydown="HandleModalKeydown" @onkeydown:stopPropagation="true">
-            <h4 class="modal-title modal-title-with-icon" id="admin-release-funds-title"><i class="fa fa-exclamation-triangle modal-title-icon"></i>Confirmar repasse ao vendedor</h4>
+            <h4 class="modal-title modal-title-with-icon" id="admin-release-funds-title"><i class="fa fa-exclamation-triangle modal-title-icon"></i>@T["AdminOrdersReview.Modal.Title"]</h4>
             <div class="modal-content release-modal-content">
-                <p class="release-modal-question">Tem certeza que deseja repassar os fundos e finalizar o pedido?</p>
+                <p class="release-modal-question">@T["AdminOrdersReview.Modal.Question"]</p>
 
                 <div class="release-modal-layout">
                     <div class="payment-details-card wide-card release-summary-card">
-                        <div class="details-row"><span class="label">Produto:</span><span>@selectedOrder.Product?.Name</span></div>
-                        <div class="details-row"><span class="label">Tipo:</span><span>@(selectedOrder.Product?.RequiresDelivery == true ? "Físico" : "Digital")</span></div>
-                        <div class="details-row"><span class="label">Quantidade:</span><span>1</span></div>
-                        <div class="details-row"><span class="label">Comprador:</span><span>@selectedOrder.Buyer?.UserName</span></div>
-                        <div class="details-row"><span class="label">Vendedor:</span><span>@selectedOrder.Seller?.UserName</span></div>
-                        <div class="details-row"><span class="label">Valor bruto:</span><span>@FormatBtc(selectedOrder.Amount)</span></div>
-                        <div class="details-row"><span class="label">Taxa operacional:</span><span>@(releaseBreakdown?.Percent.ToString("0.##") ?? "0")%</span></div>
-                        <div class="details-row"><span class="label">Valor da taxa:</span><span>@FormatBtc(releaseBreakdown?.FeeAmount ?? 0m)</span></div>
-                        <div class="details-row"><span class="label">Valor líquido (repasse):</span><span><b>@FormatBtc(releaseBreakdown?.NetAmount ?? 0m)</b></span></div>
+                        <div class="details-row"><span class="label">@T["AdminOrders.Product"]:</span><span>@selectedOrder.Product?.Name</span></div>
+                        <div class="details-row"><span class="label">@T["Products.Type"]:</span><span>@(selectedOrder.Product?.RequiresDelivery == true ? T["Marketplace.Badge.Physical"] : T["Marketplace.Badge.Digital"])</span></div>
+                        <div class="details-row"><span class="label">@T["AdminOrdersReview.Quantity"]:</span><span>1</span></div>
+                        <div class="details-row"><span class="label">@T["AdminOrders.Buyer"]:</span><span>@selectedOrder.Buyer?.UserName</span></div>
+                        <div class="details-row"><span class="label">@T["AdminOrders.Seller"]:</span><span>@selectedOrder.Seller?.UserName</span></div>
+                        <div class="details-row"><span class="label">@T["AdminOrdersReview.GrossAmount"]:</span><span>@FormatBtc(selectedOrder.Amount)</span></div>
+                        <div class="details-row"><span class="label">@T["AdminOrdersReview.OperationFee"]:</span><span>@(releaseBreakdown?.Percent.ToString("0.##") ?? "0")%</span></div>
+                        <div class="details-row"><span class="label">@T["AdminOrdersReview.FeeAmount"]:</span><span>@FormatBtc(releaseBreakdown?.FeeAmount ?? 0m)</span></div>
+                        <div class="details-row"><span class="label">@T["AdminOrdersReview.NetAmount"]:</span><span><b>@FormatBtc(releaseBreakdown?.NetAmount ?? 0m)</b></span></div>
                     </div>
 
                     <div class="release-modal-side">
@@ -131,31 +142,31 @@ else
 
                         <div class="evidence-section">
                             <div class="evidence-card">
-                                <i class="fa fa-user"></i> <b>Comprador</b>
+                                <i class="fa fa-user"></i> <b>@T["AdminOrders.Buyer"]</b>
                                 @if (!string.IsNullOrEmpty(selectedOrder.BuyerEvidencePath))
                                 {
-                                    <div>Comentário: @selectedOrder.BuyerEvidenceComment</div>
+                                    <div>@T["AdminOrdersReview.Comment"] @selectedOrder.BuyerEvidenceComment</div>
                                     <a href="@selectedOrder.BuyerEvidencePath" target="_blank">
-                                        <i class="fa fa-file-image"></i> Ver comprovante
+                                        <i class="fa fa-file-image"></i> @T["AdminOrdersReview.ViewEvidence"]
                                     </a>
                                 }
                                 else
                                 {
-                                    <div class="text-muted">Nenhuma evidência enviada.</div>
+                                    <div class="text-muted">@T["AdminOrdersReview.NoEvidence"]</div>
                                 }
                             </div>
                             <div class="evidence-card">
-                                <i class="fa fa-truck"></i> <b>Vendedor</b>
+                                <i class="fa fa-truck"></i> <b>@T["AdminOrders.Seller"]</b>
                                 @if (!string.IsNullOrEmpty(selectedOrder.SellerEvidencePath))
                                 {
-                                    <div>Comentário: @selectedOrder.SellerEvidenceComment</div>
+                                    <div>@T["AdminOrdersReview.Comment"] @selectedOrder.SellerEvidenceComment</div>
                                     <a href="@selectedOrder.SellerEvidencePath" target="_blank">
-                                        <i class="fa fa-file-image"></i> Ver comprovante
+                                        <i class="fa fa-file-image"></i> @T["AdminOrdersReview.ViewEvidence"]
                                     </a>
                                 }
                                 else
                                 {
-                                    <div class="text-muted">Nenhuma evidência enviada.</div>
+                                    <div class="text-muted">@T["AdminOrdersReview.NoEvidence"]</div>
                                 }
                             </div>
                         </div>
@@ -163,8 +174,8 @@ else
                 </div>
             </div>
             <div class="modal-actions">
-                <button class="success-btn" @onclick="ConfirmReleaseFunds">Sim, repassar</button>
-                <button class="back-btn" @onclick="() => showReleaseModal = false">Cancelar</button>
+                <button class="success-btn" @onclick="ConfirmReleaseFunds">@T["AdminOrdersReview.Modal.Confirm"]</button>
+                <button class="back-btn" @onclick="() => showReleaseModal = false">@T["Common.Cancel"]</button>
             </div>
         </div>
     </div>
@@ -507,12 +518,12 @@ else
     private string SortButtonClass(OrderReviewSortColumn column)
         => currentSortColumn == column ? "table-sort-btn active" : "table-sort-btn";
 
-    private static string SortColumnLabel(OrderReviewSortColumn column)
+    private string SortColumnLabel(OrderReviewSortColumn column)
         => column switch
         {
-            OrderReviewSortColumn.Buyer => "Comprador",
-            OrderReviewSortColumn.Product => "Produto",
-            _ => "Valor"
+            OrderReviewSortColumn.Buyer => T["AdminOrders.Buyer"],
+            OrderReviewSortColumn.Product => T["AdminOrders.Product"],
+            _ => T["Common.Value"]
         };
 
     private static string FormatBtc(decimal amount)

@@ -1,48 +1,35 @@
 @page "/about"
 
-<PageTitle>Sobre - DarkMarket</PageTitle>
+@inject UiTextService T
+
+<PageTitle>@T["About.PageTitle"]</PageTitle>
 
 <div class="about-page">
     <section class="about-hero">
-        <p class="about-kicker">Infraestrutura de comércio com Bitcoin</p>
+        <p class="about-kicker">@T["About.Kicker"]</p>
         <h1>DarkMarket</h1>
-        <p>
-            Plataforma focada em transações rastreáveis, auditoria operacional e evolução contínua por
-            backlog técnico.
-        </p>
+        <p>@T["About.Hero"]</p>
     </section>
 
-    <section class="about-grid" aria-label="Pilares do projeto">
+    <section class="about-grid" aria-label="@T["About.Aria.Pillars"]">
         <article class="about-panel">
-            <h3>Segurança como base</h3>
-            <p>
-                Controles de autenticação, lockout, confirmação de e-mail e validações críticas para
-                reduzir risco em fluxos sensíveis.
-            </p>
+            <h3>@T["About.Security.Title"]</h3>
+            <p>@T["About.Security.Text"]</p>
         </article>
 
         <article class="about-panel">
-            <h3>Auditoria real</h3>
-            <p>
-                Logs administrativos e trilhas de mudança para permitir investigação de incidentes,
-                revisão de decisões e conformidade operacional.
-            </p>
+            <h3>@T["About.Audit.Title"]</h3>
+            <p>@T["About.Audit.Text"]</p>
         </article>
 
         <article class="about-panel">
-            <h3>Operação incremental</h3>
-            <p>
-                Entregas evolutivas com validação constante em testes e ajustes práticos guiados por
-                comportamento real em produção local.
-            </p>
+            <h3>@T["About.Incremental.Title"]</h3>
+            <p>@T["About.Incremental.Text"]</p>
         </article>
     </section>
 
-    <section class="about-roadmap-note" aria-label="Visão do roadmap">
-        <h2>Visão do roadmap</h2>
-        <p>
-            O projeto prioriza robustez do núcleo de pagamentos e gestão administrativa, seguido por
-            refinamento de UX e expansão de observabilidade.
-        </p>
+    <section class="about-roadmap-note" aria-label="@T["About.Roadmap.Title"]">
+        <h2>@T["About.Roadmap.Title"]</h2>
+        <p>@T["About.Roadmap.Text"]</p>
     </section>
 </div>

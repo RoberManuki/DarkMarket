@@ -1,12 +1,13 @@
 @page
 @model DarkMarket.Areas.Identity.Pages.Account.ConfirmEmailModel
+@inject DarkMarket.Services.UiTextService T
 @{
-    ViewData["Title"] = "Confirmacao de e-mail";
+    ViewData["Title"] = T["Identity.ConfirmEmail.Title"];
 }
 
-<h2>Confirmacao de e-mail</h2>
+<h2>@T["Identity.ConfirmEmail.Heading"]</h2>
 <p class="identity-muted">@Model.StatusMessage</p>
 
 <div class="identity-actions">
-    <a asp-page="./Login">Ir para login</a>
+    <a asp-page="./Login">@T["Identity.Common.GoToLogin"]</a>
 </div>

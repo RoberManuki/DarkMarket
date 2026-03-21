@@ -1,4 +1,6 @@
+@using DarkMarket.Services
 @inject NavigationManager NavigationManager
+@inject UiTextService T
 
 @if (Segments.Count >= 2)
 {
@@ -45,7 +47,7 @@
         Segments = allSegments.Select(s => MapSegment(s)).ToList();
 
         if (Segments.Count == 0)
-            Segments.Add("Início");
+            Segments.Add(T["Breadcrumb.Home"]);
     }
 
     private bool IsIdSegment(string s)
@@ -57,17 +59,20 @@
     {
         return s.ToLower() switch
         {
-            "admin" => "Administração",
-            "users" => "Usuários",
-            "payments" => "Pagamentos",
-            "logs" => "Logs",
-            "edit" => "Editar",
-            "view" => "Detalhes",
-            "buy" => "Comprar",
-            "products" => "Meus Produtos",
-            "payments-history" => "Histórico de Pagamentos",
-            "about" => "Sobre",
-            "contact" => "Contato",
+            "admin" => T["Breadcrumb.Admin"],
+            "users" => T["Breadcrumb.Users"],
+            "payments" => T["Breadcrumb.Payments"],
+            "logs" => T["Breadcrumb.Logs"],
+            "edit" => T["Breadcrumb.Edit"],
+            "view" => T["Breadcrumb.View"],
+            "buy" => T["Breadcrumb.Buy"],
+            "products" => T["Breadcrumb.Products"],
+            "about" => T["Breadcrumb.About"],
+            "contact" => T["Breadcrumb.Contact"],
+            "dashboard" => T["Breadcrumb.Dashboard"],
+            "marketplace" => T["Breadcrumb.Marketplace"],
+            "orders" => T["Breadcrumb.Orders"],
+            "languages" => T["Breadcrumb.Languages"],
             _ => Capitalize(s)
         };
     }

@@ -12,76 +12,89 @@
 @inject BitcoinQuoteService BitcoinQuoteService
 @inject CurrencyPreferenceService CurrencyPreferenceService
 @inject AdminProductsFilterStateService AdminProductsFilterStateService
+@inject UiTextService T
 
-<h2 class="page-title">Produtos</h2>
+<div class="entity-shell">
+    <section class="entity-shell-hero">
+        <p class="entity-shell-kicker">@T["AdminProducts.Kicker"]</p>
+        <h1>@T["AdminProducts.Title"]</h1>
+        <p class="entity-shell-subtitle">@T["AdminProducts.Subtitle"]</p>
+    </section>
 
-<div class="filter-bar admin-filter-card">
-    <input type="number" placeholder="ID..." @bind="filterId" min="0" />
-    <input type="text" placeholder="Nome..." @bind="filterName" @bind:event="oninput" />
-    <input type="text" placeholder="Usuário..." @bind="filterUserId" @bind:event="oninput" />
-    <input type="number" placeholder="Preço mínimo" @bind="filterMinPrice" min="0" />
-    <input type="number" placeholder="Preço máximo" @bind="filterMaxPrice" min="0" />
-    <button type="button" @onclick="@(async () => await ApplyFiltersAndPersist())">Filtrar</button>
-    <button type="button" @onclick="@(async () => await ClearFilters())">Limpar</button>
+    <section class="entity-shell-grid" aria-label="@T["AdminProducts.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            <div class="filter-bar admin-filter-card">
+                <input type="number" placeholder="@T["AdminProducts.Filter.Id"]" @bind="filterId" min="0" />
+                <input type="text" placeholder="@T["AdminProducts.Filter.Name"]" @bind="filterName" @bind:event="oninput" />
+                <input type="text" placeholder="@T["AdminProducts.Filter.User"]" @bind="filterUserId" @bind:event="oninput" />
+                <input type="number" placeholder="@T["AdminProducts.Filter.MinPrice"]" @bind="filterMinPrice" min="0" />
+                <input type="number" placeholder="@T["AdminProducts.Filter.MaxPrice"]" @bind="filterMaxPrice" min="0" />
+                <button type="button" @onclick="@(async () => await ApplyFiltersAndPersist())">@T["Common.Filter"]</button>
+                <button type="button" @onclick="@(async () => await ClearFilters())">@T["Common.Clear"]</button>
+            </div>
+
+            @if (showRestoredFiltersNotice)
+            {
+                <div class="orders-review-restored-notice">
+                    <span>@T["AdminProducts.RestoredFilters"]</span>
+                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">×</button>
+                </div>
+            }
+
+            <AdminDataState IsLoading="@isLoading" IsEmpty="@(filteredProducts == null || !filteredProducts.Any())" LoadingText="@T["AdminProducts.Loading"]" EmptyText="@T["AdminProducts.Empty"]">
+                <table class="product-table">
+                    <thead>
+                        <tr>
+                            <th>@T["AdminProducts.Name"]</th>
+                            <th>@T["AdminProducts.User"]</th>
+                            <th>@T["AdminProducts.Price"]</th>
+                            <th>@T["AdminProducts.Type"]</th>
+                            <th>@T["AdminProducts.CreatedAt"]</th>
+                            <th>@T["Common.Actions"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var p in filteredProducts?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<Product>())
+                    {
+                        <tr>
+                            <td data-label="@T["AdminProducts.Name"]">@p.Name</td>
+                            <td data-label="@T["AdminProducts.User"]">
+                                <a class="evidence-link" href="@($"/admin/users/view/{p.UserId}")">
+                                    @p.User?.UserName
+                                </a>
+                            </td>
+                            <td data-label="@T["AdminProducts.Price"]">
+                                @FormatBtcWithUsd(p.Price)
+                            </td>
+                            <td data-label="@T["AdminProducts.Type"]">
+                                <span class="product-delivery-badge @(p.RequiresDelivery ? "physical" : "digital")">
+                                    @(p.RequiresDelivery ? T["Marketplace.Badge.Physical"] : T["Marketplace.Badge.Digital"])
+                                </span>
+                            </td>
+                            <td data-label="@T["AdminProducts.CreatedAt"]">@p.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
+                            <td data-label="@T["Common.Actions"]">
+                                <button class="details-btn action-btn" @onclick="() => ViewProduct(p.Id)">@T["Common.Details"]</button>
+                                <button class="edit-btn action-btn" @onclick="() => EditProduct(p.Id)">@T["Products.Edit"]</button>
+                                <button class="danger" @onclick="() => DeleteProduct(p.Id)">@T["Products.Remove"]</button>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+
+                <div class="pagination">
+                    <button type="button" @onclick="@(async () => await PrevPage())" disabled="@(currentPage <= 1)">@T["Common.Previous"]</button>
+                    <span class="pagination-info">@T["Common.Page"] @currentPage @T["Common.Of"] @totalPages</span>
+                    <button type="button" @onclick="@(async () => await NextPage())" disabled="@(currentPage >= totalPages)">@T["Common.Next"]</button>
+                </div>
+            </AdminDataState>
+        </article>
+    </section>
+
+    <section class="entity-shell-footer" aria-label="@T["AdminCommon.ExtraActions"]">
+        <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>@T["Common.Back"]</button>
+    </section>
 </div>
-
-@if (showRestoredFiltersNotice)
-{
-    <div class="orders-review-restored-notice">
-        <span>Filtros de produtos restaurados da sessão anterior.</span>
-        <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="Fechar aviso">×</button>
-    </div>
-}
-
-<AdminDataState IsLoading="@isLoading" IsEmpty="@(filteredProducts == null || !filteredProducts.Any())" LoadingText="Carregando produtos..." EmptyText="Nenhum produto encontrado.">
-    <table class="product-table">
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Usuário</th>
-                <th>Preço</th>
-                <th>Tipo</th>
-                <th>Criado em</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var p in filteredProducts?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<Product>())
-        {
-            <tr>
-                <td data-label="Nome">@p.Name</td>
-                <td data-label="Usuário">
-                    <a class="evidence-link" href="@($"/admin/users/view/{p.UserId}")">
-                        @p.User?.UserName
-                    </a>
-                </td>
-                <td data-label="Preço">
-                    @FormatBtcWithUsd(p.Price)
-                </td>
-                <td data-label="Tipo">
-                    <span class="product-delivery-badge @(p.RequiresDelivery ? "physical" : "digital")">
-                        @(p.RequiresDelivery ? "Físico" : "Digital")
-                    </span>
-                </td>
-                <td data-label="Criado em">@p.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
-                <td data-label="Ações">
-                    <button class="details-btn action-btn" @onclick="() => ViewProduct(p.Id)">Detalhes</button>
-                    <button class="edit-btn action-btn" @onclick="() => EditProduct(p.Id)">Editar</button>
-                    <button class="danger" @onclick="() => DeleteProduct(p.Id)">Deletar</button>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
-
-    <div class="pagination">
-        <button type="button" @onclick="@(async () => await PrevPage())" disabled="@(currentPage <= 1)">Anterior</button>
-        <span class="pagination-info">Página @currentPage de @totalPages</span>
-        <button type="button" @onclick="@(async () => await NextPage())" disabled="@(currentPage >= totalPages)">Próxima</button>
-    </div>
-</AdminDataState>
-
-<button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
 
 @code {
     private List<Product>? allProducts;
@@ -136,14 +149,14 @@
 
     private async Task DeleteProduct(int id)
     {
-        if (!await JS.InvokeAsync<bool>("confirm", "Tem certeza que deseja deletar este produto?")) return;
+        if (!await JS.InvokeAsync<bool>("confirm", T["AdminProducts.ConfirmDelete"])) return;
         await ProductService.DeleteAsync(id);
         await LogService.LogAsync(
-            $"Produto deletado (ID: {id})",
+            string.Format(T["AdminProducts.LogDeleted"], id),
             source: "Admin",
             level: "Warning"
         );
-        ToastRef?.Show("Produto deletado!", "info");
+        ToastRef?.Show(T["AdminProducts.DeletedToast"], "info");
         await OnInitializedAsync();
     }
 

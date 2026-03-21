@@ -54,6 +54,7 @@ namespace DarkMarket.Services
             var adminEmail = _configuration["AdminSeed:Email"] ?? "god@god";
             var adminPassword = _configuration["AdminSeed:Password"];
             var adminFullName = _configuration["AdminSeed:FullName"] ?? "Administrator";
+            var syncAdminPassword = _configuration.GetValue<bool?>("AdminSeed:SyncPassword") ?? _environment.IsDevelopment();
 
             var adminUser = await _userManager.FindByEmailAsync(adminEmail);
             if (adminUser == null && !string.IsNullOrWhiteSpace(adminPassword))
@@ -83,6 +84,26 @@ namespace DarkMarket.Services
             {
                 await _userManager.AddToRoleAsync(adminUser, "admin");
                 _logger.LogInformation("Usuário {AdminEmail} promovido a admin.", adminEmail);
+            }
+
+            if (adminUser != null && !string.IsNullOrWhiteSpace(adminPassword) && syncAdminPassword)
+            {
+                var isExpectedPassword = await _userManager.CheckPasswordAsync(adminUser, adminPassword);
+                if (!isExpectedPassword)
+                {
+                    var resetToken = await _userManager.GeneratePasswordResetTokenAsync(adminUser);
+                    var resetPasswordResult = await _userManager.ResetPasswordAsync(adminUser, resetToken, adminPassword);
+
+                    if (!resetPasswordResult.Succeeded)
+                    {
+                        var errors = string.Join("; ", resetPasswordResult.Errors.Select(e => e.Description));
+                        _logger.LogError("Falha ao sincronizar senha do admin seed ({AdminEmail}): {Errors}", adminEmail, errors);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Senha do admin seed sincronizada para {AdminEmail}.", adminEmail);
+                    }
+                }
             }
         }
 

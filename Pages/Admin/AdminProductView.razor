@@ -6,35 +6,44 @@
 @using Microsoft.AspNetCore.Authorization
 
 @inject ProductService ProductService
+@inject UiTextService T
 
-<h2 class="page-title">Detalhes do Produto</h2>
+<div class="entity-shell">
+    <section class="entity-shell-hero">
+        <p class="entity-shell-kicker">@T["AdminProductView.Kicker"]</p>
+        <h1>@T["AdminProductView.Title"]</h1>
+        <p class="entity-shell-subtitle">@T["AdminProductView.Subtitle"]</p>
+    </section>
 
-@if (isLoading)
-{
-    <div class="loading-spinner">Carregando...</div>
-}
-else if (product == null)
-{
-    <p>Produto não encontrado.</p>
-}
-else
-{
-    <div class="form-card">
-        <p><b>ID:</b> @product.Id</p>
-        <p><b>Nome:</b> @product.Name</p>
-        <p><b>Usuário:</b> @product.UserId</p>
-        <p><b>Preço:</b> @product.Price.ToString("C")</p>
-        <p><b>Tipo:</b>
-            <span class="product-delivery-badge @(product.RequiresDelivery ? "physical" : "digital")">
-                @(product.RequiresDelivery ? "Físico" : "Digital")
-            </span>
-        </p>
-        <p><b>Necessita entrega:</b> @(product.RequiresDelivery ? "Sim" : "Não (infoproduto)")</p>
-        <p><b>Criado em:</b> @product.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</p>
-        <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin/products")'>Voltar</button>
-        <button class="edit-btn" @onclick='() => NavigationManager.NavigateTo($"/admin/products/edit/{product.Id}")'>Editar</button>
-    </div>
-}
+    <section class="entity-shell-grid" aria-label="@T["AdminProductView.Aria"]">
+        <article class="entity-shell-card entity-shell-main form-card">
+            @if (isLoading)
+            {
+                <div class="loading-spinner">@T["Common.Loading"]</div>
+            }
+            else if (product == null)
+            {
+                <p>@T["AdminProductView.NotFound"]</p>
+            }
+            else
+            {
+                <p><b>ID:</b> @product.Id</p>
+                <p><b>@T["Common.Name"]:</b> @product.Name</p>
+                <p><b>@T["AdminUsers.User"]:</b> @product.UserId</p>
+                <p><b>@T["Common.Value"]:</b> @product.Price.ToString("C")</p>
+                <p><b>@T["Products.Type"]:</b>
+                    <span class="product-delivery-badge @(product.RequiresDelivery ? "physical" : "digital")">
+                        @(product.RequiresDelivery ? T["Marketplace.Badge.Physical"] : T["Marketplace.Badge.Digital"])
+                    </span>
+                </p>
+                <p><b>@T["AdminProductView.RequiresDelivery"]:</b> @(product.RequiresDelivery ? T["Common.Yes"] : T["AdminProductView.NoInfoproduct"])</p>
+                <p><b>@T["Products.CreatedAt"]:</b> @product.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</p>
+                <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin/products")'>@T["Common.Back"]</button>
+                <button class="edit-btn" @onclick='() => NavigationManager.NavigateTo($"/admin/products/edit/{product.Id}")'>@T["Common.Edit"]</button>
+            }
+        </article>
+    </section>
+</div>
 
 @code {
     [Parameter] public int Id { get; set; }

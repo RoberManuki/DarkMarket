@@ -10,177 +10,190 @@
 @using Microsoft.JSInterop
 @using System.Globalization
 
-@inject AppDbContext Db
+@inject IDbContextFactory<AppDbContext> DbFactory
 @inject AdminLogsQueryService AdminLogsQueryService
 @inject AdminLogsExportService AdminLogsExportService
 @inject AdminLogsFilterStateService AdminLogsFilterStateService
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JS
+@inject UiTextService T
 
-<h2 class="page-title">Logs do Sistema</h2>
+<div class="entity-shell">
+    <section class="entity-shell-hero">
+        <p class="entity-shell-kicker">@T["AdminLogs.Kicker"]</p>
+        <h1>@T["AdminLogs.Title"]</h1>
+        <p class="entity-shell-subtitle">@T["AdminLogs.Subtitle"]</p>
+    </section>
 
-<p class="logs-total-count">
-    <b>Total de logs:</b> @totalLogs
-</p>
+    <section class="entity-shell-grid" aria-label="@T["AdminLogs.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            <p class="logs-total-count">
+                <b>@T["AdminLogs.Total"]</b> @totalLogs
+            </p>
 
-<div class="filter-bar logs-main-filter-bar">
-    <input type="text" placeholder="Busca geral (usuário/fonte/mensagem)..." value="@filterGlobalSearch" @oninput="OnGlobalSearchInput" />
-    <input type="text" placeholder="Usuário..." @bind="filterUserId" @bind:event="oninput" />
-    <input type="text" placeholder="Fonte..." @bind="filterSource" @bind:event="oninput" />
-    <input type="text" placeholder="Mensagem..." @bind="filterMessage" @bind:event="oninput" />
-    <select @bind="filterLevel">
-        <option value="">Todos os níveis</option>
-        <option value="Error">Error</option>
-        <option value="Warning">Warning</option>
-        <option value="Info">Info</option>
-    </select>
-    <input type="date" @bind="filterStartDate" />
-    <input type="date" @bind="filterEndDate" />
+            <div class="filter-bar logs-main-filter-bar">
+                <input type="text" placeholder="@T["AdminLogs.Filter.Global"]" value="@filterGlobalSearch" @oninput="OnGlobalSearchInput" />
+                <input type="text" placeholder="@T["AdminLogs.Filter.User"]" @bind="filterUserId" @bind:event="oninput" />
+                <input type="text" placeholder="@T["AdminLogs.Filter.Source"]" @bind="filterSource" @bind:event="oninput" />
+                <input type="text" placeholder="@T["AdminLogs.Filter.Message"]" @bind="filterMessage" @bind:event="oninput" />
+                <select @bind="filterLevel">
+                    <option value="">@T["AdminLogs.Filter.AllLevels"]</option>
+                    <option value="Error">Error</option>
+                    <option value="Warning">Warning</option>
+                    <option value="Info">Info</option>
+                </select>
+                <input type="date" @bind="filterStartDate" />
+                <input type="date" @bind="filterEndDate" />
 
-    <div class="logs-main-actions">
-        <button type="button" @onclick="@(async () => await ApplyFilters())">Filtrar</button>
-        <button type="button" @onclick="@(async () => await ClearFilters())">Limpar</button>
-        <button class="logs-export-btn" @onclick="ExportCsvAsync" disabled="@(totalLogs == 0 || HasInvalidDateRange)">Exportar CSV</button>
-        <button class="logs-export-btn" @onclick="ExportJsonAsync" disabled="@(totalLogs == 0 || HasInvalidDateRange)">Exportar JSON</button>
-    </div>
-</div>
+                <div class="logs-main-actions">
+                    <button type="button" @onclick="@(async () => await ApplyFilters())">@T["Common.Filter"]</button>
+                    <button type="button" @onclick="@(async () => await ClearFilters())">@T["Common.Clear"]</button>
+                    <button class="logs-export-btn" @onclick="ExportCsvAsync" disabled="@(totalLogs == 0 || HasInvalidDateRange)">@T["AdminLogs.ExportCsv"]</button>
+                    <button class="logs-export-btn" @onclick="ExportJsonAsync" disabled="@(totalLogs == 0 || HasInvalidDateRange)">@T["AdminLogs.ExportJson"]</button>
+                </div>
+            </div>
 
-@if (!string.IsNullOrWhiteSpace(exportNotice))
-{
-    <div class="orders-review-restored-notice" role="status">
-        <span>@exportNotice</span>
-        <button type="button" class="orders-review-restored-close" @onclick="DismissExportNotice" aria-label="Fechar aviso">×</button>
-    </div>
-}
-
-<div class="filter-bar logs-quick-range-bar">
-    <span class="logs-filter-group-label">Período rápido:</span>
-    <div class="logs-chip-group">
-        <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.Today)" @onclick="SetTodayRangeAsync">Hoje</button>
-        <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.Last7Days)" @onclick="() => SetLastDaysRangeAsync(7)">Últimos 7 dias</button>
-        <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.Last30Days)" @onclick="() => SetLastDaysRangeAsync(30)">Últimos 30 dias</button>
-        <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.CurrentMonth)" @onclick="SetCurrentMonthRangeAsync">Mês atual</button>
-        <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.None)" @onclick="ClearDateRangeAsync">Limpar período</button>
-    </div>
-</div>
-
-<div class="filter-bar logs-audit-filter-bar">
-    <span class="logs-filter-group-label">Visão de auditoria:</span>
-    <div class="logs-chip-group">
-        <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.All)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.All)">Todos (@auditCountAll)</button>
-        <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseOnly)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseOnly)">Somente repasses (@auditCountReleaseOnly)</button>
-        <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseSuccess)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseSuccess)">Repasses OK (@auditCountReleaseSuccess)</button>
-        <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseRefused)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseRefused)">Repasses recusados (@auditCountReleaseRefused)</button>
-        <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.SecurityPolicy)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.SecurityPolicy)">Política de segurança (@auditCountSecurityPolicy)</button>
-    </div>
-</div>
-
-@if (HasInvalidDateRange)
-{
-    <div class="orders-review-restored-notice">
-        <span>Intervalo de datas inválido: a data inicial não pode ser maior que a data final.</span>
-    </div>
-}
-
-@if (showRestoredFiltersNotice)
-{
-    <div class="orders-review-restored-notice">
-        <span>Filtros de logs restaurados da sessão anterior.</span>
-        <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="Fechar aviso">×</button>
-    </div>
-}
-
-@if (HasDateRangeFilter)
-{
-    <div class="orders-review-sort-summary">Período aplicado: @ActivePeriodSummary</div>
-}
-
-@if (!logs.Any())
-{
-    <p>Nenhum log encontrado para os filtros informados.</p>
-}
-else
-{
-    <table class="log-table">
-        <thead>
-            <tr>
-                <th>
-                    <button class="table-sort-btn" @onclick="() => ApplySortAsync(AdminLogSortColumn.Timestamp)">
-                        Data/Hora @SortIndicator(AdminLogSortColumn.Timestamp)
-                    </button>
-                </th>
-                <th>
-                    <button class="table-sort-btn" @onclick="() => ApplySortAsync(AdminLogSortColumn.Level)">
-                        Nível @SortIndicator(AdminLogSortColumn.Level)
-                    </button>
-                </th>
-                <th>
-                    <button class="table-sort-btn" @onclick="() => ApplySortAsync(AdminLogSortColumn.Source)">
-                        Fonte @SortIndicator(AdminLogSortColumn.Source)
-                    </button>
-                </th>
-                <th>
-                    <button class="table-sort-btn" @onclick="() => ApplySortAsync(AdminLogSortColumn.User)">
-                        Usuário @SortIndicator(AdminLogSortColumn.User)
-                    </button>
-                </th>
-                <th>Mensagem</th>
-                <th>Exceção</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var log in logs)
+            @if (!string.IsNullOrWhiteSpace(exportNotice))
             {
-                <tr>
-                    <td data-label="Data/Hora">@log.Timestamp.ToLocalTime().ToString("dd MMM yyyy, HH:mm:ss")</td>
-                    <td data-label="Nível">
-                        @if (log.Level == "Error")
-                        {
-                            <span class="log-level-badge log-level-error">@log.Level</span>
-                        }
-                        else if (log.Level == "Warning")
-                        {
-                            <span class="log-level-badge log-level-warning">@log.Level</span>
-                        }
-                        else
-                        {
-                            <span class="log-level-badge log-level-info">@log.Level</span>
-                        }
-                    </td>
-                    <td data-label="Fonte">
-                        <span class="@SourceBadgeClass(log.Source)">@log.Source</span>
-                    </td>
-                    <td data-label="Usuário">
-                        @if (log.User != null)
-                        {
-                            <a class="evidence-link" href="@($"/admin/users/view/{log.User.Id}")">
-                                @log.User.UserName
-                            </a>
-                        }
-                        else if (!string.IsNullOrEmpty(log.UserId))
-                        {
-                            <span class="text-muted">ID: @log.UserId</span>
-                        }
-                        else
-                        {
-                            <span class="text-muted">-</span>
-                        }
-                    </td>
-                    <td data-label="Mensagem">@log.Message</td>
-                    <td data-label="Exceção" class="logs-exception-cell">@log.Exception</td>
-                </tr>
+                <div class="orders-review-restored-notice" role="status">
+                    <span>@exportNotice</span>
+                    <button type="button" class="orders-review-restored-close" @onclick="DismissExportNotice" aria-label="@T["AdminCommon.CloseNotice"]">×</button>
+                </div>
             }
-        </tbody>
-    </table>
-}
 
-<div class="pagination">
-    <button type="button" @onclick="@(async () => await PrevPage())" disabled="@(currentPage <= 1)">Anterior</button>
-    <span class="pagination-info">Página @currentPage de @totalPages</span>
-    <button type="button" @onclick="@(async () => await NextPage())" disabled="@(currentPage >= totalPages)">Próxima</button>
+            <div class="filter-bar logs-quick-range-bar">
+                <span class="logs-filter-group-label">@T["AdminLogs.QuickRange"]</span>
+                <div class="logs-chip-group">
+                    <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.Today)" @onclick="SetTodayRangeAsync">@T["AdminLogs.Today"]</button>
+                    <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.Last7Days)" @onclick="() => SetLastDaysRangeAsync(7)">@T["AdminLogs.Last7Days"]</button>
+                    <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.Last30Days)" @onclick="() => SetLastDaysRangeAsync(30)">@T["AdminLogs.Last30Days"]</button>
+                    <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.CurrentMonth)" @onclick="SetCurrentMonthRangeAsync">@T["AdminLogs.CurrentMonth"]</button>
+                    <button class="@QuickRangeButtonClass(AdminLogsQuickRangePreset.None)" @onclick="ClearDateRangeAsync">@T["AdminLogs.ClearRange"]</button>
+                </div>
+            </div>
+
+            <div class="filter-bar logs-audit-filter-bar">
+                <span class="logs-filter-group-label">@T["AdminLogs.AuditView"]</span>
+                <div class="logs-chip-group">
+                    <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.All)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.All)">@T["AdminLogs.All"] (@auditCountAll)</button>
+                    <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseOnly)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseOnly)">@T["AdminLogs.ReleaseOnly"] (@auditCountReleaseOnly)</button>
+                    <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseSuccess)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseSuccess)">@T["AdminLogs.ReleaseOk"] (@auditCountReleaseSuccess)</button>
+                    <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.ReleaseRefused)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.ReleaseRefused)">@T["AdminLogs.ReleaseRefused"] (@auditCountReleaseRefused)</button>
+                    <button class="@AuditQuickFilterButtonClass(AdminLogsAuditQuickFilter.SecurityPolicy)" @onclick="() => SetAuditQuickFilterAsync(AdminLogsAuditQuickFilter.SecurityPolicy)">@T["AdminLogs.SecurityPolicy"] (@auditCountSecurityPolicy)</button>
+                </div>
+            </div>
+
+            @if (HasInvalidDateRange)
+            {
+                <div class="orders-review-restored-notice">
+                    <span>@T["AdminLogs.InvalidDateRange"]</span>
+                </div>
+            }
+
+            @if (showRestoredFiltersNotice)
+            {
+                <div class="orders-review-restored-notice">
+                    <span>@T["AdminLogs.RestoredFilters"]</span>
+                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">×</button>
+                </div>
+            }
+
+            @if (HasDateRangeFilter)
+            {
+                <div class="orders-review-sort-summary">@T["AdminLogs.AppliedPeriod"] @ActivePeriodSummary</div>
+            }
+
+            @if (!logs.Any())
+            {
+                <p>@T["AdminLogs.Empty"]</p>
+            }
+            else
+            {
+                <table class="log-table">
+                    <thead>
+                        <tr>
+                            <th>
+                                <button class="table-sort-btn" @onclick="() => ApplySortAsync(AdminLogSortColumn.Timestamp)">
+                                    @T["AdminLogs.DateTime"] @SortIndicator(AdminLogSortColumn.Timestamp)
+                                </button>
+                            </th>
+                            <th>
+                                <button class="table-sort-btn" @onclick="() => ApplySortAsync(AdminLogSortColumn.Level)">
+                                    @T["AdminLogs.Level"] @SortIndicator(AdminLogSortColumn.Level)
+                                </button>
+                            </th>
+                            <th>
+                                <button class="table-sort-btn" @onclick="() => ApplySortAsync(AdminLogSortColumn.Source)">
+                                    @T["AdminLogs.Source"] @SortIndicator(AdminLogSortColumn.Source)
+                                </button>
+                            </th>
+                            <th>
+                                <button class="table-sort-btn" @onclick="() => ApplySortAsync(AdminLogSortColumn.User)">
+                                    @T["AdminLogs.User"] @SortIndicator(AdminLogSortColumn.User)
+                                </button>
+                            </th>
+                            <th>@T["AdminLogs.Message"]</th>
+                            <th>@T["AdminLogs.Exception"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var log in logs)
+                        {
+                            <tr>
+                                <td data-label="@T["AdminLogs.DateTime"]">@log.Timestamp.ToLocalTime().ToString("dd MMM yyyy, HH:mm:ss")</td>
+                                <td data-label="@T["AdminLogs.Level"]">
+                                    @if (log.Level == "Error")
+                                    {
+                                        <span class="log-level-badge log-level-error">@log.Level</span>
+                                    }
+                                    else if (log.Level == "Warning")
+                                    {
+                                        <span class="log-level-badge log-level-warning">@log.Level</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="log-level-badge log-level-info">@log.Level</span>
+                                    }
+                                </td>
+                                <td data-label="@T["AdminLogs.Source"]">
+                                    <span class="@SourceBadgeClass(log.Source)">@log.Source</span>
+                                </td>
+                                <td data-label="@T["AdminLogs.User"]">
+                                    @if (log.User != null)
+                                    {
+                                        <a class="evidence-link" href="@($"/admin/users/view/{log.User.Id}")">
+                                            @log.User.UserName
+                                        </a>
+                                    }
+                                    else if (!string.IsNullOrEmpty(log.UserId))
+                                    {
+                                        <span class="text-muted">@T["AdminLogs.IdPrefix"] @log.UserId</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td data-label="@T["AdminLogs.Message"]">@log.Message</td>
+                                <td data-label="@T["AdminLogs.Exception"]" class="logs-exception-cell">@log.Exception</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+
+            <div class="pagination">
+                <button type="button" @onclick="@(async () => await PrevPage())" disabled="@(currentPage <= 1)">@T["Common.Previous"]</button>
+                <span class="pagination-info">@T["Common.Page"] @currentPage @T["Common.Of"] @totalPages</span>
+                <button type="button" @onclick="@(async () => await NextPage())" disabled="@(currentPage >= totalPages)">@T["Common.Next"]</button>
+            </div>
+        </article>
+    </section>
+
+    <section class="entity-shell-footer" aria-label="@T["AdminCommon.ExtraActions"]">
+        <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>@T["Common.Back"]</button>
+    </section>
 </div>
-
-<button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
 
 @code {
     private List<AppLog> logs = new();
@@ -197,6 +210,8 @@ else
     private bool filtersLoaded;
     private bool showRestoredFiltersNotice;
     private string? exportNotice;
+    private readonly SemaphoreSlim loadLogsLock = new(1, 1);
+    private bool isDisposed;
 
     private string filterGlobalSearch = "";
     private string filterUserId = "";
@@ -235,26 +250,44 @@ else
 
     private async Task LoadLogs()
     {
-        var data = await AdminLogsQueryService.GetPageDataAsync(
-            primaryCriteria: BuildPrimaryFilterCriteria(),
-            auditCountsCriteria: BuildAuditCountsFilterCriteria(),
-            sortColumn: currentSortColumn,
-            sortAscending: sortAscending,
-            requestedPage: currentPage,
-            pageSize: pageSize);
-
-        totalLogs = data.TotalLogs;
-        auditCountAll = data.AuditCounts.All;
-        auditCountReleaseOnly = data.AuditCounts.ReleaseOnly;
-        auditCountReleaseSuccess = data.AuditCounts.ReleaseSuccess;
-        auditCountReleaseRefused = data.AuditCounts.ReleaseRefused;
-        auditCountSecurityPolicy = data.AuditCounts.SecurityPolicy;
-        logs = data.Logs;
-
-        if (currentPage != data.EffectivePage)
+        await loadLogsLock.WaitAsync();
+        try
         {
-            currentPage = data.EffectivePage;
-            await PersistFilterStateAsync();
+            if (isDisposed)
+            {
+                return;
+            }
+
+            var data = await AdminLogsQueryService.GetPageDataAsync(
+                primaryCriteria: BuildPrimaryFilterCriteria(),
+                auditCountsCriteria: BuildAuditCountsFilterCriteria(),
+                sortColumn: currentSortColumn,
+                sortAscending: sortAscending,
+                requestedPage: currentPage,
+                pageSize: pageSize);
+
+            if (isDisposed)
+            {
+                return;
+            }
+
+            totalLogs = data.TotalLogs;
+            auditCountAll = data.AuditCounts.All;
+            auditCountReleaseOnly = data.AuditCounts.ReleaseOnly;
+            auditCountReleaseSuccess = data.AuditCounts.ReleaseSuccess;
+            auditCountReleaseRefused = data.AuditCounts.ReleaseRefused;
+            auditCountSecurityPolicy = data.AuditCounts.SecurityPolicy;
+            logs = data.Logs;
+
+            if (currentPage != data.EffectivePage)
+            {
+                currentPage = data.EffectivePage;
+                await PersistFilterStateAsync();
+            }
+        }
+        finally
+        {
+            loadLogsLock.Release();
         }
     }
 
@@ -282,11 +315,6 @@ else
             StartDate = filterStartDate,
             EndDate = filterEndDate
         };
-    }
-
-    private IQueryable<AppLog> BuildFilteredLogsQuery()
-    {
-        return AdminLogFiltering.Apply(Db.Logs.AsNoTracking(), BuildPrimaryFilterCriteria());
     }
 
     private Task ApplyFilters()
@@ -503,7 +531,7 @@ else
         await JS.InvokeVoidAsync("darkMarketDownloadFile", fileName, csv, "text/csv;charset=utf-8;");
 
         exportNotice = export.Truncated
-            ? $"Export truncado para {ExportMaxRows} registros para manter performance." 
+            ? string.Format(T["AdminLogs.ExportTruncated"], ExportMaxRows)
             : null;
     }
 
@@ -526,13 +554,15 @@ else
         await JS.InvokeVoidAsync("darkMarketDownloadFile", fileName, json, "application/json;charset=utf-8;");
 
         exportNotice = export.Truncated
-            ? $"Export truncado para {ExportMaxRows} registros para manter performance."
+            ? string.Format(T["AdminLogs.ExportTruncated"], ExportMaxRows)
             : null;
     }
 
     private async Task<(List<AdminLogExportRow> Rows, bool Truncated)> BuildExportRowsAsync()
     {
-        var rows = await BuildFilteredLogsQuery()
+        await using var db = await DbFactory.CreateDbContextAsync();
+
+        var rows = await AdminLogFiltering.Apply(db.Logs.AsNoTracking(), BuildPrimaryFilterCriteria())
             .OrderByDescending(l => l.Timestamp)
             .Select(l => new AdminLogExportRow(
                 l.Timestamp,
@@ -620,20 +650,20 @@ else
     {
         if (filterStartDate.HasValue && filterEndDate.HasValue)
         {
-            return $"{filterStartDate.Value:dd/MM/yyyy} até {filterEndDate.Value:dd/MM/yyyy}";
+            return string.Format(T["AdminLogs.PeriodRange"], filterStartDate.Value.ToString("dd/MM/yyyy"), filterEndDate.Value.ToString("dd/MM/yyyy"));
         }
 
         if (filterStartDate.HasValue)
         {
-            return $"a partir de {filterStartDate.Value:dd/MM/yyyy}";
+            return string.Format(T["AdminLogs.PeriodFrom"], filterStartDate.Value.ToString("dd/MM/yyyy"));
         }
 
         if (filterEndDate.HasValue)
         {
-            return $"até {filterEndDate.Value:dd/MM/yyyy}";
+            return string.Format(T["AdminLogs.PeriodUntil"], filterEndDate.Value.ToString("dd/MM/yyyy"));
         }
 
-        return "sem período";
+        return T["AdminLogs.PeriodNone"];
     }
 
     private static string SourceBadgeClass(string source)
@@ -643,7 +673,9 @@ else
 
     public void Dispose()
     {
+        isDisposed = true;
         globalSearchDebouncer.Dispose();
+        loadLogsLock.Dispose();
     }
 
 }

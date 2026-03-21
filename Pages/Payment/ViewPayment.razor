@@ -15,35 +15,42 @@
 @inject PaymentConfirmationService PaymentConfirmationService
 @inject BitcoinQuoteService BitcoinQuoteService
 @inject CurrencyPreferenceService CurrencyPreferenceService
+@inject UiTextService T
 
-<div class="payment-container">
-    <h2 class="payment-title">Detalhes do Pagamento</h2>
+<div class="entity-shell payment-container">
+    <section class="entity-shell-hero">
+        <p class="entity-shell-kicker">@T["PaymentView.Kicker"]</p>
+        <h1>@T["PaymentView.Title"]</h1>
+        <p class="entity-shell-subtitle">@T["PaymentView.Subtitle"]</p>
+    </section>
 
-    @if (payment == null)
-    {
-        <p>Pagamento não encontrado.</p>
-    }
-    else
-    {
-        <div class="payment-card payment-view-card">
+    <section class="entity-shell-grid" aria-label="@T["PaymentView.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            @if (payment == null)
+            {
+                <p>@T["PaymentView.NotFound"]</p>
+            }
+            else
+            {
+                <div class="payment-card payment-view-card">
             @if (payment.PaymentMethod == "BTCPayServer" && payment.Address.StartsWith("http"))
             {
                 <div class="payment-address-block">
-                    <span class="label">Checkout:</span>
+                    <span class="label">@T["PaymentView.Checkout"]:</span>
                     <div class="payment-address">
                         <a href="@payment.Address" target="_blank" class="payment-btn">
-                            Abrir checkout do @payment.PaymentMethod
+                            @string.Format(T["PaymentView.OpenCheckout"], payment.PaymentMethod)
                         </a>
                     </div>
                     <div>
-                        <small>O QR code de pagamento será exibido na página do @payment.PaymentMethod.</small>
+                        <small>@string.Format(T["PaymentView.QrHint"], payment.PaymentMethod)</small>
                     </div>
                 </div>
             }
             else
             {
                 <div class="payment-address-block">
-                    <span class="label">Endereço/Invoice:</span>
+                    <span class="label">@T["PaymentBuy.InvoiceAddress"]:</span>
                     <div class="payment-address">@payment.Address</div>
                 </div>
                 <div class="payment-qrcode-block">
@@ -51,35 +58,37 @@
                 </div>
             }
             <div class="payment-amount-block">
-                <span class="label">Valor:</span>
+                <span class="label">@T["Common.Value"]:</span>
                 <span class="payment-amount">@FormatBtcWithUsdMarkup(payment.Amount) (@payment.PaymentMethod)</span>
             </div>
             <div class="payment-status-block">
-                <span class="label">Status:</span>
+                <span class="label">@T["Common.Status"]:</span>
                 @if (payment.IsPaid)
                 {
-                    <span class="payment-status-ok">Pagamento recebido!</span>
+                    <span class="payment-status-ok">@T["PaymentBuy.PaidReceived"]</span>
                     <div class="details-actions">
                         <a class="payment-btn payment-btn-success" href="@($"/payments/details/{payment.Id}")">
-                            <i class="fa fa-file-alt"></i> Ver detalhes do pagamento
+                            <i class="fa fa-file-alt"></i> @T["PaymentView.ViewPaymentDetails"]
                         </a>
                     </div>
                 }
                 else
                 {
-                    <span class="payment-status-wait">Aguardando pagamento...</span>
-                    <button class="payment-btn" @onclick="CheckPayment">Verificar pagamento</button>
+                    <span class="payment-status-wait">@T["PaymentBuy.Waiting"]</span>
+                    <button class="payment-btn" @onclick="CheckPayment">@T["PaymentBuy.Check"]</button>
                 }
             </div>
-        </div>
-    }
+                </div>
+            }
 
-    @if (isLoading)
-    {
-        <div class="loading-spinner">
-            <span class="oi oi-reload spinning"></span> Carregando...
-        </div>
-    }
+            @if (isLoading)
+            {
+                <div class="loading-spinner">
+                    <span class="oi oi-reload spinning"></span> @T["Common.Loading"]
+                </div>
+            }
+        </article>
+    </section>
 </div>
 
 @code {
@@ -143,7 +152,7 @@
             if (result.AlreadyPaid)
             {
                 payment.IsPaid = true;
-                ToastRef?.Show("Pagamento já confirmado anteriormente!", "success");
+                ToastRef?.Show(T["PaymentBuy.AlreadyConfirmed"], "success");
                 return;
             }
 
@@ -151,16 +160,16 @@
             {
                 payment.IsPaid = true;
                 payment.PaidAt = DateTime.UtcNow;
-                ToastRef?.Show("Pagamento confirmado com sucesso!", "success");
+                ToastRef?.Show(T["PaymentBuy.Confirmed"], "success");
             }
             else
             {
-                ToastRef?.Show($"Pagamento ainda não recebido. Recebido: {FormatBtcWithUsdText(result.ReceivedAmount)} de {FormatBtcWithUsdText(payment.Amount)}.", "warning");
+                ToastRef?.Show(string.Format(T["PaymentBuy.NotReceived"], FormatBtcWithUsdText(result.ReceivedAmount), FormatBtcWithUsdText(payment.Amount)), "warning");
             }
         }
         catch
         {
-            ToastRef?.Show("Erro ao verificar pagamento.", "error");
+            ToastRef?.Show(T["PaymentBuy.CheckError"], "error");
         }
     }
 

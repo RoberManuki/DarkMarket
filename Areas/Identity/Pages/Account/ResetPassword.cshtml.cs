@@ -5,16 +5,19 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using DarkMarket.Services;
 
 namespace DarkMarket.Areas.Identity.Pages.Account
 {
     public class ResetPasswordModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UiTextService _t;
 
-        public ResetPasswordModel(UserManager<ApplicationUser> userManager)
+        public ResetPasswordModel(UserManager<ApplicationUser> userManager, UiTextService t)
         {
             _userManager = userManager;
+            _t = t;
         }
 
         [BindProperty]
@@ -27,13 +30,13 @@ namespace DarkMarket.Areas.Identity.Pages.Account
             public string Email { get; set; } = string.Empty;
 
             [Required]
-            [StringLength(100, ErrorMessage = "A senha deve ter no minimo {2} e no maximo {1} caracteres.", MinimumLength = 6)]
+            [StringLength(100, ErrorMessage = "Password must be between {2} and {1} characters.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             public string Password { get; set; } = string.Empty;
 
             [DataType(DataType.Password)]
-            [Display(Name = "Confirmar senha")]
-            [Compare("Password", ErrorMessage = "A senha e a confirmacao nao coincidem.")]
+            [Display(Name = "Confirm password")]
+            [Compare("Password", ErrorMessage = "Password and confirmation do not match.")]
             public string ConfirmPassword { get; set; } = string.Empty;
 
             [Required]
@@ -44,7 +47,7 @@ namespace DarkMarket.Areas.Identity.Pages.Account
         {
             if (code == null)
             {
-                return BadRequest("Codigo de redefinicao e obrigatorio.");
+                return BadRequest(_t["Identity.Reset.ErrorCodeRequired"]);
             }
 
             Input = new InputModel

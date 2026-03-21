@@ -8,33 +8,77 @@
 
 @inject UserManager<ApplicationUser> UserManager
 @inject NavigationManager NavigationManager
-
-<h2 class="page-title">Detalhes do Usuário</h2>
+@inject UiTextService T
 
 @if (isLoading)
 {
-    <div class="loading-spinner">Carregando...</div>
+    <div class="loading-spinner">@T["Common.Loading"]</div>
 }
 else if (user == null)
 {
-    <p>Usuário não encontrado.</p>
+    <div class="alert alert-info">@T["AdminUserView.NotFound"]</div>
 }
 else
 {
-    <div class="form-card">
-        <UserSummaryCard User="user" ShowUserId="true" ShowRoles="false" ShowStatus="true" />
+    <EntityProfileShell
+        Kicker="@T["AdminUserView.Kicker"]"
+        Title="@DisplayName"
+        Subtitle="@T["AdminUserView.Subtitle"]">
+        <MainContent>
+            <h3>@T["AdminUserView.AdminData"]</h3>
+            <dl>
+                <dt>ID</dt>
+                <dd>@user.Id</dd>
 
-        <div class="admin-user-actions">
-            <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin/users")'>Voltar</button>
-            <button class="edit-btn" @onclick='() => NavigationManager.NavigateTo($"/admin/users/edit/{user.Id}")'>Editar</button>
-        </div>
-    </div>
+                <dt>@T["AdminUsers.User"]</dt>
+                <dd>@(user.UserName ?? T["AdminUserView.NotInformed"])</dd>
+
+                <dt>@T["Common.Email"]</dt>
+                <dd>@(user.Email ?? T["AdminUserView.NotInformed"])</dd>
+
+                <dt>@T["AdminUserView.FullName"]</dt>
+                <dd>@(string.IsNullOrWhiteSpace(user.FullName) ? T["AdminUserView.NotInformed"] : user.FullName)</dd>
+
+                <dt>@T["AdminUserView.BirthDate"]</dt>
+                <dd>@(user.BirthDate?.ToString("dd/MM/yyyy") ?? T["AdminUserView.NotInformed"])</dd>
+
+                <dt>@T["Common.Status"]</dt>
+                <dd>
+                    @if (user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.Now)
+                    {
+                        <span class="entity-shell-chip warn">@T["AdminUsers.Blocked"]</span>
+                    }
+                    else
+                    {
+                        <span class="entity-shell-chip ok">@T["AdminUsers.Active"]</span>
+                    }
+                </dd>
+            </dl>
+        </MainContent>
+
+        <SideContent>
+            <h3>@T["AdminUserView.Governance"]</h3>
+            <p>@T["AdminUserView.GovernanceHint"]</p>
+            <span class="entity-shell-chip ok">@T["AdminUserView.AdminScope"]</span>
+        </SideContent>
+
+        <FooterContent>
+            <div class="action-row">
+                <button class="back-btn" type="button" @onclick='() => NavigationManager.NavigateTo("/admin/users")'>@T["Common.Back"]</button>
+                <button class="edit-btn" type="button" @onclick='() => NavigationManager.NavigateTo($"/admin/users/edit/{user.Id}")'>@T["Common.Edit"]</button>
+            </div>
+        </FooterContent>
+    </EntityProfileShell>
 }
 
 @code {
     [Parameter] public string UserId { get; set; } = "";
     private ApplicationUser? user;
     private bool isLoading = true;
+
+    private string DisplayName => user?.FullName?.Trim() is { Length: > 0 } name
+        ? name
+        : user?.UserName ?? T["Layout.UserFallback"];
 
     protected override async Task OnInitializedAsync()
     {

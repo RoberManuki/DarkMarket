@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 using DarkMarket.Models;
+using DarkMarket.Services;
 
 namespace DarkMarket.Areas.Identity.Pages.Account
 {
@@ -17,17 +18,20 @@ namespace DarkMarket.Areas.Identity.Pages.Account
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly IWebHostEnvironment _environment;
+        private readonly UiTextService _t;
 
         public RegisterModel(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
-            IWebHostEnvironment environment)
+            IWebHostEnvironment environment,
+            UiTextService t)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _environment = environment;
+            _t = t;
         }
 
         [BindProperty]
@@ -45,7 +49,7 @@ namespace DarkMarket.Areas.Identity.Pages.Account
 
             [Required]
             [DataType(DataType.Password)]
-            [Compare("Password", ErrorMessage = "As senhas não coincidem.")]
+            [Compare("Password", ErrorMessage = "Passwords do not match.")]
             public string ConfirmPassword { get; set; } = string.Empty;
         }
 
@@ -75,8 +79,8 @@ namespace DarkMarket.Areas.Identity.Pages.Account
                     {
                         await _emailSender.SendEmailAsync(
                             Input.Email,
-                            "Confirme seu e-mail",
-                            $"Confirme sua conta clicando aqui: <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>confirmar conta</a>.");
+                            _t["Identity.Email.ConfirmSubject"],
+                            string.Format(_t["Identity.Email.ConfirmBody"], HtmlEncoder.Default.Encode(callbackUrl), _t["Identity.Email.ConfirmAction"]));
                     }
 
                     if (_environment.IsDevelopment())

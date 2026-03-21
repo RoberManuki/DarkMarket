@@ -2,8 +2,9 @@
     Layout = null;
     var title = ViewData["Title"] ?? "DarkMarket";
 }
+@inject DarkMarket.Services.LanguagePreferenceService LanguagePreferenceService
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="@LanguagePreferenceService.SelectedLanguage">
 <head>
     <meta charset="utf-8" />
     <title>@title</title>

@@ -1,39 +1,22 @@
 @page "/"
 
-@using DarkMarket.Shared
+@inject NavigationManager NavigationManager
+@inject UiTextService T
 
-@inject UserService UserService
-@inject ProductService ProductService
+<PageTitle>@T["Index.PageTitle"]</PageTitle>
 
-<PageTitle>DarkMarket - Bem-vindo</PageTitle>
-
-<div class="index-container">
-    <h2 class="page-title">Bem-vindo ao DarkMarket!</h2>
-
-    <BtcQuoteCard Label="Bitcoin" Currency="BTC" CryptoId="bitcoin" ImageSrc="https://assets.coingecko.com/coins/images/1/large/bitcoin.png" />
-
-    <div class="stats-row">
-        <StatCard Title="Usuários">
-            <span class="stat-value">@usersCount</span>
-        </StatCard>
-        <StatCard Title="Produtos">
-            <span class="stat-value">@productsCount</span>
-        </StatCard>
-        <StatCard Title="Consultas de Cotação">
-            <span class="stat-value">@quoteViews</span>
-        </StatCard>
-    </div>
+<div class="entity-shell">
+    <section class="entity-shell-hero">
+        <h1>@T["Index.Redirecting"]</h1>
+    </section>
 </div>
 
 @code {
-    private int usersCount;
-    private int productsCount;
-    private int quoteViews = 0; // Implemente a lógica real se quiser
-
-    protected override async Task OnInitializedAsync()
+    protected override void OnAfterRender(bool firstRender)
     {
-        usersCount = await UserService.GetUsersCountAsync();
-        productsCount = await ProductService.GetProductsCountAsync();
-        quoteViews++; // Exemplo simples
+        if (firstRender)
+        {
+            NavigationManager.NavigateTo("/dashboard", replace: true);
+        }
     }
 }

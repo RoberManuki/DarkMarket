@@ -1,40 +1,41 @@
 @page
 @model DarkMarket.Areas.Identity.Pages.Account.LoginModel
+@inject DarkMarket.Services.UiTextService T
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = T["Identity.Login.Title"];
 }
 
-<h2>Login DarkMarket</h2>
+<h2>@T["Identity.Login.Heading"]</h2>
 
 <div asp-validation-summary="All" class="text-danger"></div>
 
-<a href="/" class="identity-home-link">
+<a href="/dashboard" class="identity-home-link">
     <span class="identity-home-arrow">&#8592;</span>
-    <span class="identity-home-text">Home</span>
+    <span class="identity-home-text">@T["Nav.Dashboard"]</span>
 </a>
 
 <form method="post">
     <div>
-        <label asp-for="Input.Email"></label>
+        <label asp-for="Input.Email">@T["Identity.Common.Email"]</label>
         <input asp-for="Input.Email" autocomplete="username" />
         <span asp-validation-for="Input.Email" class="text-danger"></span>
     </div>
     <div>
-        <label asp-for="Input.Password"></label>
+        <label asp-for="Input.Password">@T["Identity.Common.Password"]</label>
         <input asp-for="Input.Password" autocomplete="current-password" />
         <span asp-validation-for="Input.Password" class="text-danger"></span>
     </div>
     <div class="identity-remember">
         <input asp-for="Input.RememberMe" />
-        <label asp-for="Input.RememberMe">Lembrar-me</label>
+        <label asp-for="Input.RememberMe">@T["Identity.Login.RememberMe"]</label>
     </div>
-    <button type="submit">Entrar</button>
+    <button type="submit">@T["Nav.Login"]</button>
 </form>
 
 <div class="identity-actions">
-    <a asp-page="./ForgotPassword">Esqueceu a senha?</a>
-    <a asp-page="./Register">Registrar</a>
-    <a asp-page="./ResendEmailConfirmation">Reenviar confirmação</a>
+    <a asp-page="./ForgotPassword">@T["Identity.Login.ForgotPassword"]</a>
+    <a asp-page="./Register">@T["Nav.Register"]</a>
+    <a asp-page="./ResendEmailConfirmation">@T["Identity.Resend.Title"]</a>
 </div>
 
 <div class="identity-footer">

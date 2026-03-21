@@ -14,37 +14,47 @@
 @inject PaymentConfirmationService PaymentConfirmationService
 @inject BitcoinQuoteService BitcoinQuoteService
 @inject CurrencyPreferenceService CurrencyPreferenceService
+@inject LanguagePreferenceService LanguagePreferenceService
+@inject UiTextService T
 
-<div class="payment-container">
-    @if (product == null)
-    {
-        <p>Carregando produto...</p>
-    }
-    else
-    {
-        <div class="payment-details-container">
-            <div class="payment-card">
+<div class="entity-shell payment-container">
+    <section class="entity-shell-hero">
+        <p class="entity-shell-kicker">@T["Marketplace.Title"]</p>
+        <h1>@T["PaymentBuy.Title"]</h1>
+        <p class="entity-shell-subtitle">@T["PaymentBuy.Subtitle"]</p>
+    </section>
+
+    <section class="entity-shell-grid" aria-label="@T["PaymentBuy.Title"]">
+        <article class="entity-shell-card entity-shell-main">
+            @if (product == null)
+            {
+                <p>@T["PaymentBuy.LoadingProduct"]</p>
+            }
+            else
+            {
+                <div class="payment-details-container">
+                    <div class="payment-card">
                 <div class="card-content-center">
                     <div class="product-img-block">
                         @if (!string.IsNullOrEmpty(product.ImagePath))
                         {
-                            <img src="@product.ImagePath" alt="Imagem do produto" />
+                            <img src="@product.ImagePath" alt="@T["Marketplace.ImageAlt"]" />
                         }
                     </div>
                     <div class="product-main">
                         <div class="product-title">@product.Name</div>
                         <div class="product-delivery-badge-wrap">
                             <span class="product-delivery-badge @(product.RequiresDelivery ? "physical" : "digital")">
-                                @(product.RequiresDelivery ? "Físico" : "Digital")
+                                @(product.RequiresDelivery ? T["Marketplace.Badge.Physical"] : T["Marketplace.Badge.Digital"])
                             </span>
                         </div>
                     </div>
                     <div class="product-desc-block">
-                        <div class="label">Descrição:</div>
+                        <div class="label">@T["Common.Description"]:</div>
                         <div class="product-desc system-value">@product.Description</div>
                     </div>
                     <div class="product-seller-block">
-                        <div class="label">Vendedor:</div>
+                        <div class="label">@T["Common.Seller"]:</div>
                         <div class="product-user system-value">
                             @if (product.User != null)
                             {
@@ -53,31 +63,31 @@
                         </div>
                     </div>
                     <div class="delivery-block">
-                        <div class="label">Entrega:</div>
+                        <div class="label">@T["PaymentBuy.Delivery"]:</div>
                         <div class="delivery-details system-value">
                             @if (product.RequiresDelivery)
                             {
-                                <span>Entregador: <b>@SelectedDeliveryAgentName</b></span>
+                                <span>@T["PaymentBuy.DeliveryAgent"]: <b>@SelectedDeliveryAgentName</b></span>
                                 <br />
-                                <span>Previsão: <b>@SelectedDeliveryAgentEstimateText</b></span>
+                                <span>@T["PaymentBuy.Forecast"]: <b>@SelectedDeliveryAgentEstimateText</b></span>
                             }
                             else
                             {
-                                <span>Este produto é digital e não requer entrega física.</span>
+                                <span>@T["PaymentBuy.DigitalNoDelivery"]</span>
                             }
                         </div>
                     </div>
                 </div>
-            </div>
+                    </div>
 
-            <div class="payment-card">
-                <div class="payment-title">Gerar Pagamento</div>
+                    <div class="payment-card">
+                <div class="payment-title">@T["PaymentBuy.GeneratePayment"]</div>
                 @if (!ActiveGateways.Any())
                 {
                     <div class="no-gateways">
-                        <b>Nenhum método de pagamento disponível no momento.</b>
+                        <b>@T["PaymentBuy.NoMethod"]</b>
                         <div class="no-gateways-hint">
-                            Tente novamente mais tarde ou entre em contato com o suporte.
+                            @T["PaymentBuy.NoMethodHint"]
                         </div>
                     </div>
                 }
@@ -86,11 +96,11 @@
                     <div class="generate-invoice-block">
                         @if (product.RequiresDelivery)
                         {
-                            <label class="gateway-label" for="delivery-agent">Selecione o entregador:</label>
-                            <select id="delivery-agent" class="gateway-select" @bind="SelectedDeliveryAgentId" aria-label="Selecionar entregador">
+                            <label class="gateway-label" for="delivery-agent">@T["PaymentBuy.SelectDelivery"]</label>
+                            <select id="delivery-agent" class="gateway-select" @bind="SelectedDeliveryAgentId" aria-label="@T["PaymentBuy.SelectDelivery"]">
                                 @if (!ActiveDeliveryAgents.Any())
                                 {
-                                    <option value="">Nenhum entregador ativo</option>
+                                    <option value="">@T["PaymentBuy.NoActiveDelivery"]</option>
                                 }
                                 else
                                 {
@@ -103,33 +113,33 @@
 
                             @if (!ActiveDeliveryAgents.Any())
                             {
-                                <div class="no-gateways-hint">Nenhum entregador ativo cadastrado. O pedido será criado sem entregador definido.</div>
+                                <div class="no-gateways-hint">@T["PaymentBuy.NoActiveDeliveryHint"]</div>
                             }
                         }
                         else
                         {
-                            <div class="no-gateways-hint">Infoproduto selecionado: sem entrega física.</div>
+                            <div class="no-gateways-hint">@T["PaymentBuy.InfoProductHint"]</div>
                         }
 
-                        <label class="gateway-label" for="payment-method">Selecione o gateway:</label>
-                        <select id="payment-method" class="gateway-select" @bind="SelectedMethod" aria-label="Selecionar gateway de pagamento">
+                        <label class="gateway-label" for="payment-method">@T["PaymentBuy.SelectGateway"]</label>
+                        <select id="payment-method" class="gateway-select" @bind="SelectedMethod" aria-label="@T["PaymentBuy.SelectGateway"]">
                             @foreach (var gateway in ActiveGateways)
                             {
                                 <option value="@gateway.Name">@gateway.Name</option>
                             }
                         </select>
-                        <button class="payment-btn payment-btn-generate big-btn" @onclick="GenerateAddress" aria-label="Gerar endereço de pagamento">
-                            Gerar endereço de pagamento
+                        <button class="payment-btn payment-btn-generate big-btn" @onclick="GenerateAddress" aria-label="@T["PaymentBuy.GenerateAddress"]">
+                            @T["PaymentBuy.GenerateAddress"]
                         </button>
-                        <button class="payment-btn payment-btn-history" @onclick="ShowPaymentHistory" aria-label="Ver histórico de pagamentos">
-                            <i class="fa fa-list"></i> Histórico de pagamentos
+                        <button class="payment-btn payment-btn-history" @onclick="ShowPaymentHistory" aria-label="@T["PaymentBuy.History"]">
+                            <i class="fa fa-list"></i> @T["PaymentBuy.History"]
                         </button>
                     </div>
                 }
                 else
                 {
                     <div class="payment-address-block">
-                        <span class="label">Endereço/Invoice:</span>
+                        <span class="label">@T["PaymentBuy.InvoiceAddress"]:</span>
                         <div class="payment-address">@Address</div>
                     </div>
                     <div class="payment-qrcode-block">
@@ -137,20 +147,20 @@
                     </div>
 
                     <div class="payment-amount-block">
-                        <span class="label">Valor:</span>
+                        <span class="label">@T["Common.Value"]:</span>
                         <span class="system-value">@FormatBtcWithUsdMarkup(Amount) (@SelectedMethod)</span>
                     </div>
                     <div class="payment-status-block">
-                        <span class="label">Status:</span>
+                        <span class="label">@T["Common.Status"]:</span>
                         @if (IsPaid)
                         {
-                            <span class="payment-status-ok">Pagamento recebido!</span>
+                            <span class="payment-status-ok">@T["PaymentBuy.PaidReceived"]</span>
                         }
                         else
                         {
-                            <span class="payment-status-wait">Aguardando pagamento...</span>
-                            <button class="payment-btn" @onclick="CheckPayment" aria-label="Verificar pagamento">
-                                Verificar pagamento
+                            <span class="payment-status-wait">@T["PaymentBuy.Waiting"]</span>
+                            <button class="payment-btn" @onclick="CheckPayment" aria-label="@T["PaymentBuy.Check"]">
+                                @T["PaymentBuy.Check"]
                             </button>
                         }
                     </div>
@@ -160,36 +170,38 @@
                         <div class="private-key-block">
                             <div class="private-key-title">
                                 <i class="fa fa-key"></i>
-                                Chave privada do endereço:
+                                @T["PaymentBuy.PrivateKey"]
                             </div>
                             <div class="private-key-value">
                                 <code>@paymentRecord.PrivateKey</code>
                             </div>
                             <div class="private-key-warning">
                                 <i class="fa fa-exclamation-triangle"></i>
-                                Guarde esta chave! Sem ela, não será possível movimentar os testcoins deste endereço.
+                                @T["PaymentBuy.PrivateKeyWarning"]
                             </div>
                             @if (IsPaid && paymentRecord?.Order?.Id is int orderId)
                             {
                                 <div class="private-key-actions">
                                     <a class="payment-btn payment-btn-success" href="@($"/orders/{orderId}")">
-                                        <i class="fa fa-exchange-alt"></i> Ver Pedido
+                                        <i class="fa fa-exchange-alt"></i> @T["PaymentBuy.ViewOrder"]
                                     </a>
                                 </div>
                             }
                         </div>
                     }
                 }
-            </div>
-        </div>
-    }
+                    </div>
+                </div>
+            }
 
-    @if (isLoading)
-    {
-        <div class="loading-spinner">
-            <span class="oi oi-reload spinning"></span> Processando...
-        </div>
-    }
+            @if (isLoading)
+            {
+                <div class="loading-spinner">
+                    <span class="oi oi-reload spinning"></span> @T["PaymentBuy.Processing"]
+                </div>
+            }
+        </article>
+    </section>
 </div>
 
 @code {
@@ -218,10 +230,10 @@
     private List<GatewayInfo> ActiveGateways = new();
     private List<DeliveryAgent> ActiveDeliveryAgents = new();
     private int? SelectedDeliveryAgentId;
-    private string SelectedDeliveryAgentName => SelectedDeliveryAgent?.Name ?? "A definir";
+    private string SelectedDeliveryAgentName => SelectedDeliveryAgent?.Name ?? T["Common.ToBeDefined"];
     private string SelectedDeliveryAgentEstimateText => SelectedDeliveryAgent?.EstimatedBusinessDays is int days
-        ? $"{days} dia{(days == 1 ? string.Empty : "s")} úteis"
-        : "Prazo a definir";
+        ? $"{days} {GetBusinessDaysLabel(days)}"
+        : T["Common.ToBeDefined"];
     private DeliveryAgent? SelectedDeliveryAgent => ActiveDeliveryAgents.FirstOrDefault(d => d.Id == SelectedDeliveryAgentId);
 
     protected override async Task OnInitializedAsync()
@@ -298,7 +310,7 @@
                 level: "Warning",
                 userId: product?.UserId
             );
-            ToastRef?.Show($"O valor mínimo para pagamento é {FormatBtcWithUsdText(MinBtcAmount)}.", "warning");
+            ToastRef?.Show(string.Format(T["PaymentBuy.MinAmountWarning"], FormatBtcWithUsdText(MinBtcAmount)), "warning");
             return;
         }
 
@@ -352,7 +364,7 @@
                 userId: userId
             );
 
-            ToastRef?.Show("Endereço/Invoice de pagamento gerado!", "success");
+            ToastRef?.Show(T["PaymentBuy.Generated"], "success");
         }
         catch (Exception ex)
         {
@@ -363,7 +375,7 @@
                 userId: product?.UserId,
                 ex: ex
             );
-            ToastRef?.Show($"Erro ao gerar endereço/invoice: {ex.Message}", "error");
+            ToastRef?.Show(string.Format(T["PaymentBuy.GenerateError"], ex.Message), "error");
         }
         finally
         {
@@ -381,7 +393,7 @@
             PaymentRecord? payment = Db.Payments.FirstOrDefault(p => p.Address == Address);
             if (payment == null)
             {
-                ToastRef?.Show("Pagamento não encontrado para o endereço informado.", "error");
+                ToastRef?.Show(T["PaymentBuy.NotFoundByAddress"], "error");
                 return;
             }
 
@@ -390,18 +402,18 @@
             if (result.AlreadyPaid)
             {
                 IsPaid = true;
-                ToastRef?.Show("Pagamento já confirmado anteriormente!", "success");
+                ToastRef?.Show(T["PaymentBuy.AlreadyConfirmed"], "success");
                 return;
             }
 
             if (result.Confirmed)
             {
                 IsPaid = true;
-                ToastRef?.Show("Pagamento confirmado com sucesso!", "success");
+                ToastRef?.Show(T["PaymentBuy.Confirmed"], "success");
             }
             else
             {
-                ToastRef?.Show($"Pagamento ainda não recebido. Recebido: {FormatBtcWithUsdText(result.ReceivedAmount)} de {FormatBtcWithUsdText(Amount)}.", "warning");
+                ToastRef?.Show(string.Format(T["PaymentBuy.NotReceived"], FormatBtcWithUsdText(result.ReceivedAmount), FormatBtcWithUsdText(Amount)), "warning");
             }
         }
         catch (Exception ex)
@@ -412,8 +424,18 @@
                 level: "Error",
                 ex: ex
             );
-            ToastRef?.Show("Erro ao verificar pagamento.", "error");
+            ToastRef?.Show(T["PaymentBuy.CheckError"], "error");
         }
+    }
+
+    private string GetBusinessDaysLabel(int days)
+    {
+        return LanguagePreferenceService.SelectedLanguage switch
+        {
+            "en-US" => days == 1 ? "business day" : "business days",
+            "es-ES" => days == 1 ? "dia habil" : "dias habiles",
+            _ => days == 1 ? "dia util" : "dias uteis"
+        };
     }
 
     private MarkupString FormatBtcWithUsdMarkup(decimal amount)

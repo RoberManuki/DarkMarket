@@ -8,52 +8,61 @@
 
 @inject ProductService ProductService
 @inject LogService LogService
+@inject UiTextService T
 
-<div class="form-card">
-    <h2 class="page-title">Editar Produto</h2>
+<div class="entity-shell">
+    <section class="entity-shell-hero">
+        <p class="entity-shell-kicker">@T["AdminProductEdit.Kicker"]</p>
+        <h1>@T["AdminProductEdit.Title"]</h1>
+        <p class="entity-shell-subtitle">@T["AdminProductEdit.Subtitle"]</p>
+    </section>
 
-    @if (isLoading)
-    {
-        <div class="loading-spinner">Carregando...</div>
-    }
-    else if (product == null)
-    {
-        <p>Produto não encontrado.</p>
-    }
-    else
-    {
-        <EditForm Model="product" OnValidSubmit="Save">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+    <section class="entity-shell-grid" aria-label="@T["AdminProductEdit.Aria"]">
+        <article class="entity-shell-card entity-shell-main form-card">
+            @if (isLoading)
+            {
+                <div class="loading-spinner">@T["Common.Loading"]</div>
+            }
+            else if (product == null)
+            {
+                <p>@T["AdminProductEdit.NotFound"]</p>
+            }
+            else
+            {
+                <EditForm Model="product" OnValidSubmit="Save">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
 
-            <div class="form-group">
-                <label>Nome</label>
-                <InputText class="input" @bind-Value="product.Name" />
-                <ValidationMessage For="@(() => product.Name)" class="validation-message" />
-            </div>
-            <div class="form-group">
-                <label>Descrição</label>
-                <InputTextArea class="input" @bind-Value="product.Description" />
-                <ValidationMessage For="@(() => product.Description)" class="validation-message" />
-            </div>
-            <div class="form-group">
-                <label>Preço</label>
-                <InputNumber class="input" @bind-Value="product.Price" />
-                <ValidationMessage For="@(() => product.Price)" class="validation-message" />
-            </div>
-            <div class="form-group form-group-checkbox">
-                <label class="checkbox-label">
-                    <InputCheckbox @bind-Value="product.RequiresDelivery" />
-                    Necessita entrega física
-                </label>
-                <small class="hint-text">Desmarque para infoprodutos/entrega digital.</small>
-            </div>
-            <div class="form-actions">
-                <button class="cancel-btn" type="button" @onclick='() => NavigationManager.NavigateTo($"/admin/products")'>Cancelar</button>
-                <button class="save-btn" type="submit" disabled="@isSaving">Salvar</button>
-            </div>
-        </EditForm>
-    }
+                    <div class="form-group">
+                        <label>@T["Common.Name"]</label>
+                        <InputText class="input" @bind-Value="product.Name" />
+                        <ValidationMessage For="@(() => product.Name)" class="validation-message" />
+                    </div>
+                    <div class="form-group">
+                        <label>@T["Common.Description"]</label>
+                        <InputTextArea class="input" @bind-Value="product.Description" />
+                        <ValidationMessage For="@(() => product.Description)" class="validation-message" />
+                    </div>
+                    <div class="form-group">
+                        <label>@T["AdminProductEdit.Price"]</label>
+                        <InputNumber class="input" @bind-Value="product.Price" />
+                        <ValidationMessage For="@(() => product.Price)" class="validation-message" />
+                    </div>
+                    <div class="form-group form-group-checkbox">
+                        <label class="checkbox-label">
+                            <InputCheckbox @bind-Value="product.RequiresDelivery" />
+                            @T["AdminProductEdit.RequiresPhysicalDelivery"]
+                        </label>
+                        <small class="hint-text">@T["AdminProductEdit.DigitalHint"]</small>
+                    </div>
+                    <div class="form-actions">
+                        <button class="cancel-btn" type="button" @onclick='() => NavigationManager.NavigateTo($"/admin/products")'>@T["Common.Cancel"]</button>
+                        <button class="save-btn" type="submit" disabled="@isSaving">@T["Common.Save"]</button>
+                    </div>
+                </EditForm>
+            }
+        </article>
+    </section>
 </div>
 
 @code {
@@ -75,7 +84,7 @@
     {
         if (product == null)
         {
-            ToastRef?.Show("Produto não encontrado.", "error");
+            ToastRef?.Show(T["AdminProductEdit.NotFound"], "error");
             return;
         }
         
@@ -84,11 +93,11 @@
         isSaving = false;
 
         await LogService.LogAsync(
-            $"Produto editado (ID: {product.Id})",
+            string.Format(T["AdminProductEdit.LogEdited"], product.Id),
             source: "Admin",
             level: "Info"
         );
-        ToastRef?.Show("Produto atualizado com sucesso!", "success");
+        ToastRef?.Show(T["AdminProductEdit.UpdatedToast"], "success");
         NavigationManager.NavigateTo($"/admin/products/view/{product.Id}");
     }
 }

@@ -13,79 +13,89 @@
 @inject IJSRuntime JS
 @inject BitcoinQuoteService BitcoinQuoteService
 @inject CurrencyPreferenceService CurrencyPreferenceService
+@inject UiTextService T
 
-<div class="products-page">
-    <h2 class="page-title">Meus Produtos</h2>
+<div class="entity-shell products-page">
+    <section class="entity-shell-hero">
+        <p class="entity-shell-kicker">@T["Products.Kicker"]</p>
+        <h1>@T["Products.Title"]</h1>
+        <p class="entity-shell-subtitle">@T["Products.Subtitle"]</p>
+    </section>
 
-    <button class="primary-btn" @onclick='() => Navigation.NavigateTo("/products/create")'>
-        Novo Produto
-    </button>
+    <section class="entity-shell-grid" aria-label="@T["Products.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
 
-    <div class="filter-bar">
-        <input type="text" placeholder="Buscar por nome..." @bind="filterName" @bind:event="oninput" />
-        <input type="number" placeholder="Preço mínimo" @bind="filterMinPrice" min="0" />
-        <input type="number" placeholder="Preço máximo" @bind="filterMaxPrice" min="0" />
-        <button @onclick="ApplyFilters">Filtrar</button>
-        <button @onclick="ClearFilters">Limpar</button>
-    </div>
+            <button class="primary-btn" @onclick='() => Navigation.NavigateTo("/products/create")'>
+                @T["Products.New"]
+            </button>
+
+            <div class="filter-bar">
+                <input type="text" placeholder="@T["Products.Filter.Name"]" @bind="filterName" @bind:event="oninput" />
+                <input type="number" placeholder="@T["Products.Filter.MinPrice"]" @bind="filterMinPrice" min="0" />
+                <input type="number" placeholder="@T["Products.Filter.MaxPrice"]" @bind="filterMaxPrice" min="0" />
+                <button @onclick="ApplyFilters">@T["Common.Filter"]</button>
+                <button @onclick="ClearFilters">@T["Common.Clear"]</button>
+            </div>
 
 
-    @if (filteredProducts == null)
-    {
-        <div class="loading-spinner">
-            <span class="oi oi-reload spinning"></span> Carregando produtos...
-        </div>
-    }
-    else if (!filteredProducts.Any())
-    {
-        <p>Você ainda não cadastrou produtos.</p>
-    }
-    else
-    {
-        <table class="product-table">
+            @if (filteredProducts == null)
+            {
+                <div class="loading-spinner">
+                    <span class="oi oi-reload spinning"></span> @T["Products.Loading"]
+                </div>
+            }
+            else if (!filteredProducts.Any())
+            {
+                <p>@T["Products.Empty"]</p>
+            }
+            else
+            {
+                <table class="product-table">
             <thead>
                 <tr>
-                    <th>Imagem</th>
-                    <th>Nome</th>
-                    <th>Preço</th>
-                    <th>Tipo</th>
-                    <th>Criado em</th>
-                    <th>Ações</th>
+                    <th>@T["Products.Image"]</th>
+                    <th>@T["Products.Name"]</th>
+                    <th>@T["Products.Price"]</th>
+                    <th>@T["Products.Type"]</th>
+                    <th>@T["Products.CreatedAt"]</th>
+                    <th>@T["Common.Actions"]</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var p in filteredProducts?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<Product>())
                 {
                     <tr>
-                        <td data-label="Imagem">
+                        <td data-label="@T["Products.Image"]">
                             @if (!string.IsNullOrEmpty(p.ImagePath))
                             {
-                                <img src="@p.ImagePath" alt="Imagem" class="product-thumbnail" />
+                                <img src="@p.ImagePath" alt="@T["Products.Image"]" class="product-thumbnail" />
                             }
                         </td>
-                        <td data-label="Nome">@p.Name</td>
-                        <td data-label="Preço">@FormatBtcWithUsd(p.Price)</td>
-                        <td data-label="Tipo">
+                        <td data-label="@T["Products.Name"]">@p.Name</td>
+                        <td data-label="@T["Products.Price"]">@FormatBtcWithUsd(p.Price)</td>
+                        <td data-label="@T["Products.Type"]">
                             <span class="product-delivery-badge @(p.RequiresDelivery ? "physical" : "digital")">
-                                @(p.RequiresDelivery ? "Físico" : "Digital")
+                                @(p.RequiresDelivery ? T["Marketplace.Badge.Physical"] : T["Marketplace.Badge.Digital"])
                             </span>
                         </td>
-                        <td data-label="Criado em">@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
-                        <td data-label="Ações">
-                            <button class="edit-btn" @onclick='() => Navigation.NavigateTo($"/products/edit/{p.Id}")'>Editar</button>
-                            <button class="danger" @onclick='() => ConfirmDelete(p.Id)'>Remover</button>
+                        <td data-label="@T["Products.CreatedAt"]">@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                        <td data-label="@T["Common.Actions"]">
+                            <button class="edit-btn" @onclick='() => Navigation.NavigateTo($"/products/edit/{p.Id}")'>@T["Products.Edit"]</button>
+                            <button class="danger" @onclick='() => ConfirmDelete(p.Id)'>@T["Products.Remove"]</button>
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
 
-        <div class="pagination">
-            <button type="button" @onclick="@(() => PrevPage())" disabled="@(!CanGoToPreviousPage)">Anterior</button>
-            <span class="pagination-info">Página @currentPage de @totalPages</span>
-            <button type="button" @onclick="@(() => NextPage())" disabled="@(!CanGoToNextPage)">Próxima</button>
-        </div>
-    }
+                <div class="pagination">
+                    <button type="button" @onclick="@(() => PrevPage())" disabled="@(!CanGoToPreviousPage)">@T["Common.Previous"]</button>
+                    <span class="pagination-info">@T["Common.Page"] @currentPage @T["Common.Of"] @totalPages</span>
+                    <button type="button" @onclick="@(() => NextPage())" disabled="@(!CanGoToNextPage)">@T["Common.Next"]</button>
+                </div>
+            }
+        </article>
+    </section>
 </div>
 
 
@@ -152,13 +162,13 @@
 
         products = await ProductService.GetByUserIdAsync(userId);
         ApplyFilters();
-        ToastRef?.Show("Produto removido!", "info");
+        ToastRef?.Show(T["Products.RemovedToast"], "info");
         StateHasChanged();
     }
 
     private async Task ConfirmDelete(int id)
     {
-        if (!await JS.InvokeAsync<bool>("confirm", "Tem certeza que deseja remover este produto?")) return;
+        if (!await JS.InvokeAsync<bool>("confirm", T["Products.ConfirmRemove"])) return;
         await Delete(id);
     }
 

@@ -9,29 +9,38 @@
 @inject AppDbContext Db
 @inject BitcoinQuoteService BitcoinQuoteService
 @inject CurrencyPreferenceService CurrencyPreferenceService
+@inject UiTextService T
 
-<h2 class="page-title">Detalhes do Pagamento</h2>
+<div class="entity-shell">
+    <section class="entity-shell-hero">
+        <p class="entity-shell-kicker">@T["AdminPaymentView.Kicker"]</p>
+        <h1>@T["AdminPaymentView.Title"]</h1>
+        <p class="entity-shell-subtitle">@T["AdminPaymentView.Subtitle"]</p>
+    </section>
 
-@if (isLoading)
-{
-    <div class="loading-spinner">Carregando...</div>
-}
-else if (payment == null)
-{
-    <p>Pagamento não encontrado.</p>
-}
-else
-{
-    <div class="form-card">
-        <p><b>ID:</b> @payment.Id</p>
-        <p><b>Usuário:</b> @payment.UserId</p>
-        <p><b>Produto:</b> @payment.ProductId</p>
-        <p><b>Valor:</b> @FormatBtcWithUsd(payment.Amount)</p>
-        <p><b>Status:</b> @(payment.IsPaid ? "Pago" : "Pendente")</p>
-        <p><b>Data:</b> @payment.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</p>
-        <button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin/payments")'>Voltar</button>
-    </div>
-}
+    <section class="entity-shell-grid" aria-label="@T["AdminPaymentView.Aria"]">
+        <article class="entity-shell-card entity-shell-main form-card">
+            @if (isLoading)
+            {
+                <div class="loading-spinner">@T["Common.Loading"]</div>
+            }
+            else if (payment == null)
+            {
+                <p>@T["AdminPaymentView.NotFound"]</p>
+            }
+            else
+            {
+                <p><b>ID:</b> @payment.Id</p>
+                <p><b>@T["AdminUsers.User"]:</b> @payment.UserId</p>
+                <p><b>@T["AdminPayments.Product"]:</b> @payment.ProductId</p>
+                <p><b>@T["Common.Value"]:</b> @FormatBtcWithUsd(payment.Amount)</p>
+                <p><b>@T["Common.Status"]:</b> @(payment.IsPaid ? T["Common.Paid"] : T["Common.Pending"])</p>
+                <p><b>@T["Common.Date"]:</b> @payment.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</p>
+                <button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin/payments")'>@T["Common.Back"]</button>
+            }
+        </article>
+    </section>
+</div>
 
 @code {
     [Parameter] public int Id { get; set; }

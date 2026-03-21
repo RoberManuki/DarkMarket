@@ -11,16 +11,24 @@
 @inject NavigationManager Navigation
 @inject BitcoinQuoteService BitcoinQuoteService
 @inject CurrencyPreferenceService CurrencyPreferenceService
+@inject UiTextService T
 
-<h2 class="page-title">Detalhes do Pagamento</h2>
+<div class="entity-shell">
+    <section class="entity-shell-hero">
+        <p class="entity-shell-kicker">@T["PaymentDetails.Kicker"]</p>
+        <h1>@T["PaymentDetails.Title"]</h1>
+        <p class="entity-shell-subtitle">@T["PaymentDetails.Subtitle"]</p>
+    </section>
 
-@if (payment == null)
-{
-    <p>Carregando...</p>
-}
-else
-{
-    <div class="details-container">
+    <section class="entity-shell-grid" aria-label="@T["PaymentDetails.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            @if (payment == null)
+            {
+                <p>@T["Common.Loading"]</p>
+            }
+            else
+            {
+                <div class="details-container">
         <!-- Card da Esquerda: Produto -->
         <div class="product-card">
             <img class="product-img" src="@payment.Product?.ImagePath" alt="@payment.Product?.Name" />
@@ -32,46 +40,49 @@ else
         <!-- Card da Direita: Pagamento -->
         <div class="dashboard-card payment-details-card">
             <div class="details-row">
-                <span class="label">Status:</span>
+                <span class="label">@T["Common.Status"]:</span>
                 <span>
                     <span class="badge @(payment.IsPaid ? "payment-status-ok" : "payment-status-wait")">
-                        @(payment.IsPaid ? "Pago" : "Pendente")
+                        @(payment.IsPaid ? T["Common.Paid"] : T["Common.Pending"])
                     </span>
                 </span>
             </div>
             <div class="details-row">
-                <span class="label">Gateway:</span>
+                <span class="label">@T["Common.Gateway"]:</span>
                 <span class="system-value">@payment.PaymentMethod</span>
             </div>
             <div class="details-row">
-                <span class="label">Endereço:</span>
+                <span class="label">@T["Common.Address"]:</span>
                 <span class="payment-address">@payment.Address</span>
             </div>
             <div class="details-row">
-                <span class="label">Data:</span>
+                <span class="label">@T["Common.Date"]:</span>
                 <span class="system-value">@payment.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
             </div>
             @if (payment.PaidAt != null)
             {
                 <div class="details-row">
-                    <span class="label">Pago em:</span>
+                    <span class="label">@T["PaymentDetails.PaidAt"]:</span>
                     <span class="system-value">@payment.PaidAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
                 </div>
             }
             @if (payment.Order != null)
             {
                 <div class="details-actions">
-                    <a class="payment-link-btn" href="@($"/orders/{payment.Order.Id}")" title="Ver pedido">
-                        <span class="payment-link-text">Ver pedido</span>
+                    <a class="payment-link-btn" href="@($"/orders/{payment.Order.Id}")" title="@T["PaymentDetails.ViewOrder"]">
+                        <span class="payment-link-text">@T["PaymentDetails.ViewOrder"]</span>
                     </a>
                 </div>
             }
             <div class="details-actions">
-                <button class="back-btn" @onclick="GoBack">Voltar</button>
+                <button class="back-btn" @onclick="GoBack">@T["Common.Back"]</button>
             </div>
         </div>
-    </div>
-}
+                </div>
+            }
+        </article>
+    </section>
+</div>
 
 @code {
     [Parameter] public int PaymentId { get; set; }

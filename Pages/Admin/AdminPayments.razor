@@ -12,102 +12,115 @@
 @inject BitcoinQuoteService BitcoinQuoteService
 @inject CurrencyPreferenceService CurrencyPreferenceService
 @inject AdminPaymentsFilterStateService AdminPaymentsFilterStateService
+@inject UiTextService T
 
-<h2 class="page-title">Pagamentos</h2>
+<div class="entity-shell">
+    <section class="entity-shell-hero">
+        <p class="entity-shell-kicker">@T["AdminPayments.Kicker"]</p>
+        <h1>@T["AdminPayments.Title"]</h1>
+        <p class="entity-shell-subtitle">@T["AdminPayments.Subtitle"]</p>
+    </section>
 
-<div class="filter-bar admin-filter-card">
-    <input type="text" placeholder="Usuário..." @bind="filterUserId" @bind:event="oninput" />
-    <input type="text" placeholder="Produto..." @bind="filterProductId" @bind:event="oninput" />
-    <input type="number" placeholder="Valor mínimo" @bind="filterMinAmount" min="0" />
-    <input type="number" placeholder="Valor máximo" @bind="filterMaxAmount" min="0" />
-    <select @bind="filterStatus">
-        <option value="">Todos os status</option>
-        <option value="Pago">Pago</option>
-        <option value="Pendente">Pendente</option>
-    </select>
-    <input type="date" @bind="filterDate" />
-    <button type="button" @onclick="@(async () => await ApplyFiltersAndPersist())">Filtrar</button>
-    <button type="button" @onclick="@(async () => await ClearFilters())">Limpar</button>
+    <section class="entity-shell-grid" aria-label="@T["AdminPayments.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            <div class="filter-bar admin-filter-card">
+                <input type="text" placeholder="@T["AdminPayments.Filter.User"]" @bind="filterUserId" @bind:event="oninput" />
+                <input type="text" placeholder="@T["AdminPayments.Filter.Product"]" @bind="filterProductId" @bind:event="oninput" />
+                <input type="number" placeholder="@T["AdminPayments.Filter.Min"]" @bind="filterMinAmount" min="0" />
+                <input type="number" placeholder="@T["AdminPayments.Filter.Max"]" @bind="filterMaxAmount" min="0" />
+                <select @bind="filterStatus">
+                    <option value="">@T["AdminPayments.Filter.AllStatuses"]</option>
+                    <option value="paid">@T["Common.Paid"]</option>
+                    <option value="pending">@T["Common.Pending"]</option>
+                </select>
+                <input type="date" @bind="filterDate" />
+                <button type="button" @onclick="@(async () => await ApplyFiltersAndPersist())">@T["Common.Filter"]</button>
+                <button type="button" @onclick="@(async () => await ClearFilters())">@T["Common.Clear"]</button>
+            </div>
+
+            @if (showRestoredFiltersNotice)
+            {
+                <div class="orders-review-restored-notice">
+                    <span>@T["AdminPayments.RestoredFilters"]</span>
+                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">×</button>
+                </div>
+            }
+
+            <AdminDataState IsLoading="@isLoading" IsEmpty="@(filteredPayments == null || !filteredPayments.Any())" LoadingText="@T["AdminPayments.Loading"]" EmptyText="@T["AdminPayments.Empty"]">
+                <table class="payments-table align-right">
+                    <thead>
+                        <tr>
+                            <th>@T["AdminPayments.Product"]</th>
+                            <th>@T["AdminPayments.User"]</th>
+                            <th>@T["Common.Gateway"]</th>
+                            <th>@T["Common.Value"]</th>
+                            <th>@T["Common.Status"]</th>
+                            <th>@T["Common.Date"]</th>
+                            <th>@T["Common.Actions"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var p in filteredPayments?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<PaymentRecord>())
+                    {
+                        <tr>
+                            <td data-label="@T["AdminPayments.Product"]">
+                                @if (p.Product != null)
+                                {
+                                    <a class="evidence-link" href="@($"/admin/products/view/{p.ProductId}")">
+                                        @p.Product.Name
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">ID: @p.ProductId</span>
+                                }
+                            </td>
+                            <td data-label="@T["AdminPayments.User"]">
+                                @if (p.User != null)
+                                {
+                                    <a class="evidence-link" href="@($"/admin/users/view/{p.UserId}")">
+                                        @p.User.UserName
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">ID: @p.UserId</span>
+                                }
+                            </td>
+                            <td data-label="@T["Common.Gateway"]">@p.PaymentMethod</td>
+                            <td data-label="@T["Common.Value"]">@FormatBtcWithUsd(p.Amount)</td>
+                            <td data-label="@T["Common.Status"]">
+                                @if (p.IsPaid)
+                                {
+                                    <span class="order-status-badge pago">@T["Common.Paid"]</span>
+                                }
+                                else
+                                {
+                                    <span class="order-status-badge aguardandopagamento">@T["Common.Pending"]</span>
+                                }
+                            </td>
+                            <td data-label="@T["Common.Date"]">@p.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
+                            <td data-label="@T["Common.Actions"]">
+                                <button class="details-btn action-btn" @onclick="() => ViewPayment(p.Id)">@T["Common.Details"]</button>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+
+                <div class="pagination">
+                    <button type="button" @onclick="@(async () => await PrevPage())" disabled="@(currentPage <= 1)">@T["Common.Previous"]</button>
+                    <span class="pagination-info">@T["Common.Page"] @currentPage @T["Common.Of"] @totalPages</span>
+                    <button type="button" @onclick="@(async () => await NextPage())" disabled="@(currentPage >= totalPages)">@T["Common.Next"]</button>
+                </div>
+            </AdminDataState>
+        </article>
+    </section>
+
+    <section class="entity-shell-footer" aria-label="@T["AdminCommon.ExtraActions"]">
+        <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>@T["Common.Back"]</button>
+    </section>
 </div>
-
-@if (showRestoredFiltersNotice)
-{
-    <div class="orders-review-restored-notice">
-        <span>Filtros de pagamentos restaurados da sessão anterior.</span>
-        <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="Fechar aviso">×</button>
-    </div>
-}
-
-<AdminDataState IsLoading="@isLoading" IsEmpty="@(filteredPayments == null || !filteredPayments.Any())" LoadingText="Carregando pagamentos..." EmptyText="Nenhum pagamento encontrado.">
-    <table class="payments-table align-right">
-        <thead>
-            <tr>
-                <th>Produto</th>
-                <th>Usuário</th>
-                <th>Gateway</th>
-                <th>Valor</th>
-                <th>Status</th>
-                <th>Data</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var p in filteredPayments?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<PaymentRecord>())
-        {
-            <tr>
-                <td data-label="Produto">
-                    @if (p.Product != null)
-                    {
-                        <a class="evidence-link" href="@($"/admin/products/view/{p.ProductId}")">
-                            @p.Product.Name
-                        </a>
-                    }
-                    else
-                    {
-                        <span class="text-muted">ID: @p.ProductId</span>
-                    }
-                </td>
-                <td data-label="Usuário">
-                    @if (p.User != null)
-                    {
-                        <a class="evidence-link" href="@($"/admin/users/view/{p.UserId}")">
-                            @p.User.UserName
-                        </a>
-                    }
-                    else
-                    {
-                        <span class="text-muted">ID: @p.UserId</span>
-                    }
-                </td>
-                <td data-label="Gateway">@p.PaymentMethod</td>
-                <td data-label="Valor">@FormatBtcWithUsd(p.Amount)</td>
-                <td data-label="Status">
-                    @if (p.IsPaid)
-                    {
-                        <span class="order-status-badge pago">Pago</span>
-                    }
-                    else
-                    {
-                        <span class="order-status-badge aguardandopagamento">Pendente</span>
-                    }
-                </td>
-                <td data-label="Data">@p.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
-                <td data-label="Ações">
-                    <button class="details-btn action-btn" @onclick="() => ViewPayment(p.Id)">Detalhes</button>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
-
-    <div class="pagination">
-        <button type="button" @onclick="@(async () => await PrevPage())" disabled="@(currentPage <= 1)">Anterior</button>
-        <span class="pagination-info">Página @currentPage de @totalPages</span>
-        <button type="button" @onclick="@(async () => await NextPage())" disabled="@(currentPage >= totalPages)">Próxima</button>
-    </div>
-</AdminDataState>
-
-<button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
 
 @code {
     private List<PaymentRecord>? allPayments;
@@ -183,8 +196,8 @@
                 (!filterMinAmount.HasValue || p.Amount >= filterMinAmount.Value) &&
                 (!filterMaxAmount.HasValue || p.Amount <= filterMaxAmount.Value) &&
                 (string.IsNullOrWhiteSpace(filterStatus) ||
-                    (filterStatus == "Pago" && p.IsPaid) ||
-                    (filterStatus == "Pendente" && !p.IsPaid)) &&
+                    (filterStatus == "paid" && p.IsPaid) ||
+                    (filterStatus == "pending" && !p.IsPaid)) &&
                 (!filterDate.HasValue || p.CreatedAt.Date == filterDate.Value.Date)
             )
             .ToList();

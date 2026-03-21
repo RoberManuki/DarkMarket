@@ -1,8 +1,10 @@
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Routing
 @using DarkMarket.Shared
+@using DarkMarket.Services
 
 @inject NavigationManager NavigationManager
+@inject UiTextService T
 
 <CascadingAuthenticationState>
     <Router AppAssembly="@typeof(Program).Assembly">
@@ -10,7 +12,7 @@
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(DarkMarket.Shared.MainLayout)">
                 <NotAuthorized>
                     <div class="alert alert-warning">
-                        Você não tem permissão para acessar esta página.
+                        @T["App.NotAuthorized"]
                     </div>
                 </NotAuthorized>
             </AuthorizeRouteView>
@@ -19,13 +21,13 @@
             <LayoutView Layout="@typeof(DarkMarket.Shared.MainLayout)">
                 <div class="not-found-card">
                     <span class="not-found-icon">&#9888;</span>
-                    <h2 class="not-found-title">Página não encontrada</h2>
+                    <h2 class="not-found-title">@T["App.NotFound.Title"]</h2>
                     <p class="not-found-description">
-                        O endereço acessado não existe.<br>
-                        Verifique a URL ou volte para a página inicial.
+                        @T["App.NotFound.Description"]<br>
+                        @T["App.NotFound.Help"]
                     </p>
-                    <a href="/" class="not-found-home-link">
-                        &#8592; Voltar para Home
+                    <a href="/dashboard" class="not-found-home-link">
+                        &#8592; @T["App.NotFound.BackToDashboard"]
                     </a>
                 </div>
             </LayoutView>

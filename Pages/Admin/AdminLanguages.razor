@@ -1,0 +1,82 @@
+@page "/admin/languages"
+
+@attribute [Authorize(Roles = "admin")]
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.JSInterop
+
+@inject LanguagePreferenceService LanguagePreferenceService
+@inject UiTextService T
+@inject IJSRuntime JSRuntime
+
+<div class="entity-shell admin-page">
+    <section class="entity-shell-hero">
+        <p class="entity-shell-kicker">@T["AdminLanguages.Kicker"]</p>
+        <h1>@T["AdminLanguages.Title"]</h1>
+        <p class="entity-shell-subtitle">@T["AdminLanguages.Subtitle"]</p>
+    </section>
+
+    <section class="entity-shell-grid" aria-label="@T["AdminLanguages.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            <div class="admin-settings-card">
+                <span><b>@T["AdminLanguages.Current"]:</b> @selectedLanguage</span>
+            </div>
+
+            <div class="admin-settings-card">
+                <label for="ui-language"><b>@T["AdminLanguages.Select"]:</b></label>
+                <select id="ui-language" class="fiat-select" @bind="selectedLanguage">
+                    @foreach (var language in LanguagePreferenceService.SupportedLanguages)
+                    {
+                        <option value="@language.Code">@language.Label</option>
+                    }
+                </select>
+                <button class="details-btn" @onclick="SaveLanguageAsync">@T["AdminLanguages.Save"]</button>
+
+                @if (!string.IsNullOrWhiteSpace(message))
+                {
+                    <span class="operation-fee-message ok">@message</span>
+                }
+            </div>
+
+            <div class="admin-settings-card">
+                <span class="hint-text">@T["AdminLanguages.Hint"]</span>
+            </div>
+        </article>
+    </section>
+</div>
+
+@code {
+    private string selectedLanguage = LanguagePreferenceService.DefaultLanguage;
+    private string? message;
+
+    protected override void OnInitialized()
+    {
+        selectedLanguage = LanguagePreferenceService.SelectedLanguage;
+    }
+
+    private async Task SaveLanguageAsync()
+    {
+        LanguagePreferenceService.SetLanguage(selectedLanguage);
+
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("localStorage.setItem", "darkmarket.uiLanguage", LanguagePreferenceService.SelectedLanguage);
+        }
+        catch
+        {
+            // Keep runtime update even if storage is unavailable.
+        }
+
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("darkMarketSetCookie", "darkmarket.uiLanguage", LanguagePreferenceService.SelectedLanguage, 365);
+        }
+        catch
+        {
+            // Keep runtime update even if cookie helper is unavailable.
+        }
+
+        selectedLanguage = LanguagePreferenceService.SelectedLanguage;
+        message = T["AdminLanguages.Success"];
+    }
+}

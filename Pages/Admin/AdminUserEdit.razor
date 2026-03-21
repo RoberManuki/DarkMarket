@@ -13,38 +13,47 @@
 @inject UserManager<ApplicationUser> UserManager
 @inject NavigationManager NavigationManager
 @inject LogService LogService
+@inject UiTextService T
 
-<div class="form-card">
-    <h2 class="page-title">Editar Usuário</h2>
+<div class="entity-shell">
+    <section class="entity-shell-hero">
+        <p class="entity-shell-kicker">@T["AdminUserEdit.Kicker"]</p>
+        <h1>@T["AdminUserEdit.Title"]</h1>
+        <p class="entity-shell-subtitle">@T["AdminUserEdit.Subtitle"]</p>
+    </section>
 
-    @if (isLoading)
-    {
-        <div class="loading-spinner">Carregando...</div>
-    }
-    else if (user == null)
-    {
-        <p>Usuário não encontrado.</p>
-    }
-    else
-    {
-        <EditForm Model="model" OnValidSubmit="Save">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
+    <section class="entity-shell-grid" aria-label="@T["AdminUserEdit.Aria"]">
+        <article class="entity-shell-card entity-shell-main form-card">
+            @if (isLoading)
+            {
+                <div class="loading-spinner">@T["Common.Loading"]</div>
+            }
+            else if (user == null)
+            {
+                <p>@T["AdminUserEdit.NotFound"]</p>
+            }
+            else
+            {
+                <EditForm Model="model" OnValidSubmit="Save">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
 
-            <div class="form-group">
-                <label>Nome Completo</label>
-                <InputText class="input" @bind-Value="model.FullName" />
-            </div>
-            <div class="form-group">
-                <label>Data de Nascimento</label>
-                <InputDate class="input" @bind-Value="model.BirthDate" />
-            </div>
-            <div class="form-actions">
-                <button class="cancel-btn" type="button" @onclick='() => NavigationManager.NavigateTo($"/admin/users")'>Cancelar</button>
-                <button class="save-btn" type="submit" disabled="@isSaving">Salvar</button>
-            </div>
-        </EditForm>
-    }
+                    <div class="form-group">
+                        <label>@T["AdminUserView.FullName"]</label>
+                        <InputText class="input" @bind-Value="model.FullName" />
+                    </div>
+                    <div class="form-group">
+                        <label>@T["AdminUserView.BirthDate"]</label>
+                        <InputDate class="input" @bind-Value="model.BirthDate" />
+                    </div>
+                    <div class="form-actions">
+                        <button class="cancel-btn" type="button" @onclick='() => NavigationManager.NavigateTo($"/admin/users")'>@T["Common.Cancel"]</button>
+                        <button class="save-btn" type="submit" disabled="@isSaving">@T["Common.Save"]</button>
+                    </div>
+                </EditForm>
+            }
+        </article>
+    </section>
 </div>
 
 @code {
@@ -73,7 +82,7 @@
     {
         if (user == null)
         {
-            ToastRef?.Show("Usuário não encontrado.", "error");
+            ToastRef?.Show(T["AdminUserEdit.NotFound"], "error");
             return;
         }
         isSaving = true;
@@ -85,17 +94,17 @@
         if (result.Succeeded)
         {
             await LogService.LogAsync(
-                $"Usuário editado (ID: {user.Id})",
+                string.Format(T["AdminUserEdit.LogEdited"], user.Id),
                 source: "Admin",
                 level: "Info",
                 userId: user.Id
             );
-            ToastRef?.Show("Usuário atualizado com sucesso!", "success");
+            ToastRef?.Show(T["AdminUserEdit.UpdatedToast"], "success");
             NavigationManager.NavigateTo($"/admin/users/view/{user.Id}");
         }
         else
         {
-            ToastRef?.Show("Erro ao atualizar usuário.", "error");
+            ToastRef?.Show(T["AdminUserEdit.UpdateErrorToast"], "error");
         }
     }
 }

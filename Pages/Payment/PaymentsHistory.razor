@@ -16,92 +16,103 @@
 @inject IJSRuntime JS
 @inject BitcoinQuoteService BitcoinQuoteService
 @inject CurrencyPreferenceService CurrencyPreferenceService
+@inject UiTextService T
 
-<h2 class="page-title">Histórico de Pagamentos</h2>
+<div class="entity-shell">
+    <section class="entity-shell-hero">
+        <p class="entity-shell-kicker">@T["PaymentHistory.Kicker"]</p>
+        <h1>@T["PaymentHistory.Title"]</h1>
+        <p class="entity-shell-subtitle">@T["PaymentHistory.Subtitle"]</p>
+    </section>
 
-<div class="filter-bar">
-    <input type="number" placeholder="Valor mínimo" @bind="filterMinAmount" min="0" />
-    <input type="number" placeholder="Valor máximo" @bind="filterMaxAmount" min="0" />
-    <select @bind="filterStatus">
-        <option value="">Todos os status</option>
-        <option value="Pago">Pago</option>
-        <option value="Pendente">Pendente</option>
-    </select>
-    <input type="text" placeholder="Gateway..." @bind="filterGateway" @bind:event="oninput" />
-    <input type="date" @bind="filterDate" />
-    <button @onclick="ApplyFilters">Filtrar</button>
-    <button @onclick="ClearFilters">Limpar</button>
-</div>
+    <section class="entity-shell-grid" aria-label="@T["PaymentHistory.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            <div class="filter-bar">
+                <input type="number" placeholder="@T["PaymentHistory.Filter.MinValue"]" @bind="filterMinAmount" min="0" />
+                <input type="number" placeholder="@T["PaymentHistory.Filter.MaxValue"]" @bind="filterMaxAmount" min="0" />
+                <select @bind="filterStatus">
+                    <option value="">@T["PaymentHistory.Filter.AllStatus"]</option>
+                    <option value="paid">@T["Common.Paid"]</option>
+                    <option value="pending">@T["Common.Pending"]</option>
+                </select>
+                <input type="text" placeholder="@T["PaymentHistory.Filter.Gateway"]" @bind="filterGateway" @bind:event="oninput" />
+                <input type="date" @bind="filterDate" />
+                <button @onclick="ApplyFilters">@T["Common.Filter"]</button>
+                <button @onclick="ClearFilters">@T["Common.Clear"]</button>
+            </div>
 
-@if (filteredPayments == null)
-{
-    <p>Carregando...</p>
-}
-else if (!filteredPayments.Any())
-{
-    <p>Você ainda não realizou nenhum pagamento.</p>
-}
-else
-{
-    <table class="product-table">
+            @if (filteredPayments == null)
+            {
+                <p>@T["Common.Loading"]</p>
+            }
+            else if (!filteredPayments.Any())
+            {
+                <p>@T["PaymentHistory.Empty"]</p>
+            }
+            else
+            {
+                <table class="product-table">
         <thead>
             <tr>
-                <th>Produto</th>
-                <th>Endereço</th>
-                <th>Valor</th>
-                <th>Status</th>
-                <th>Gateway</th>
-                <th>Data</th>
-                <th>Ações</th>
+                <th>@T["PaymentHistory.Product"]</th>
+                <th>@T["Common.Address"]</th>
+                <th>@T["Common.Value"]</th>
+                <th>@T["Common.Status"]</th>
+                <th>@T["Common.Gateway"]</th>
+                <th>@T["Common.Date"]</th>
+                <th>@T["Common.Actions"]</th>
             </tr>
         </thead>
         <tbody>
         @foreach (var p in filteredPayments?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<PaymentRecord>())
         {
             <tr>
-                <td data-label="Produto">@p.ProductId</td>
-                <td data-label="Endereço" class="address-monospace">@p.Address</td>
-                <td data-label="Valor">@FormatBtcWithUsd(p.Amount)</td>
-                <td data-label="Status">
+                <td data-label="@T["PaymentHistory.Product"]">@p.ProductId</td>
+                <td data-label="@T["Common.Address"]" class="address-monospace">@p.Address</td>
+                <td data-label="@T["Common.Value"]">@FormatBtcWithUsd(p.Amount)</td>
+                <td data-label="@T["Common.Status"]">
                     @if (p.IsPaid)
                     {
-                        <span class="status-paid">Pago</span>
+                        <span class="status-paid">@T["Common.Paid"]</span>
                     }
                     else
                     {
-                        <span class="status-pending">Pendente</span>
+                        <span class="status-pending">@T["Common.Pending"]</span>
                     }
                 </td>
-                <td data-label="Gateway">@p.PaymentMethod</td>
-                <td data-label="Data">@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
-                <td data-label="Ações">
+                <td data-label="@T["Common.Gateway"]">@p.PaymentMethod</td>
+                <td data-label="@T["Common.Date"]">@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                <td data-label="@T["Common.Actions"]">
                     @if (!p.IsPaid)
                     {
                         <button class="edit-btn" @onclick='() => Navigation.NavigateTo($"/payments/view/{p.Id}")'>
-                            Visualizar
+                            @T["Common.View"]
                         </button>
                         <button class="danger" @onclick='() => ConfirmCancelPayment(p.Id)'>
-                            Cancelar
+                            @T["Common.Cancel"]
                         </button>
                     }
                     else
                     {
                         <button class="details-btn action-btn" @onclick='() => Navigation.NavigateTo($"/payments/details/{p.Id}")'>
-                            Detalhes
+                            @T["Common.Details"]
                         </button>
                     }
                 </td>
             </tr>
         }
         </tbody>
-    </table>
+                </table>
 
-    <div class="pagination">
-        <button type="button" @onclick="@(() => PrevPage())" disabled="@(!CanGoToPreviousPage)">Anterior</button>
-        <span class="pagination-info">Página @currentPage de @totalPages</span>
-        <button type="button" @onclick="@(() => NextPage())" disabled="@(!CanGoToNextPage)">Próxima</button>
-    </div>
-}
+                <div class="pagination">
+                    <button type="button" @onclick="@(() => PrevPage())" disabled="@(!CanGoToPreviousPage)">@T["Common.Previous"]</button>
+                    <span class="pagination-info">@T["Common.Page"] @currentPage @T["Common.Of"] @totalPages</span>
+                    <button type="button" @onclick="@(() => NextPage())" disabled="@(!CanGoToNextPage)">@T["Common.Next"]</button>
+                </div>
+            }
+        </article>
+    </section>
+</div>
 
 @code {
     private List<PaymentRecord>? payments;
@@ -151,7 +162,7 @@ else
                 payment.IsPaid = true;
                 payment.PaidAt = DateTime.UtcNow;
                 await InvokeAsync(StateHasChanged);
-                ToastRef?.Show($"Pagamento {paymentId} confirmado!", "success");
+                ToastRef?.Show(string.Format(T["PaymentHistory.ConfirmedToast"], paymentId), "success");
             }
         });
 
@@ -172,8 +183,8 @@ else
                 (!filterMinAmount.HasValue || p.Amount >= filterMinAmount.Value) &&
                 (!filterMaxAmount.HasValue || p.Amount <= filterMaxAmount.Value) &&
                 (string.IsNullOrWhiteSpace(filterStatus) ||
-                    (filterStatus == "Pago" && p.IsPaid) ||
-                    (filterStatus == "Pendente" && !p.IsPaid)) &&
+                    (filterStatus == "paid" && p.IsPaid) ||
+                    (filterStatus == "pending" && !p.IsPaid)) &&
                 (string.IsNullOrWhiteSpace(filterGateway) || (p.PaymentMethod?.Contains(filterGateway, StringComparison.OrdinalIgnoreCase) ?? false)) &&
                 (!filterDate.HasValue || p.CreatedAt.Date == filterDate.Value.Date)
             )
@@ -207,13 +218,13 @@ else
             );
 
             ApplyFilters();
-            ToastRef?.Show("Pedido cancelado.", "info");
+            ToastRef?.Show(T["PaymentHistory.CanceledToast"], "info");
         }
     }
 
     private async Task ConfirmCancelPayment(int paymentId)
     {
-        if (!await JS.InvokeAsync<bool>("confirm", "Tem certeza que deseja cancelar este pagamento?")) return;
+        if (!await JS.InvokeAsync<bool>("confirm", T["PaymentHistory.ConfirmCancel"])) return;
         await CancelPayment(paymentId);
     }
 

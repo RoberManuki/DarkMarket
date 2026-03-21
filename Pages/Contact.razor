@@ -1,44 +1,43 @@
 @page "/contact"
 
-<PageTitle>Contato - DarkMarket</PageTitle>
+@inject UiTextService T
+
+<PageTitle>@T["Contact.PageTitle"]</PageTitle>
 
 <div class="contact-page">
     <section class="contact-hero">
-        <p class="contact-kicker">Suporte e colaboração</p>
-        <h1>Contato</h1>
-        <p>
-            Para incidentes, dúvidas técnicas e propostas de melhoria, use os canais abaixo com o máximo
-            de contexto possível.
-        </p>
+        <p class="contact-kicker">@T["Contact.Kicker"]</p>
+        <h1>@T["Contact.Title"]</h1>
+        <p>@T["Contact.Hero"]</p>
     </section>
 
-    <section class="contact-grid" aria-label="Canais de contato">
+    <section class="contact-grid" aria-label="@T["Contact.Aria.Channels"]">
         <article class="contact-card">
-            <h3>E-mail</h3>
+            <h3>@T["Contact.Email.Title"]</h3>
             <p class="contact-highlight">suporte@darkmarket.local</p>
-            <p>Canal principal para suporte operacional e dúvidas de fluxo.</p>
+            <p>@T["Contact.Email.Text"]</p>
         </article>
 
         <article class="contact-card">
-            <h3>GitHub</h3>
-            <p class="contact-highlight">Issues e discussões do repositório</p>
-            <p>Use para reportes reproduzíveis, propostas de melhoria e rastreio de evolução.</p>
+            <h3>@T["Contact.GitHub.Title"]</h3>
+            <p class="contact-highlight">@T["Contact.GitHub.Highlight"]</p>
+            <p>@T["Contact.GitHub.Text"]</p>
         </article>
 
         <article class="contact-card">
-            <h3>SLA atual</h3>
-            <p class="contact-highlight">Até 2 dias úteis</p>
-            <p>Priorização por severidade e impacto no fluxo de pagamentos e pedidos.</p>
+            <h3>@T["Contact.Sla.Title"]</h3>
+            <p class="contact-highlight">@T["Contact.Sla.Highlight"]</p>
+            <p>@T["Contact.Sla.Text"]</p>
         </article>
     </section>
 
-    <section class="contact-checklist" aria-label="Checklist de abertura de chamado">
-        <h2>Checklist para abrir chamado</h2>
+    <section class="contact-checklist" aria-label="@T["Contact.Aria.Checklist"]">
+        <h2>@T["Contact.Checklist.Title"]</h2>
         <ul>
-            <li>ID do pedido ou pagamento, quando aplicável</li>
-            <li>Descrição objetiva do problema e horário aproximado</li>
-            <li>Navegador, ambiente e captura de tela/evidência</li>
-            <li>Passos para reproduzir o comportamento</li>
+            <li>@T["Contact.Checklist.Item1"]</li>
+            <li>@T["Contact.Checklist.Item2"]</li>
+            <li>@T["Contact.Checklist.Item3"]</li>
+            <li>@T["Contact.Checklist.Item4"]</li>
         </ul>
     </section>
 </div>

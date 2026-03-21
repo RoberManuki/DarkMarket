@@ -19,11 +19,11 @@ public sealed record AdminLogsPageData(
 
 public class AdminLogsQueryService
 {
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _dbFactory;
 
-    public AdminLogsQueryService(AppDbContext db)
+    public AdminLogsQueryService(IDbContextFactory<AppDbContext> dbFactory)
     {
-        _db = db;
+        _dbFactory = dbFactory;
     }
 
     public async Task<AdminLogsPageData> GetPageDataAsync(
@@ -34,8 +34,10 @@ public class AdminLogsQueryService
         int requestedPage,
         int pageSize)
     {
+        await using var db = await _dbFactory.CreateDbContextAsync();
+
         var effectivePageSize = Math.Max(pageSize, 1);
-        var filteredQuery = AdminLogFiltering.Apply(_db.Logs.AsNoTracking(), primaryCriteria);
+        var filteredQuery = AdminLogFiltering.Apply(db.Logs.AsNoTracking(), primaryCriteria);
         var totalLogs = await filteredQuery.CountAsync();
 
         var totalPages = Math.Max(1, (int)Math.Ceiling(totalLogs / (double)effectivePageSize));
@@ -48,7 +50,7 @@ public class AdminLogsQueryService
             .Take(effectivePageSize)
             .ToListAsync();
 
-        var auditBase = AdminLogFiltering.Apply(_db.Logs.AsNoTracking(), auditCountsCriteria);
+        var auditBase = AdminLogFiltering.Apply(db.Logs.AsNoTracking(), auditCountsCriteria);
 
         var countsProjection = await auditBase
             .GroupBy(_ => 1)

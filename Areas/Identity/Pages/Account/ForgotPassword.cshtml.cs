@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using DarkMarket.Services;
 
 namespace DarkMarket.Areas.Identity.Pages.Account
 {
@@ -14,11 +15,13 @@ namespace DarkMarket.Areas.Identity.Pages.Account
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailSender _emailSender;
+        private readonly UiTextService _t;
 
-        public ForgotPasswordModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender)
+        public ForgotPasswordModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender, UiTextService t)
         {
             _userManager = userManager;
             _emailSender = emailSender;
+            _t = t;
         }
 
         [BindProperty]
@@ -61,8 +64,8 @@ namespace DarkMarket.Areas.Identity.Pages.Account
             {
                 await _emailSender.SendEmailAsync(
                     Input.Email,
-                    "Redefinir sua senha",
-                    $"Para redefinir sua senha, clique aqui: <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>redefinir senha</a>.");
+                    _t["Identity.Email.ResetSubject"],
+                    string.Format(_t["Identity.Email.ResetBody"], HtmlEncoder.Default.Encode(callbackUrl), _t["Identity.Email.ResetAction"]));
             }
 
             return RedirectToPage("./ForgotPasswordConfirmation");

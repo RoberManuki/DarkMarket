@@ -1,11 +1,12 @@
 @page
 @model DarkMarket.Areas.Identity.Pages.Account.ResendEmailConfirmationModel
+@inject DarkMarket.Services.UiTextService T
 @{
-    ViewData["Title"] = "Reenviar confirmacao";
+    ViewData["Title"] = T["Identity.Resend.Title"];
 }
 
-<h2>Reenviar confirmacao de e-mail</h2>
-<p class="identity-muted">Informe o e-mail usado no cadastro para receber um novo link de confirmacao.</p>
+<h2>@T["Identity.Resend.Heading"]</h2>
+<p class="identity-muted">@T["Identity.Resend.Subtitle"]</p>
 
 @if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
 {
@@ -16,16 +17,16 @@
 
 <form method="post">
     <div>
-        <label asp-for="Input.Email"></label>
+        <label asp-for="Input.Email">@T["Identity.Common.Email"]</label>
         <input asp-for="Input.Email" autocomplete="username" />
         <span asp-validation-for="Input.Email" class="text-danger"></span>
     </div>
 
-    <button type="submit">Reenviar e-mail</button>
+    <button type="submit">@T["Identity.Resend.Submit"]</button>
 </form>
 
 <div class="identity-actions">
-    <a asp-page="./Login">Voltar para login</a>
+    <a asp-page="./Login">@T["Identity.Common.BackToLogin"]</a>
 </div>
 
 @section Scripts {

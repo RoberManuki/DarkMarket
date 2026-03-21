@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using DarkMarket.Services;
 
 namespace DarkMarket.Areas.Identity.Pages.Account
 {
@@ -14,11 +15,13 @@ namespace DarkMarket.Areas.Identity.Pages.Account
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IEmailSender _emailSender;
+        private readonly UiTextService _t;
 
-        public ResendEmailConfirmationModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender)
+        public ResendEmailConfirmationModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender, UiTextService t)
         {
             _userManager = userManager;
             _emailSender = emailSender;
+            _t = t;
         }
 
         [BindProperty]
@@ -48,7 +51,7 @@ namespace DarkMarket.Areas.Identity.Pages.Account
             var user = await _userManager.FindByEmailAsync(Input.Email);
             if (user == null)
             {
-                StatusMessage = "Se o e-mail existir, o link de confirmacao sera enviado.";
+                StatusMessage = _t["Identity.Resend.StatusQueued"];
                 return RedirectToPage();
             }
 
@@ -66,11 +69,11 @@ namespace DarkMarket.Areas.Identity.Pages.Account
             {
                 await _emailSender.SendEmailAsync(
                     Input.Email,
-                    "Confirme seu e-mail",
-                    $"Confirme sua conta clicando aqui: <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>confirmar conta</a>.");
+                    _t["Identity.Email.ConfirmSubject"],
+                    string.Format(_t["Identity.Email.ConfirmBody"], HtmlEncoder.Default.Encode(callbackUrl), _t["Identity.Email.ConfirmAction"]));
             }
 
-            StatusMessage = "Se o e-mail existir, o link de confirmacao sera enviado.";
+            StatusMessage = _t["Identity.Resend.StatusQueued"];
             return RedirectToPage();
         }
     }

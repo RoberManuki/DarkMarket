@@ -43,6 +43,8 @@ builder.Services.AddScoped<OrderAccessService>();
 builder.Services.AddScoped<AppInitializationService>();
 builder.Services.AddScoped<BtcPayWebhookService>();
 builder.Services.AddScoped<CurrencyPreferenceService>();
+builder.Services.AddScoped<LanguagePreferenceService>();
+builder.Services.AddScoped<UiTextService>();
 builder.Services.AddScoped<DashboardMetricsService>();
 builder.Services.AddScoped<AdminSettingsService>();
 builder.Services.AddScoped<OperationFeeCalculatorService>();
@@ -67,6 +69,9 @@ if (string.IsNullOrWhiteSpace(defaultConnection) || defaultConnection.Contains("
 }
 
 builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(defaultConnection));
+
+builder.Services.AddDbContextFactory<AppDbContext>(options =>
     options.UseNpgsql(defaultConnection));
 
 var isDevelopment = builder.Environment.IsDevelopment();
@@ -106,8 +111,55 @@ var app = builder.Build();
 
 app.UseStaticFiles();
 app.UseRouting();
+
+app.Use(async (context, next) =>
+{
+    var languagePreference = context.RequestServices.GetRequiredService<LanguagePreferenceService>();
+    context.Request.Cookies.TryGetValue("darkmarket.uiLanguage", out var languageFromCookie);
+    languagePreference.SetLanguage(languageFromCookie);
+    await next();
+});
+
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.MapGet("/set-language/{languageCode}", (HttpContext context, string languageCode, string? returnUrl) =>
+{
+    var supported = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    {
+        "pt-BR",
+        "en-US",
+        "es-ES"
+    };
+
+    var normalized = string.IsNullOrWhiteSpace(languageCode) ? LanguagePreferenceService.DefaultLanguage : languageCode.Trim();
+    if (!supported.Contains(normalized))
+    {
+        normalized = LanguagePreferenceService.DefaultLanguage;
+    }
+
+    context.Response.Cookies.Append("darkmarket.uiLanguage", normalized, new CookieOptions
+    {
+        Path = "/",
+        HttpOnly = false,
+        IsEssential = true,
+        Secure = !isDevelopment,
+        SameSite = SameSiteMode.Lax,
+        Expires = DateTimeOffset.UtcNow.AddDays(365)
+    });
+
+    var target = string.IsNullOrWhiteSpace(returnUrl) ? "/" : returnUrl;
+    if (!Uri.TryCreate(target, UriKind.Relative, out _) || target.StartsWith("//", StringComparison.Ordinal))
+    {
+        target = "/";
+    }
+    else if (!target.StartsWith('/'))
+    {
+        target = "/" + target;
+    }
+
+    return Results.LocalRedirect(target);
+});
 
 app.MapBlazorHub();
 app.MapRazorPages();

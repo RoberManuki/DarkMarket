@@ -2,22 +2,20 @@
 
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Authorization
+@using DarkMarket.Services
+
+@inject UiTextService T
 
 <nav>
     <ul>
         <li>
-            <NavLink href="/" Match="NavLinkMatch.All">
-                <span class="oi oi-home"></span> Home
-            </NavLink>
-        </li>
-        <li>
             <NavLink href="/dashboard" Match="NavLinkMatch.All">
-                <span class="oi oi-dashboard"></span> Dashboard
+                <span class="oi oi-dashboard"></span> @T["Nav.Dashboard"]
             </NavLink>
         </li>
         <li>
             <NavLink href="/marketplace">
-                <span class="oi oi-shopping-cart"></span> Marketplace
+                <span class="oi oi-shopping-cart"></span> @T["Nav.Marketplace"]
             </NavLink>
         </li>
 
@@ -25,29 +23,29 @@
             <Authorized>
                 <li>
                     <NavLink href="/products">
-                        <span class="oi oi-box"></span> My Products
+                        <span class="oi oi-box"></span> @T["Nav.MyProducts"]
                     </NavLink>
                 </li>
                 <li>
                     <NavLink href="/payments" class="nav-link" Match="NavLinkMatch.All">
-                        <span class="oi oi-list"></span> Invoice History
+                        <span class="oi oi-list"></span> @T["Nav.InvoiceHistory"]
                     </NavLink>
                 </li>
                 <li>
                     <NavLink href="/orders">
-                        <span class="oi oi-list"></span> My Orders
+                        <span class="oi oi-list"></span> @T["Nav.MyOrders"]
                     </NavLink>
                 </li>
             </Authorized>
             <NotAuthorized>
                 <li>
                     <NavLink href="/Identity/Account/Login">
-                        <span class="oi oi-login"></span> Login
+                        <span class="oi oi-login"></span> @T["Nav.Login"]
                     </NavLink>
                 </li>
                 <li>
                     <NavLink href="/Identity/Account/Register">
-                        <span class="oi oi-user-plus"></span> Register
+                        <span class="oi oi-user-plus"></span> @T["Nav.Register"]
                     </NavLink>
                 </li>
             </NotAuthorized>
@@ -57,7 +55,7 @@
             <Authorized>
                 <li>
                     <NavLink href="/admin">
-                        <span class="oi oi-lock"></span> Admin
+                        <span class="oi oi-lock"></span> @T["Nav.Admin"]
                     </NavLink>
                 </li>
             </Authorized>
@@ -65,12 +63,12 @@
 
         <li>
             <NavLink href="/about">
-                <span class="oi oi-info"></span> About
+                <span class="oi oi-info"></span> @T["Nav.About"]
             </NavLink>
         </li>
         <li>
             <NavLink href="/contact">
-                <span class="oi oi-envelope"></span> Contact
+                <span class="oi oi-envelope"></span> @T["Nav.Contact"]
             </NavLink>
         </li>
 

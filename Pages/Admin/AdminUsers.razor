@@ -10,87 +10,100 @@
 
 @inject LogService LogService
 @inject AdminUsersFilterStateService AdminUsersFilterStateService
+@inject UiTextService T
 
-<h2 class="page-title">Usuários do Sistema</h2>
+<div class="entity-shell">
+    <section class="entity-shell-hero">
+        <p class="entity-shell-kicker">@T["AdminUsers.Kicker"]</p>
+        <h1>@T["AdminUsers.Title"]</h1>
+        <p class="entity-shell-subtitle">@T["AdminUsers.Subtitle"]</p>
+    </section>
 
-<div class="filter-bar admin-filter-card">
-    <input type="text" placeholder="Usuário..." @bind="filterUserName" @bind:event="oninput" />
-    <input type="text" placeholder="Email..." @bind="filterEmail" @bind:event="oninput" />
-    <input type="text" placeholder="Role..." @bind="filterRole" @bind:event="oninput" />
-    <select @bind="filterStatus">
-        <option value="">Todos</option>
-        <option value="Ativo">Ativo</option>
-        <option value="Bloqueado">Bloqueado</option>
-    </select>
-    <button type="button" @onclick="@(async () => await ApplyFiltersAndPersist())">Filtrar</button>
-    <button type="button" @onclick="@(async () => await ClearFilters())">Limpar</button>
+    <section class="entity-shell-grid" aria-label="@T["AdminUsers.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            <div class="filter-bar admin-filter-card">
+                <input type="text" placeholder="@T["AdminUsers.Filter.User"]" @bind="filterUserName" @bind:event="oninput" />
+                <input type="text" placeholder="@T["AdminUsers.Filter.Email"]" @bind="filterEmail" @bind:event="oninput" />
+                <input type="text" placeholder="@T["AdminUsers.Filter.Role"]" @bind="filterRole" @bind:event="oninput" />
+                <select @bind="filterStatus">
+                    <option value="">@T["AdminUsers.Filter.All"]</option>
+                    <option value="active">@T["AdminUsers.Active"]</option>
+                    <option value="blocked">@T["AdminUsers.Blocked"]</option>
+                </select>
+                <button type="button" @onclick="@(async () => await ApplyFiltersAndPersist())">@T["Common.Filter"]</button>
+                <button type="button" @onclick="@(async () => await ClearFilters())">@T["Common.Clear"]</button>
+            </div>
+
+            @if (showRestoredFiltersNotice)
+            {
+                <div class="orders-review-restored-notice">
+                    <span>@T["AdminUsers.RestoredFilters"]</span>
+                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">×</button>
+                </div>
+            }
+
+            <AdminDataState IsLoading="@isLoading" IsEmpty="@(filteredUsers == null || !filteredUsers.Any())" LoadingText="@T["AdminUsers.Loading"]" EmptyText="@T["AdminUsers.Empty"]">
+                <table class="product-table">
+                    <thead>
+                        <tr>
+                            <th>@T["AdminUsers.User"]</th>
+                            <th>@T["AdminUsers.Email"]</th>
+                            <th>@T["AdminUsers.Role"]</th>
+                            <th>@T["AdminUsers.ActiveColumn"]</th>
+                            <th>@T["Common.Actions"]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var u in filteredUsers?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<ApplicationUser>())
+                    {
+                        <tr>
+                            <td data-label="@T["AdminUsers.User"]">@u.UserName</td>
+                            <td data-label="@T["AdminUsers.Email"]">@u.Email</td>
+                            <td data-label="@T["AdminUsers.Role"]">@userRoles.GetValueOrDefault(u.Id, "-")</td>
+
+                            @* <td data-label="Data Cadastro">@u.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td> *@
+
+                            <td data-label="@T["AdminUsers.ActiveColumn"]">
+                                @if (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)
+                                {
+                                    <span class="order-status-badge cancelado">@T["AdminUsers.Blocked"]</span>
+                                }
+                                else
+                                {
+                                    <span class="order-status-badge pago">@T["AdminUsers.Active"]</span>
+                                }
+                            </td>
+                            <td data-label="@T["Common.Actions"]">
+                                <button class="details-btn action-btn" @onclick="() => ViewUser(u.Id)">@T["Common.Details"]</button>
+                                <button class="edit-btn action-btn" @onclick="() => EditUser(u.Id)">@T["Products.Edit"]</button>
+                                @if (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)
+                                {
+                                    <button class="success-btn action-btn" @onclick="() => UnlockUser(u.Id)">@T["AdminUsers.Unlock"]</button>
+                                }
+                                else
+                                {
+                                    <button class="warning-btn action-btn" @onclick="() => LockUser(u.Id)">@T["AdminUsers.Lock"]</button>
+                                }
+                                <button class="danger" @onclick="() => DeleteUser(u.Id)">@T["Products.Remove"]</button>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+
+                <div class="pagination">
+                    <button type="button" @onclick="@(async () => await PrevPage())" disabled="@(currentPage <= 1)">@T["Common.Previous"]</button>
+                    <span class="pagination-info">@T["Common.Page"] @currentPage @T["Common.Of"] @totalPages</span>
+                    <button type="button" @onclick="@(async () => await NextPage())" disabled="@(currentPage >= totalPages)">@T["Common.Next"]</button>
+                </div>
+            </AdminDataState>
+        </article>
+    </section>
+
+    <section class="entity-shell-footer" aria-label="@T["AdminCommon.ExtraActions"]">
+        <button class="back-btn" @onclick='() => NavigationManager.NavigateTo("/admin")'>@T["Common.Back"]</button>
+    </section>
 </div>
-
-@if (showRestoredFiltersNotice)
-{
-    <div class="orders-review-restored-notice">
-        <span>Filtros de usuários restaurados da sessão anterior.</span>
-        <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="Fechar aviso">×</button>
-    </div>
-}
-
-<AdminDataState IsLoading="@isLoading" IsEmpty="@(filteredUsers == null || !filteredUsers.Any())" LoadingText="Carregando usuários..." EmptyText="Nenhum usuário encontrado.">
-    <table class="product-table">
-        <thead>
-            <tr>
-                <th>Usuário</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Ativo</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-        @foreach (var u in filteredUsers?.Skip((currentPage - 1) * pageSize).Take(pageSize) ?? Enumerable.Empty<ApplicationUser>())
-        {
-            <tr>
-                <td data-label="Usuário">@u.UserName</td>
-                <td data-label="Email">@u.Email</td>
-                <td data-label="Role">@userRoles.GetValueOrDefault(u.Id, "-")</td>
-
-                @* <td data-label="Data Cadastro">@u.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td> *@
-
-                <td data-label="Ativo">
-                    @if (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)
-                    {
-                        <span class="order-status-badge cancelado">Bloqueado</span>
-                    }
-                    else
-                    {
-                        <span class="order-status-badge pago">Ativo</span>
-                    }
-                </td>
-                <td data-label="Ações">
-                    <button class="details-btn action-btn" @onclick="() => ViewUser(u.Id)">Detalhes</button>
-                    <button class="edit-btn action-btn" @onclick="() => EditUser(u.Id)">Editar</button>
-                    @if (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)
-                    {
-                        <button class="success-btn action-btn" @onclick="() => UnlockUser(u.Id)">Desbloquear</button>
-                    }
-                    else
-                    {
-                        <button class="warning-btn action-btn" @onclick="() => LockUser(u.Id)">Bloquear</button>
-                    }
-                    <button class="danger" @onclick="() => DeleteUser(u.Id)">Deletar</button>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
-
-    <div class="pagination">
-        <button type="button" @onclick="@(async () => await PrevPage())" disabled="@(currentPage <= 1)">Anterior</button>
-        <span class="pagination-info">Página @currentPage de @totalPages</span>
-        <button type="button" @onclick="@(async () => await NextPage())" disabled="@(currentPage >= totalPages)">Próxima</button>
-    </div>
-</AdminDataState>
-
-<button class="back-btn mt-2" @onclick='() => NavigationManager.NavigateTo("/admin")'>Voltar</button>
 
 @code {
     [Inject] public UserManager<ApplicationUser> UserManager { get; set; } = default!;
@@ -157,8 +170,8 @@
                 (string.IsNullOrWhiteSpace(filterEmail) || (u.Email?.Contains(filterEmail, StringComparison.OrdinalIgnoreCase) ?? false)) &&
                 (string.IsNullOrWhiteSpace(filterRole) || (userRoles.GetValueOrDefault(u.Id, "-").Contains(filterRole, StringComparison.OrdinalIgnoreCase))) &&
                 (string.IsNullOrWhiteSpace(filterStatus) ||
-                    (filterStatus == "Ativo" && (u.LockoutEnd == null || u.LockoutEnd <= DateTimeOffset.Now)) ||
-                    (filterStatus == "Bloqueado" && (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)))
+                    (filterStatus == "active" && (u.LockoutEnd == null || u.LockoutEnd <= DateTimeOffset.Now)) ||
+                    (filterStatus == "blocked" && (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)))
             )
             .ToList();
 
@@ -177,7 +190,7 @@
 
     private async Task LockUser(string userId)
     {
-        var confirm = await JS.InvokeAsync<bool>("confirm", "Tem certeza que deseja bloquear este usuário?");
+        var confirm = await JS.InvokeAsync<bool>("confirm", T["AdminUsers.ConfirmLock"]);
         if (!confirm)
             return;
 
@@ -185,16 +198,16 @@
         if (user != null)
         {
             await UserManager.SetLockoutEndDateAsync(user, DateTimeOffset.MaxValue);
-            await LogService.LogAsync($"Usuário bloqueado (ID: {userId})", 
+            await LogService.LogAsync(string.Format(T["AdminUsers.LogLocked"], userId), 
                                         source: "Admin", 
                                         level: "Warning", 
                                         userId: userId);
-            ToastRef?.Show("Usuário bloqueado!", "warning");
+            ToastRef?.Show(T["AdminUsers.LockedToast"], "warning");
             await LoadUsers();
         }
         else
         {
-            ToastRef?.Show("Usuário não encontrado.", "error");
+            ToastRef?.Show(T["AdminUsers.NotFoundToast"], "error");
         }
     }
 
@@ -204,16 +217,16 @@
         if (user != null)
         {
             await UserManager.SetLockoutEndDateAsync(user, null);
-            await LogService.LogAsync($"Usuário desbloqueado (ID: {userId})", 
+            await LogService.LogAsync(string.Format(T["AdminUsers.LogUnlocked"], userId), 
                                         source: "Admin", 
                                         level: "Info", 
                                         userId: userId);
-            ToastRef?.Show("Usuário desbloqueado!", "success");
+            ToastRef?.Show(T["AdminUsers.UnlockedToast"], "success");
             await LoadUsers();
         }
         else
         {
-            ToastRef?.Show("Usuário não encontrado.", "error");
+            ToastRef?.Show(T["AdminUsers.NotFoundToast"], "error");
         }
     }
 
@@ -229,7 +242,7 @@
 
     private async Task DeleteUser(string userId)
     {
-        var confirm = await JS.InvokeAsync<bool>("confirm", "Tem certeza que deseja deletar este usuário?");
+        var confirm = await JS.InvokeAsync<bool>("confirm", T["AdminUsers.ConfirmDelete"]);
         if (!confirm)
             return;
 
@@ -239,21 +252,21 @@
             var result = await UserManager.DeleteAsync(user);
             if (result.Succeeded)
             {
-                await LogService.LogAsync($"Usuário deletado (ID: {userId})", 
+                await LogService.LogAsync(string.Format(T["AdminUsers.LogDeleted"], userId), 
                                                             source: "Admin", 
                                                             level: "Warning", 
                                                             userId: userId);
-                ToastRef?.Show("Usuário deletado!", "info");
+                ToastRef?.Show(T["AdminUsers.DeletedToast"], "info");
             }
             else
             {
-                ToastRef?.Show("Erro ao deletar usuário.", "error");
+                ToastRef?.Show(T["AdminUsers.DeleteErrorToast"], "error");
             }
             await LoadUsers();
         }
         else
         {
-            ToastRef?.Show("Usuário não encontrado.", "error");
+            ToastRef?.Show(T["AdminUsers.NotFoundToast"], "error");
         }
     }
 

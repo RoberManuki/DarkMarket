@@ -7,34 +7,59 @@
 @using DarkMarket.Shared.Components
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.JSInterop
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JSRuntime
 @inject CurrencyPreferenceService CurrencyPreferenceService
+@inject LanguagePreferenceService LanguagePreferenceService
+@inject UiTextService T
 
 <Toast @ref="ToastRef" />
 <CascadingValue Value="ToastRef">
     <CascadingAuthenticationState>
         <div class="sidebar">
-            <NavMenu />
+            <NavMenu @key="selectedLanguage" />
         </div>
 
         <div class="main">
             <header>
+                <div class="header-left-actions">
+                    <div class="language-flags" role="group" aria-label="@T["Layout.Language"]">
+                        <a class="language-flag-card lang-br @(IsLanguageSelected("pt-BR") ? "active" : string.Empty)"
+                           title="@T["Layout.LanguagePtBr"]"
+                           aria-label="@T["Layout.LanguagePtBr"]"
+                           href="@BuildLanguageUrl("pt-BR")">
+                            <img class="flag-icon" src="/images/flags/br.svg" alt="" aria-hidden="true" />
+                        </a>
+                        <a class="language-flag-card lang-us @(IsLanguageSelected("en-US") ? "active" : string.Empty)"
+                           title="@T["Layout.LanguageEnUs"]"
+                           aria-label="@T["Layout.LanguageEnUs"]"
+                           href="@BuildLanguageUrl("en-US")">
+                            <img class="flag-icon" src="/images/flags/us.svg" alt="" aria-hidden="true" />
+                        </a>
+                        <a class="language-flag-card lang-es @(IsLanguageSelected("es-ES") ? "active" : string.Empty)"
+                           title="@T["Layout.LanguageEsEs"]"
+                           aria-label="@T["Layout.LanguageEsEs"]"
+                           href="@BuildLanguageUrl("es-ES")">
+                            <img class="flag-icon" src="/images/flags/es.svg" alt="" aria-hidden="true" />
+                        </a>
+                    </div>
+                </div>
                 <h1>DarkMarket</h1>
                 <div class="header-actions">
-                    <span class="currency-indicator" title="Moeda ativa para exibição de cotação">
-                        Cotação: @CurrencyPreferenceService.SelectedFiatCurrency
+                    <span class="currency-indicator" title="@T["Layout.HeaderQuoteTitle"]">
+                        @T["Layout.HeaderQuote"]: @CurrencyPreferenceService.SelectedFiatCurrency
                     </span>
                     <AuthorizeView>
                         <Authorized>
-                            <span>Olá, @(string.IsNullOrWhiteSpace(context.User.Identity?.Name) ? "Usuário" : context.User.Identity.Name)!</span>
-                            <a href="/Identity/Account/Logout" class="logout-btn">Sair</a>
+                            <span>@T["Layout.Hello"], @(string.IsNullOrWhiteSpace(context.User.Identity?.Name) ? T["Layout.UserFallback"] : context.User.Identity.Name)!</span>
+                            <a href="/Identity/Account/Logout" class="logout-btn">@T["Layout.Logout"]</a>
                         </Authorized>
                         <NotAuthorized>
-                            <span>Bem-vindo, visitante!</span>
+                            <span>@T["Layout.WelcomeVisitor"]</span>
                         </NotAuthorized>
                     </AuthorizeView>
                 </div>
@@ -52,6 +77,20 @@
 
 @code {
     private Toast? ToastRef;
+    private string selectedLanguage = LanguagePreferenceService.DefaultLanguage;
+
+    protected override void OnInitialized()
+    {
+        LanguagePreferenceService.Changed += HandleLanguageChanged;
+
+        var hintedLanguage = GetLanguageHintFromUri();
+        if (!string.IsNullOrWhiteSpace(hintedLanguage))
+        {
+            LanguagePreferenceService.SetLanguage(hintedLanguage);
+        }
+
+        selectedLanguage = LanguagePreferenceService.SelectedLanguage;
+    }
 
     private string MainContentCssClass
         => HasOwnContentPaddingRoute()
@@ -82,11 +121,65 @@
         {
             var persistedCurrency = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", "darkmarket.fiatCurrency");
             CurrencyPreferenceService.SetCurrency(persistedCurrency);
+
+            var hintedLanguage = GetLanguageHintFromUri();
+            var cookieLanguage = await JSRuntime.InvokeAsync<string?>("darkMarketGetCookie", "darkmarket.uiLanguage");
+            var persistedLanguage = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", "darkmarket.uiLanguage");
+            LanguagePreferenceService.SetLanguage(hintedLanguage ?? cookieLanguage ?? persistedLanguage);
+
+            await JSRuntime.InvokeVoidAsync("darkMarketSetCookie", "darkmarket.uiLanguage", LanguagePreferenceService.SelectedLanguage, 365);
+            await JSRuntime.InvokeVoidAsync("localStorage.setItem", "darkmarket.uiLanguage", LanguagePreferenceService.SelectedLanguage);
+            selectedLanguage = LanguagePreferenceService.SelectedLanguage;
             StateHasChanged();
         }
         catch
         {
             CurrencyPreferenceService.SetCurrency("USD");
+            selectedLanguage = LanguagePreferenceService.SelectedLanguage;
         }
+    }
+
+    private string BuildLanguageUrl(string languageCode)
+    {
+        var current = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        var returnUrl = string.IsNullOrWhiteSpace(current.AbsolutePath) ? "/" : current.AbsolutePath;
+        var withHint = QueryHelpers.AddQueryString(returnUrl, "uiLang", languageCode);
+        return $"/set-language/{Uri.EscapeDataString(languageCode)}?returnUrl={Uri.EscapeDataString(withHint)}";
+    }
+
+    private string? GetLanguageHintFromUri()
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        if (!QueryHelpers.ParseQuery(uri.Query).TryGetValue("uiLang", out var hinted))
+        {
+            return null;
+        }
+
+        for (var i = hinted.Count - 1; i >= 0; i--)
+        {
+            var value = hinted[i]?.Trim();
+            if (!string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
+        }
+
+        return null;
+    }
+
+    private bool IsLanguageSelected(string languageCode)
+    {
+        return string.Equals(selectedLanguage, languageCode, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private void HandleLanguageChanged()
+    {
+        selectedLanguage = LanguagePreferenceService.SelectedLanguage;
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        LanguagePreferenceService.Changed -= HandleLanguageChanged;
     }
 }

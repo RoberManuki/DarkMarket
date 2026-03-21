@@ -13,15 +13,18 @@ namespace DarkMarket.Areas.Identity.Pages.Account
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly AdminSecurityPolicyService _securityPolicyService;
+        private readonly UiTextService _t;
 
         public LoginModel(
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager,
-            AdminSecurityPolicyService securityPolicyService)
+            AdminSecurityPolicyService securityPolicyService,
+            UiTextService t)
         {
             _signInManager = signInManager;
             _userManager = userManager;
             _securityPolicyService = securityPolicyService;
+            _t = t;
         }
 
         [BindProperty]
@@ -51,19 +54,19 @@ namespace DarkMarket.Areas.Identity.Pages.Account
 
                 if (user is null)
                 {
-                    ModelState.AddModelError(string.Empty, "Login inválido.");
+                    ModelState.AddModelError(string.Empty, _t["Identity.Login.ErrorInvalid"]);
                     return Page();
                 }
 
                 if (await _userManager.IsLockedOutAsync(user))
                 {
-                    ModelState.AddModelError(string.Empty, "Conta temporariamente bloqueada por tentativas inválidas. Tente novamente em alguns minutos.");
+                    ModelState.AddModelError(string.Empty, _t["Identity.Login.ErrorLocked"]);
                     return Page();
                 }
 
                 if (policy.RequireConfirmedEmail && !await _userManager.IsEmailConfirmedAsync(user))
                 {
-                    ModelState.AddModelError(string.Empty, "Login não permitido. Confirme seu e-mail antes de entrar.");
+                    ModelState.AddModelError(string.Empty, _t["Identity.Login.ErrorConfirmEmail"]);
                     return Page();
                 }
 
@@ -96,7 +99,7 @@ namespace DarkMarket.Areas.Identity.Pages.Account
         {
             if (!user.LockoutEnabled)
             {
-                ModelState.AddModelError(string.Empty, "Login inválido.");
+                ModelState.AddModelError(string.Empty, _t["Identity.Login.ErrorInvalid"]);
                 return;
             }
 
@@ -108,11 +111,11 @@ namespace DarkMarket.Areas.Identity.Pages.Account
                 await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddMinutes(policy.LockoutMinutes));
                 await _userManager.ResetAccessFailedCountAsync(user);
 
-                ModelState.AddModelError(string.Empty, "Conta temporariamente bloqueada por tentativas inválidas. Tente novamente em alguns minutos.");
+                ModelState.AddModelError(string.Empty, _t["Identity.Login.ErrorLocked"]);
                 return;
             }
 
-            ModelState.AddModelError(string.Empty, "Login inválido.");
+            ModelState.AddModelError(string.Empty, _t["Identity.Login.ErrorInvalid"]);
         }
     }
 }

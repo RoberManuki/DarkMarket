@@ -1,15 +1,16 @@
 @page
 @model DarkMarket.Areas.Identity.Pages.Account.RegisterConfirmationModel
+@inject DarkMarket.Services.UiTextService T
 @{
-    ViewData["Title"] = "Confirme seu cadastro";
+    ViewData["Title"] = T["Identity.RegisterConfirmation.Title"];
 }
 
-<h2>Cadastro realizado</h2>
+<h2>@T["Identity.RegisterConfirmation.Heading"]</h2>
 <p class="identity-muted">
-    Enviamos um link de confirmacao para <b>@Model.Email</b>. Confirme o e-mail antes de fazer login.
+    @string.Format(T["Identity.RegisterConfirmation.Message"], Model.Email)
 </p>
 
 <div class="identity-actions">
-    <a asp-page="./Login">Ir para login</a>
-    <a asp-page="./ResendEmailConfirmation">Reenviar confirmacao</a>
+    <a asp-page="./Login">@T["Identity.Common.GoToLogin"]</a>
+    <a asp-page="./ResendEmailConfirmation">@T["Identity.Resend.Title"]</a>
 </div>

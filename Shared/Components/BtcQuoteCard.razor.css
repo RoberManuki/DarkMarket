@@ -2,6 +2,7 @@
     display: flex;
     align-items: center;
     background: linear-gradient(90deg, #23272b 60%, #181c20 100%);
+    border: 1px solid #314454;
     border-radius: 14px;
     box-shadow: 0 2px 16px #000a;
     margin-bottom: 2.5rem;

@@ -10,53 +10,62 @@
 @inject DashboardMetricsService DashboardMetricsService
 @inject BitcoinQuoteService BitcoinQuoteService
 @inject CurrencyPreferenceService CurrencyPreferenceService
+@inject UiTextService T
 
-<div class="dashboard-container">
-    <h2 class="page-title">Dashboard</h2>
+<div class="entity-shell dashboard-container">
+    <section class="entity-shell-hero">
+        <p class="entity-shell-kicker">@T["Dashboard.Kicker"]</p>
+        <h1>@T["Dashboard.Title"]</h1>
+        <p class="entity-shell-subtitle">@T["Dashboard.Subtitle"]</p>
+    </section>
 
-    <BtcQuoteCard Label="Bitcoin" Currency="BTC" CryptoId="bitcoin" ImageSrc="https://assets.coingecko.com/coins/images/1/large/bitcoin.png" />
-    <BtcQuoteCard Label="Ethereum" Currency="ETH" CryptoId="ethereum" ImageSrc="https://assets.coingecko.com/coins/images/279/large/ethereum.png" />
-    <BtcQuoteCard Label="Solana" Currency="SOL" CryptoId="solana" ImageSrc="https://assets.coingecko.com/coins/images/4128/large/solana.png" />
+    <section class="entity-shell-grid" aria-label="@T["Dashboard.Aria.Metrics"]">
+        <article class="entity-shell-card entity-shell-main">
+            <BtcQuoteCard Label="Bitcoin" Currency="BTC" CryptoId="bitcoin" ImageSrc="https://assets.coingecko.com/coins/images/1/large/bitcoin.png" />
+            <BtcQuoteCard Label="Ethereum" Currency="ETH" CryptoId="ethereum" ImageSrc="https://assets.coingecko.com/coins/images/279/large/ethereum.png" />
+            <BtcQuoteCard Label="Solana" Currency="SOL" CryptoId="solana" ImageSrc="https://assets.coingecko.com/coins/images/4128/large/solana.png" />
 
-    @if (isLoading)
-    {
-        <div class="loading-spinner">Carregando métricas...</div>
-    }
-    else
-    {
-        <div class="dashboard-cards">
-            <StatCard Title="Perfil">
-                @if (isAuthenticated)
-                {
-                    <span>Bem-vindo, @userName!</span>
-                }
-                else
-                {
-                    <span>Faça login para ver seu perfil.</span>
-                }
-            </StatCard>
+            @if (isLoading)
+            {
+                <div class="loading-spinner">@T["Dashboard.Loading"]</div>
+            }
+            else
+            {
+                <div class="dashboard-cards">
+                    <StatCard Title="@T["Dashboard.Profile"]">
+                        @if (isAuthenticated)
+                        {
+                            <span>@string.Format(T["Dashboard.WelcomeUser"], userName)</span>
+                        }
+                        else
+                        {
+                            <span>@T["Dashboard.LoginHint"]</span>
+                        }
+                    </StatCard>
 
-            <StatCard Title="Usuários">
-                <span>@metrics.UsersCount</span>
-            </StatCard>
+                    <StatCard Title="@T["Dashboard.Users"]">
+                        <span>@metrics.UsersCount</span>
+                    </StatCard>
 
-            <StatCard Title="Vendas Pagas">
-                <span>@metrics.PaidSalesCount</span>
-            </StatCard>
+                    <StatCard Title="@T["Dashboard.PaidSales"]">
+                        <span>@metrics.PaidSalesCount</span>
+                    </StatCard>
 
-            <StatCard Title="Volume (BTC/Fiat)">
-                <span>@FormatBtcWithFiat(metrics.PaidSalesVolumeBtc)</span>
-            </StatCard>
+                    <StatCard Title="@T["Dashboard.Volume"]">
+                        <span>@FormatBtcWithFiat(metrics.PaidSalesVolumeBtc)</span>
+                    </StatCard>
 
-            <StatCard Title="Pendências">
-                <span>@metrics.PendingOrdersCount</span>
-            </StatCard>
+                    <StatCard Title="@T["Dashboard.Pending"]">
+                        <span>@metrics.PendingOrdersCount</span>
+                    </StatCard>
 
-            <StatCard Title="Consultas de Cotação">
-                <span>@metrics.QuoteQueriesCount</span>
-            </StatCard>
-        </div>
-    }
+                    <StatCard Title="@T["Dashboard.Quotes"]">
+                        <span>@metrics.QuoteQueriesCount</span>
+                    </StatCard>
+                </div>
+            }
+        </article>
+    </section>
 </div>
 
 @code {

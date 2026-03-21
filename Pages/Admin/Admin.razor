@@ -16,59 +16,68 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IWebHostEnvironment WebHostEnvironment
 @inject IJSRuntime JSRuntime
+@inject UiTextService T
 
-<div class="admin-page">
-    <h2 class="page-title">Painel Administrativo</h2>
-    <p>Bem-vindo, administrador!</p>
+<div class="entity-shell admin-page">
+    <section class="entity-shell-hero">
+        <p class="entity-shell-kicker">@T["AdminDashboard.Kicker"]</p>
+        <h1>@T["AdminDashboard.Title"]</h1>
+        <p class="entity-shell-subtitle">@T["AdminDashboard.Subtitle"]</p>
+    </section>
 
-    <nav class="admin-nav">
-        <a href="/admin/users">Usuários</a>
-        <a href="/admin/products">Produtos</a>
-        <a href="/admin/payments">Pagamentos</a>
-        <a href="/admin/orders">Pedidos</a>
-        <a href="/admin/gateways">Gateways</a>
-        <a href="/admin/delivery-agents">Entregadores</a>
-        <a href="/admin/orders-review">Revisão/Repasse</a>
-        <a href="/admin/logs">Logs</a>
-    </nav>
+    <section class="entity-shell-grid" aria-label="@T["AdminDashboard.Aria"]">
+        <article class="entity-shell-card entity-shell-main">
+            <p>@T["AdminDashboard.Welcome"]</p>
 
-    <div class="admin-kpi-grid" aria-label="Métricas operacionais">
-        <a class="admin-kpi-card" href="/admin/users" aria-label="Abrir gestão de usuários">
-            <span class="admin-kpi-label">Usuários</span>
-            <span class="admin-kpi-value">@usersCount</span>
-            <span class="admin-kpi-cta">Ver detalhes</span>
-        </a>
-        <a class="admin-kpi-card" href="/admin/orders" aria-label="Abrir lista de pedidos">
-            <span class="admin-kpi-label">Vendas pagas</span>
-            <span class="admin-kpi-value">@paidSalesCount</span>
-            <span class="admin-kpi-cta">Ver detalhes</span>
-        </a>
-        <a class="admin-kpi-card" href="/admin/orders" aria-label="Abrir lista de pedidos para ver volume pago">
-            <span class="admin-kpi-label">Volume pago (BTC)</span>
-            <span class="admin-kpi-value">@FormatBtc(paidSalesVolumeBtc)</span>
-            <span class="admin-kpi-cta">Ver detalhes</span>
-        </a>
-        <a class="admin-kpi-card" href="/admin/orders-review" aria-label="Abrir pedidos pendentes para revisão">
-            <span class="admin-kpi-label">Pedidos pendentes</span>
-            <span class="admin-kpi-value">@pendingOrdersCount</span>
-            <span class="admin-kpi-cta">Ver detalhes</span>
-        </a>
-    </div>
+            <nav class="admin-nav">
+                <a href="/admin/users">@T["Admin.Nav.Users"]</a>
+                <a href="/admin/products">@T["Admin.Nav.Products"]</a>
+                <a href="/admin/payments">@T["Admin.Nav.Payments"]</a>
+                <a href="/admin/orders">@T["Admin.Nav.Orders"]</a>
+                <a href="/admin/gateways">@T["Admin.Nav.Gateways"]</a>
+                <a href="/admin/delivery-agents">@T["Admin.Nav.DeliveryAgents"]</a>
+                <a href="/admin/orders-review">@T["Admin.Nav.Review"]</a>
+                <a href="/admin/logs">@T["Admin.Nav.Logs"]</a>
+                <a href="/admin/languages">@T["Admin.Nav.Languages"]</a>
+            </nav>
 
-    <div class="admin-settings-card">
-        <label for="fiat-select"><b>Moeda de cotação padrão:</b></label>
-        <select id="fiat-select" class="fiat-select" @bind="selectedFiat" @bind:after="ApplyCurrencyPreferenceAsync">
-            <option value="USD">USD</option>
-            <option value="BRL">BRL</option>
-        </select>
-    </div>
+            <div class="admin-kpi-grid" aria-label="@T["AdminDashboard.KpiAria"]">
+                <a class="admin-kpi-card" href="/admin/users" aria-label="@T["AdminDashboard.KpiUsersAria"]">
+                    <span class="admin-kpi-label">@T["AdminDashboard.KpiUsers"]</span>
+                    <span class="admin-kpi-value">@usersCount</span>
+                    <span class="admin-kpi-cta">@T["AdminDashboard.ViewDetails"]</span>
+                </a>
+                <a class="admin-kpi-card" href="/admin/orders" aria-label="@T["AdminDashboard.KpiPaidSalesAria"]">
+                    <span class="admin-kpi-label">@T["AdminDashboard.KpiPaidSales"]</span>
+                    <span class="admin-kpi-value">@paidSalesCount</span>
+                    <span class="admin-kpi-cta">@T["AdminDashboard.ViewDetails"]</span>
+                </a>
+                <a class="admin-kpi-card" href="/admin/orders" aria-label="@T["AdminDashboard.KpiPaidVolumeAria"]">
+                    <span class="admin-kpi-label">@T["AdminDashboard.KpiPaidVolume"]</span>
+                    <span class="admin-kpi-value">@FormatBtc(paidSalesVolumeBtc)</span>
+                    <span class="admin-kpi-cta">@T["AdminDashboard.ViewDetails"]</span>
+                </a>
+                <a class="admin-kpi-card" href="/admin/orders-review" aria-label="@T["AdminDashboard.KpiPendingOrdersAria"]">
+                    <span class="admin-kpi-label">@T["AdminDashboard.KpiPendingOrders"]</span>
+                    <span class="admin-kpi-value">@pendingOrdersCount</span>
+                    <span class="admin-kpi-cta">@T["AdminDashboard.ViewDetails"]</span>
+                </a>
+            </div>
 
-    <div class="admin-settings-card">
-        <span><b>Consultas de cotação (total):</b> @quoteQueriesCount</span>
-    </div>
+            <div class="admin-settings-card">
+                <label for="fiat-select"><b>@T["AdminDashboard.CurrencyLabel"]</b></label>
+                <select id="fiat-select" class="fiat-select" @bind="selectedFiat" @bind:after="ApplyCurrencyPreferenceAsync">
+                    <option value="USD">USD</option>
+                    <option value="BRL">BRL</option>
+                </select>
+            </div>
 
-    <div class="admin-settings-card operation-fee-card">
-        <label for="operation-fee"><b>Taxa operacional (%):</b></label>
+            <div class="admin-settings-card">
+                <span><b>@T["AdminDashboard.QuoteQueriesLabel"]</b> @quoteQueriesCount</span>
+            </div>
+
+            <div class="admin-settings-card operation-fee-card">
+        <label for="operation-fee"><b>@T["AdminDashboard.OperationFeeLabel"]</b></label>
         <input id="operation-fee"
                class="fee-input"
                type="number"
@@ -76,83 +85,83 @@
                max="100"
                step="0.01"
                @bind="operationFeePercent" />
-        <button class="details-btn" @onclick="SaveOperationFeeAsync">Salvar taxa</button>
+        <button class="details-btn" @onclick="SaveOperationFeeAsync">@T["AdminDashboard.SaveFee"]</button>
         @if (!string.IsNullOrWhiteSpace(operationFeeMessage))
         {
             <span class="operation-fee-message @(operationFeeSaved ? "ok" : "error")">@operationFeeMessage</span>
         }
-    </div>
+            </div>
 
-    <div class="admin-settings-card security-settings-card">
+            <div class="admin-settings-card security-settings-card">
         <div class="security-header">
-            <h3>Segurança</h3>
-            <p>Configuração da autenticação, lockout e baseline de proteção por ambiente.</p>
+            <h3>@T["AdminDashboard.SecurityTitle"]</h3>
+            <p>@T["AdminDashboard.SecuritySubtitle"]</p>
         </div>
 
         <div class="security-panels">
-            <section class="security-panel" aria-label="Base do ambiente">
-                <h4>Base do ambiente</h4>
+            <section class="security-panel" aria-label="@T["AdminDashboard.BaselineAria"]">
+                <h4>@T["AdminDashboard.BaselineTitle"]</h4>
                 <div class="security-baseline-meta">
-                    <span class="security-label">Ambiente</span>
-                    <span class="security-value security-env-pill">@(WebHostEnvironment.IsDevelopment() ? "Development" : "Production")</span>
+                    <span class="security-label">@T["AdminDashboard.Environment"]</span>
+                    <span class="security-value security-env-pill">@(WebHostEnvironment.IsDevelopment() ? T["AdminDashboard.EnvironmentDevelopment"] : T["AdminDashboard.EnvironmentProduction"])</span>
                 </div>
 
                 <div class="security-baseline-group">
-                    <h5>Credenciais</h5>
+                    <h5>@T["AdminDashboard.Credentials"]</h5>
                     <div class="security-baseline-grid">
                         <div class="security-baseline-row">
-                            <span class="security-label">Senha mínima</span>
-                            <span class="security-value">@securityPolicy.PasswordRequiredLength caracteres</span>
+                            <span class="security-label">@T["AdminDashboard.MinPassword"]</span>
+                            <span class="security-value">@securityPolicy.PasswordRequiredLength @T["AdminDashboard.Characters"]</span>
                         </div>
 
                         <div class="security-baseline-row">
-                            <span class="security-label">Chars únicos</span>
+                            <span class="security-label">@T["AdminDashboard.UniqueChars"]</span>
                             <span class="security-value">@securityPolicy.PasswordRequiredUniqueChars</span>
                         </div>
 
                         <div class="security-baseline-row">
-                            <span class="security-label">Exige número</span>
-                            <span class="security-boolean-badge @(securityPolicy.PasswordRequireDigit ? "on" : "off")">@(securityPolicy.PasswordRequireDigit ? "Sim" : "Não")</span>
+                            <span class="security-label">@T["AdminDashboard.RequireDigit"]</span>
+                            <span class="security-boolean-badge @(securityPolicy.PasswordRequireDigit ? "on" : "off")">@(securityPolicy.PasswordRequireDigit ? T["Common.Yes"] : T["Common.No"])</span>
                         </div>
 
                         <div class="security-baseline-row">
-                            <span class="security-label">Exige minúscula</span>
-                            <span class="security-boolean-badge @(securityPolicy.PasswordRequireLowercase ? "on" : "off")">@(securityPolicy.PasswordRequireLowercase ? "Sim" : "Não")</span>
+                            <span class="security-label">@T["AdminDashboard.RequireLowercase"]</span>
+                            <span class="security-boolean-badge @(securityPolicy.PasswordRequireLowercase ? "on" : "off")">@(securityPolicy.PasswordRequireLowercase ? T["Common.Yes"] : T["Common.No"])</span>
                         </div>
 
                         <div class="security-baseline-row">
-                            <span class="security-label">Exige maiúscula</span>
-                            <span class="security-boolean-badge @(securityPolicy.PasswordRequireUppercase ? "on" : "off")">@(securityPolicy.PasswordRequireUppercase ? "Sim" : "Não")</span>
+                            <span class="security-label">@T["AdminDashboard.RequireUppercase"]</span>
+                            <span class="security-boolean-badge @(securityPolicy.PasswordRequireUppercase ? "on" : "off")">@(securityPolicy.PasswordRequireUppercase ? T["Common.Yes"] : T["Common.No"])</span>
                         </div>
 
                         <div class="security-baseline-row">
-                            <span class="security-label">Exige símbolo</span>
-                            <span class="security-boolean-badge @(securityPolicy.PasswordRequireNonAlphanumeric ? "on" : "off")">@(securityPolicy.PasswordRequireNonAlphanumeric ? "Sim" : "Não")</span>
+                            <span class="security-label">@T["AdminDashboard.RequireSymbol"]</span>
+                            <span class="security-boolean-badge @(securityPolicy.PasswordRequireNonAlphanumeric ? "on" : "off")">@(securityPolicy.PasswordRequireNonAlphanumeric ? T["Common.Yes"] : T["Common.No"])</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="security-baseline-group">
-                    <h5>Sessão</h5>
+                    <h5>@T["AdminDashboard.Session"]</h5>
                     <div class="security-baseline-grid">
                         <div class="security-baseline-row">
-                            <span class="security-label">Tempo de sessão</span>
-                            <span class="security-value">@securityPolicy.SessionTimeoutMinutes min</span>
+                            <span class="security-label">@T["AdminDashboard.SessionDuration"]</span>
+                            <span class="security-value">@securityPolicy.SessionTimeoutMinutes @T["AdminDashboard.Minutes"]</span>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section class="security-panel security-runtime-panel" aria-label="Controles em runtime">
-                <h4>Controles em runtime</h4>
+            <section class="security-panel security-runtime-panel" aria-label="@T["AdminDashboard.RuntimeAria"]">
+                <h4>@T["AdminDashboard.RuntimeTitle"]</h4>
 
                 <label class="security-toggle" for="security-require-confirmed">
                     <input id="security-require-confirmed" type="checkbox" @bind="runtimeRequireConfirmedEmail" />
-                    <span>Exigir e-mail confirmado no login</span>
+                    <span>@T["AdminDashboard.RequireConfirmedEmail"]</span>
                 </label>
 
                 <div class="security-input-grid">
-                    <label for="security-lockout-attempts">Lockout após tentativas inválidas</label>
+                    <label for="security-lockout-attempts">@T["AdminDashboard.LockoutAttempts"]</label>
                     <input id="security-lockout-attempts"
                            class="fee-input"
                            type="number"
@@ -161,7 +170,7 @@
                            step="1"
                            @bind="runtimeLockoutMaxAttempts" />
 
-                    <label for="security-lockout-minutes">Duração do lockout (min)</label>
+                    <label for="security-lockout-minutes">@T["AdminDashboard.LockoutDuration"]</label>
                     <input id="security-lockout-minutes"
                            class="fee-input"
                            type="number"
@@ -171,7 +180,7 @@
                            @bind="runtimeLockoutMinutes" />
                 </div>
 
-                <button class="details-btn" @onclick="SaveSecurityPolicyAsync">Salvar política de segurança</button>
+                <button class="details-btn" @onclick="SaveSecurityPolicyAsync">@T["AdminDashboard.SaveSecurityPolicy"]</button>
 
                 @if (!string.IsNullOrWhiteSpace(securityPolicyMessage))
                 {
@@ -179,7 +188,9 @@
                 }
             </section>
         </div>
-    </div>
+            </div>
+        </article>
+    </section>
 </div>
 
 @code {
@@ -241,17 +252,17 @@
 
             if (saved)
             {
-                operationFeeMessage = "Taxa operacional salva com sucesso.";
+                operationFeeMessage = T["AdminDashboard.OperationFeeSaved"];
                 operationFeePercent = await AdminSettingsService.GetOperationFeePercentForAdminAsync(currentUser);
                 return;
             }
 
-            operationFeeMessage = "Informe uma taxa entre 0 e 100.";
+            operationFeeMessage = T["AdminDashboard.OperationFeeRangeError"];
         }
         catch (UnauthorizedAccessException)
         {
             operationFeeSaved = false;
-            operationFeeMessage = "Acesso negado para alterar configurações.";
+            operationFeeMessage = T["AdminDashboard.AccessDeniedSettings"];
         }
     }
 
@@ -270,7 +281,7 @@
 
             if (saved)
             {
-                securityPolicyMessage = "Política de segurança salva com sucesso.";
+                securityPolicyMessage = T["AdminDashboard.SecurityPolicySaved"];
                 var runtimePolicy = await AdminSecurityPolicyService.GetRuntimePolicyForAdminAsync(currentUser);
                 runtimeRequireConfirmedEmail = runtimePolicy.RequireConfirmedEmail;
                 runtimeLockoutMaxAttempts = runtimePolicy.LockoutMaxFailedAccessAttempts;
@@ -278,12 +289,12 @@
                 return;
             }
 
-            securityPolicyMessage = "Valores inválidos. Tentativas: 1-20, lockout: 1-1440 min.";
+            securityPolicyMessage = T["AdminDashboard.SecurityPolicyRangeError"];
         }
         catch (UnauthorizedAccessException)
         {
             securityPolicySaved = false;
-            securityPolicyMessage = "Acesso negado para alterar a política de segurança.";
+            securityPolicyMessage = T["AdminDashboard.AccessDeniedSecurity"];
         }
     }
 }

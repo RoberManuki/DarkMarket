@@ -4,16 +4,19 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
+using DarkMarket.Services;
 
 namespace DarkMarket.Areas.Identity.Pages.Account
 {
     public class ConfirmEmailModel : PageModel
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UiTextService _t;
 
-        public ConfirmEmailModel(UserManager<ApplicationUser> userManager)
+        public ConfirmEmailModel(UserManager<ApplicationUser> userManager, UiTextService t)
         {
             _userManager = userManager;
+            _t = t;
         }
 
         public string StatusMessage { get; set; } = "";
@@ -22,22 +25,22 @@ namespace DarkMarket.Areas.Identity.Pages.Account
         {
             if (userId == null || code == null)
             {
-                StatusMessage = "Link de confirmacao invalido.";
+                StatusMessage = _t["Identity.ConfirmEmail.InvalidLink"];
                 return Page();
             }
 
             var user = await _userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                StatusMessage = "Usuario nao encontrado.";
+                StatusMessage = _t["Identity.Common.UserNotFound"];
                 return Page();
             }
 
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
             var result = await _userManager.ConfirmEmailAsync(user, code);
             StatusMessage = result.Succeeded
-                ? "Obrigado por confirmar seu e-mail."
-                : "Nao foi possivel confirmar o e-mail.";
+                ? _t["Identity.ConfirmEmail.Success"]
+                : _t["Identity.ConfirmEmail.Failure"];
 
             return Page();
         }
