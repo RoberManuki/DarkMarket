@@ -174,6 +174,39 @@ Referências para debate na comunidade:
 
 ---
 
+## Testes E2E (Playwright)
+
+Além dos testes automatizados .NET (`DarkMarket.Tests`), o projeto possui uma suíte de testes E2E de navegador na pasta [e2e](e2e) para validar interações reais de UI/JavaScript.
+
+### Cenários cobertos atualmente
+
+- Banner de consentimento de cookies (aceitar/personalizar/persistência)
+- Troca de idioma via flags e persistência em rotas protegidas
+
+### Pré-requisitos
+
+- Node.js 20+
+- npm
+- Aplicação rodando localmente (ex.: `http://127.0.0.1:5000`)
+
+### Como executar
+
+```bash
+cd e2e
+npm install
+npm run install:browsers
+npm test
+```
+
+Para apontar para outra URL:
+
+```bash
+set E2E_BASE_URL=http://127.0.0.1:5001
+npm test
+```
+
+---
+
 ## Estrutura de Pastas
 
 - `Pages/` - Páginas principais (Marketplace, Admin, Pedidos, Pagamentos)

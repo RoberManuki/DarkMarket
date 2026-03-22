@@ -30,11 +30,81 @@
     </script>
     <script>
         window.darkMarketCookieConsent = window.darkMarketCookieConsent || {
+            _storageKey: "darkmarket.cookieConsent.v1",
+            _consentCookie: "darkmarket.cookieConsent",
+            _analyticsCookie: "darkmarket.cookieAnalytics",
+            _readCookie: function (name) {
+                var escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                var match = document.cookie.match(new RegExp("(?:^|; )" + escaped + "=([^;]*)"));
+                return match ? decodeURIComponent(match[1]) : null;
+            },
+            _writeCookie: function (name, value, days) {
+                var expires = "";
+                if (typeof days === "number") {
+                    var date = new Date();
+                    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                    expires = "; expires=" + date.toUTCString();
+                }
+                document.cookie = name + "=" + encodeURIComponent(value) + expires + "; path=/";
+            },
+            _writeConsent: function (analytics) {
+                var state = {
+                    essential: true,
+                    analytics: !!analytics,
+                    updatedAtUtc: new Date().toISOString()
+                };
+
+                try {
+                    localStorage.setItem(this._storageKey, JSON.stringify(state));
+                } catch {
+                    // Ignore storage failures.
+                }
+
+                try {
+                    this._writeCookie(this._consentCookie, analytics ? "all" : "essential", 365);
+                    this._writeCookie(this._analyticsCookie, analytics ? "1" : "0", 365);
+                } catch {
+                    // Ignore cookie failures.
+                }
+            },
+            _loadConsent: function () {
+                try {
+                    var raw = localStorage.getItem(this._storageKey);
+                    if (raw) {
+                        var parsed = JSON.parse(raw);
+                        return !!parsed.analytics;
+                    }
+                } catch {
+                    // Ignore parse/storage failures.
+                }
+
+                var cookie = this._readCookie(this._consentCookie);
+                if (cookie === "all") {
+                    return true;
+                }
+                if (cookie === "essential") {
+                    return false;
+                }
+
+                return null;
+            },
             init: function () {
                 var banner = document.getElementById("cookie-consent-banner");
                 var modal = document.getElementById("cookie-consent-modal");
+                var consent = this._loadConsent();
+
+                if (consent === null) {
+                    if (banner) {
+                        banner.classList.remove("is-hidden");
+                    }
+                    if (modal) {
+                        modal.classList.add("is-hidden");
+                    }
+                    return;
+                }
+
                 if (banner) {
-                    banner.classList.remove("is-hidden");
+                    banner.classList.add("is-hidden");
                 }
                 if (modal) {
                     modal.classList.add("is-hidden");
@@ -42,6 +112,13 @@
             },
             openPreferences: function () {
                 var modal = document.getElementById("cookie-consent-modal");
+                var analyticsToggle = document.getElementById("cookie-analytics-toggle");
+                var consent = this._loadConsent();
+
+                if (analyticsToggle) {
+                    analyticsToggle.checked = consent === null ? false : !!consent;
+                }
+
                 if (modal) {
                     modal.classList.remove("is-hidden");
                 }
@@ -55,6 +132,7 @@
             acceptAll: function () {
                 var banner = document.getElementById("cookie-consent-banner");
                 var modal = document.getElementById("cookie-consent-modal");
+                this._writeConsent(true);
                 if (banner) {
                     banner.classList.add("is-hidden");
                 }
@@ -65,6 +143,7 @@
             rejectOptional: function () {
                 var banner = document.getElementById("cookie-consent-banner");
                 var modal = document.getElementById("cookie-consent-modal");
+                this._writeConsent(false);
                 if (banner) {
                     banner.classList.add("is-hidden");
                 }
@@ -75,6 +154,8 @@
             savePreferences: function () {
                 var banner = document.getElementById("cookie-consent-banner");
                 var modal = document.getElementById("cookie-consent-modal");
+                var analyticsToggle = document.getElementById("cookie-analytics-toggle");
+                this._writeConsent(!!(analyticsToggle && analyticsToggle.checked));
                 if (banner) {
                     banner.classList.add("is-hidden");
                 }

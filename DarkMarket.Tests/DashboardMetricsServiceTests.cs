@@ -31,6 +31,7 @@ public class DashboardMetricsServiceTests
         var service = new DashboardMetricsService(db);
         var snapshot = await service.GetSnapshotAsync();
 
+        Assert.IsType<DashboardMetricsSnapshot>(snapshot);
         Assert.Equal(2, snapshot.UsersCount);
         Assert.Equal(2, snapshot.PaidSalesCount);
         Assert.Equal(0.03m, snapshot.PaidSalesVolumeBtc);

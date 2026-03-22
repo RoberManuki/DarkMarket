@@ -90,7 +90,11 @@ public class PurchaseFlowIntegrationTests : IClassFixture<IntegrationTestWebAppF
         var html = await detailsResponse.Content.ReadAsStringAsync();
 
         Assert.Equal(HttpStatusCode.OK, detailsResponse.StatusCode);
-        Assert.Contains("Transação não encontrada ou acesso negado.", html);
+        Assert.True(
+            html.Contains("Transacao nao encontrada ou acesso negado.", StringComparison.Ordinal)
+            || html.Contains("Transaction not found or access denied.", StringComparison.Ordinal)
+            || html.Contains("Transaccion no encontrada o acceso denegado.", StringComparison.Ordinal),
+            "Expected localized order access-denied text in HTML response.");
     }
 
     [Fact]

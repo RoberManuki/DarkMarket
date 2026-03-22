@@ -8,6 +8,34 @@ namespace DarkMarket.Tests;
 
 public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAppFactory>
 {
+    private static readonly string[] NotAuthorizedTexts =
+    {
+        "Voce nao tem permissao para acessar esta pagina.",
+        "You are not authorized to access this page.",
+        "No tienes permiso para acceder a esta pagina."
+    };
+
+    private static readonly string[] AdminPanelTitles =
+    {
+        "Painel Administrativo",
+        "Admin Panel",
+        "Panel Administrativo"
+    };
+
+    private static readonly string[] MyOrdersTitles =
+    {
+        "Meus Pedidos",
+        "My Orders",
+        "Mis Pedidos"
+    };
+
+    private static readonly string[] OrderNotFoundOrDeniedTexts =
+    {
+        "Transacao nao encontrada ou acesso negado.",
+        "Transaction not found or access denied.",
+        "Transaccion no encontrada o acceso denegado."
+    };
+
     private readonly IntegrationTestWebAppFactory _factory;
 
     public ProtectedPagesIntegrationTests(IntegrationTestWebAppFactory factory)
@@ -19,7 +47,7 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
     public async Task OrdersPage_ShowsNotAuthorized_WhenAnonymous()
     {
         var result = await GetPageAsync(_factory.CreateClient(), "/orders");
-        AssertOkAndContains(result, "Você não tem permissão para acessar esta página.");
+        AssertOkAndContainsAny(result, NotAuthorizedTexts);
     }
 
     [Fact]
@@ -27,7 +55,7 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
     {
         var client = CreateAuthenticatedClient(userId: "buyer-int", userName: "buyer");
         var result = await GetPageAsync(client, "/orders");
-        AssertOkAndContains(result, "Meus Pedidos");
+        AssertOkAndContainsAny(result, MyOrdersTitles);
     }
 
     [Fact]
@@ -35,7 +63,7 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
     {
         var client = CreateAuthenticatedClient(userId: "user-int", userName: "user", roles: "user");
         var result = await GetPageAsync(client, "/admin");
-        AssertOkAndContains(result, "Você não tem permissão para acessar esta página.");
+        AssertOkAndContainsAny(result, NotAuthorizedTexts);
     }
 
     [Fact]
@@ -43,7 +71,7 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
     {
         var client = CreateAuthenticatedClient(userId: "admin-int", userName: "admin", roles: "admin");
         var result = await GetPageAsync(client, "/admin");
-        AssertOkAndContains(result, "Painel Administrativo");
+        AssertOkAndContainsAny(result, AdminPanelTitles);
     }
 
     [Fact]
@@ -51,7 +79,7 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
     {
         var client = CreateHeaderClient(("X-Test-UserId", "user-int-blank-role"), ("X-Test-UserName", "userblankrole"), ("X-Test-Roles", "   "));
         var result = await GetPageAsync(client, "/admin");
-        AssertOkAndContains(result, "Você não tem permissão para acessar esta página.");
+        AssertOkAndContainsAny(result, NotAuthorizedTexts);
     }
 
     [Fact]
@@ -59,7 +87,7 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
     {
         var client = CreateHeaderClient(("X-Test-UserId", "admin-int-mixed-role"), ("X-Test-UserName", "adminmixedrole"), ("X-Test-Roles", "user, ,admin, "));
         var result = await GetPageAsync(client, "/admin");
-        AssertOkAndContains(result, "Painel Administrativo");
+        AssertOkAndContainsAny(result, AdminPanelTitles);
     }
 
     [Fact]
@@ -67,7 +95,7 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
     {
         var client = CreateHeaderClient(("X-Test-UserId", "user-int-mixed-no-admin"), ("X-Test-UserName", "usermixednoadmin"), ("X-Test-Roles", "user, ,manager, "));
         var result = await GetPageAsync(client, "/admin");
-        AssertOkAndContains(result, "Você não tem permissão para acessar esta página.");
+        AssertOkAndContainsAny(result, NotAuthorizedTexts);
     }
 
     [Fact]
@@ -75,7 +103,7 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
     {
         var client = CreateHeaderClient(("X-Test-UserId", "admin-int-dup-role"), ("X-Test-UserName", "admindupe"), ("X-Test-Roles", "admin,admin"));
         var result = await GetPageAsync(client, "/admin");
-        AssertOkAndContains(result, "Painel Administrativo");
+        AssertOkAndContainsAny(result, AdminPanelTitles);
     }
 
     [Theory]
@@ -92,12 +120,35 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
     [InlineData("/admin/orders-review")]
     [InlineData("/admin/gateways")]
     [InlineData("/admin/delivery-agents")]
+    [InlineData("/admin/delivery-agents/view/1")]
+    [InlineData("/admin/languages")]
     [InlineData("/admin/logs")]
     public async Task AdminRoutes_ShowNotAuthorized_ForNonAdminUser(string route)
     {
         var client = CreateAuthenticatedClient(userId: "user-int-admin-surface", userName: "user", roles: "user");
         var result = await GetPageAsync(client, route);
-        AssertOkAndContains(result, "Você não tem permissão para acessar esta página.");
+        AssertOkAndContainsAny(result, NotAuthorizedTexts);
+    }
+
+    [Theory]
+    [InlineData("/payments/details/1")]
+    [InlineData("/payments/view/1")]
+    public async Task AuthenticatedRoutes_ShowNotAuthorized_WhenAnonymous(string route)
+    {
+        var result = await GetPageAsync(_factory.CreateClient(), route);
+        AssertOkAndContainsAny(result, NotAuthorizedTexts);
+    }
+
+    [Theory]
+    [InlineData("/about")]
+    [InlineData("/contact")]
+    [InlineData("/marketplace")]
+    [InlineData("/profile/non-existent-user")]
+    [InlineData("/delivery-agents/999999")]
+    public async Task PublicRoutes_AreAccessible_WhenAnonymous(string route)
+    {
+        var result = await GetPageAsync(_factory.CreateClient(), route);
+        Assert.Equal(HttpStatusCode.OK, result.Response.StatusCode);
     }
 
     [Fact]
@@ -107,7 +158,7 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
 
         var client = CreateAuthenticatedClient(userId: "intruder-user", userName: "intruder", roles: "user");
         var result = await GetPageAsync(client, $"/orders/{orderId}");
-        AssertOkAndContains(result, "Transação não encontrada ou acesso negado.");
+        AssertOkAndContainsAny(result, OrderNotFoundOrDeniedTexts);
     }
 
     [Fact]
@@ -117,7 +168,7 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
 
         var client = CreateHeaderClient(("X-Test-UserName", "missing-userid"));
         var result = await GetPageAsync(client, $"/orders/{orderId}");
-        AssertOkAndContains(result, "Você não tem permissão para acessar esta página.");
+        AssertOkAndContainsAny(result, NotAuthorizedTexts);
     }
 
     [Fact]
@@ -127,7 +178,7 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
 
         var client = CreateHeaderClient(("X-Test-UserId", "   "), ("X-Test-UserName", "blank-userid"));
         var result = await GetPageAsync(client, $"/orders/{orderId}");
-        AssertOkAndContains(result, "Você não tem permissão para acessar esta página.");
+        AssertOkAndContainsAny(result, NotAuthorizedTexts);
     }
 
     private HttpClient CreateAuthenticatedClient(string userId, string userName, params string[] roles)
@@ -158,10 +209,12 @@ public class ProtectedPagesIntegrationTests : IClassFixture<IntegrationTestWebAp
         return (response, html);
     }
 
-    private static void AssertOkAndContains((HttpResponseMessage Response, string Html) result, string expectedText)
+    private static void AssertOkAndContainsAny((HttpResponseMessage Response, string Html) result, params string[] expectedTexts)
     {
         Assert.Equal(HttpStatusCode.OK, result.Response.StatusCode);
-        Assert.Contains(expectedText, result.Html);
+        Assert.True(
+            expectedTexts.Any(expectedText => result.Html.Contains(expectedText, StringComparison.Ordinal)),
+            $"Expected one of [{string.Join(" | ", expectedTexts)}] in HTML response.");
     }
 
     private async Task<int> SeedOrderAsync(string buyerId, string sellerId)

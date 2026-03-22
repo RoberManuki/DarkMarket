@@ -1,10 +1,13 @@
 using DarkMarket.Data;
 using DarkMarket.Models;
 using DarkMarket.Services;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
 namespace DarkMarket.Tests;
@@ -112,6 +115,7 @@ public class AppInitializationServiceTests
             }
         });
         services.AddSingleton(configuration);
+        services.AddSingleton<IWebHostEnvironment>(new TestWebHostEnvironment());
 
         services.AddDbContext<AppDbContext>(options =>
             options.UseInMemoryDatabase(Guid.NewGuid().ToString()));
@@ -124,6 +128,16 @@ public class AppInitializationServiceTests
         services.AddScoped<AppInitializationService>();
 
         return services.BuildServiceProvider();
+    }
+
+    private sealed class TestWebHostEnvironment : IWebHostEnvironment
+    {
+        public string ApplicationName { get; set; } = "DarkMarket.Tests";
+        public IFileProvider WebRootFileProvider { get; set; } = new NullFileProvider();
+        public string WebRootPath { get; set; } = string.Empty;
+        public string EnvironmentName { get; set; } = Environments.Development;
+        public string ContentRootPath { get; set; } = string.Empty;
+        public IFileProvider ContentRootFileProvider { get; set; } = new NullFileProvider();
     }
 
     private static IConfiguration CreateConfiguration(
