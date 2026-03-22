@@ -535,6 +535,7 @@ public sealed class UiTextService
                 ["OrderDetails.CommentLabel"] = "Comentario:",
                 ["OrderDetails.OrderStatus"] = "Status do pedido:",
                 ["OrderDetails.ChatTitle"] = "Chat da Transacao",
+                ["OrderDetails.PaymentId"] = "ID do pagamento",
                 ["OrderDetails.ChatPlaceholder"] = "Digite sua mensagem...",
                 ["OrderDetails.Send"] = "Enviar",
                 ["OrderDetails.ErrorCommentRequired"] = "Preencha um comentario.",
@@ -688,6 +689,7 @@ public sealed class UiTextService
                 ["PaymentView.OpenCheckout"] = "Abrir checkout do {0}",
                 ["PaymentView.QrHint"] = "O QR code de pagamento sera exibido na pagina do {0}.",
                 ["PaymentView.ViewPaymentDetails"] = "Ver detalhes do pagamento",
+                ["PaymentView.BackToPayment"] = "Voltar para pagamento",
 
                 ["PaymentDetails.Kicker"] = "Pagamento",
                 ["PaymentDetails.Title"] = "Detalhes do Pagamento",
@@ -1240,6 +1242,7 @@ public sealed class UiTextService
                 ["OrderDetails.CommentLabel"] = "Comment:",
                 ["OrderDetails.OrderStatus"] = "Order status:",
                 ["OrderDetails.ChatTitle"] = "Transaction Chat",
+                ["OrderDetails.PaymentId"] = "Payment ID",
                 ["OrderDetails.ChatPlaceholder"] = "Type your message...",
                 ["OrderDetails.Send"] = "Send",
                 ["OrderDetails.ErrorCommentRequired"] = "Fill in a comment.",
@@ -1393,6 +1396,7 @@ public sealed class UiTextService
                 ["PaymentView.OpenCheckout"] = "Open checkout from {0}",
                 ["PaymentView.QrHint"] = "The payment QR code is shown on the {0} page.",
                 ["PaymentView.ViewPaymentDetails"] = "View payment details",
+                ["PaymentView.BackToPayment"] = "Back to payment",
 
                 ["PaymentDetails.Kicker"] = "Payment",
                 ["PaymentDetails.Title"] = "Payment Details",
@@ -1945,6 +1949,7 @@ public sealed class UiTextService
                 ["OrderDetails.CommentLabel"] = "Comentario:",
                 ["OrderDetails.OrderStatus"] = "Estado del pedido:",
                 ["OrderDetails.ChatTitle"] = "Chat de la Transaccion",
+                ["OrderDetails.PaymentId"] = "ID del pago",
                 ["OrderDetails.ChatPlaceholder"] = "Escriba su mensaje...",
                 ["OrderDetails.Send"] = "Enviar",
                 ["OrderDetails.ErrorCommentRequired"] = "Complete un comentario.",
@@ -2098,6 +2103,7 @@ public sealed class UiTextService
                 ["PaymentView.OpenCheckout"] = "Abrir checkout de {0}",
                 ["PaymentView.QrHint"] = "El QR de pago se mostrara en la pagina de {0}.",
                 ["PaymentView.ViewPaymentDetails"] = "Ver detalles del pago",
+                ["PaymentView.BackToPayment"] = "Volver al pago",
 
                 ["PaymentDetails.Kicker"] = "Pago",
                 ["PaymentDetails.Title"] = "Detalles del Pago",

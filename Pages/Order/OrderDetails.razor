@@ -97,6 +97,10 @@ else
             {
                 <div class="details-row">
                     <span class="label">@T["Common.Gateway"]:</span>
+                    <span class="system-value align-right">@(string.IsNullOrWhiteSpace(order.Payment.PaymentMethod) ? "-" : order.Payment.PaymentMethod)</span>
+                </div>
+                <div class="details-row payment-id-row">
+                    <span class="label payment-id-label">@(T["OrderDetails.PaymentId"] == "OrderDetails.PaymentId" ? "ID do pagamento" : T["OrderDetails.PaymentId"]):</span>
                     <span class="payment-address-flex">
                         <span class="payment-address">@order.Payment.PaymentId</span>
                         <button class="clipboard-btn" @onclick="() => CopyToClipboard(order.Payment.PaymentId)">

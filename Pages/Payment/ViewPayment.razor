@@ -28,56 +28,94 @@
         <article class="entity-shell-card entity-shell-main">
             @if (payment == null)
             {
-                <p>@T["PaymentView.NotFound"]</p>
+                <div class="alert alert-warning">@T["PaymentView.NotFound"]</div>
             }
             else
             {
-                <div class="payment-card payment-view-card">
-            @if (payment.PaymentMethod == "BTCPayServer" && payment.Address.StartsWith("http"))
-            {
-                <div class="payment-address-block">
-                    <span class="label">@T["PaymentView.Checkout"]:</span>
-                    <div class="payment-address">
-                        <a href="@payment.Address" target="_blank" class="payment-btn">
-                            @string.Format(T["PaymentView.OpenCheckout"], payment.PaymentMethod)
-                        </a>
+                <div class="payment-ops-shell">
+                    <div class="payment-ops-header">
+                        <div class="payment-ops-title-wrap">
+                            <h2 class="payment-ops-title">@T["PaymentView.Title"]</h2>
+                            <p class="payment-ops-subtitle">@T["PaymentView.Subtitle"]</p>
+                        </div>
+                        <span class="payment-ops-status @(payment.IsPaid ? "paid" : "pending")">
+                            @(payment.IsPaid ? T["Common.Paid"] : T["Common.Pending"])
+                        </span>
                     </div>
-                    <div>
-                        <small>@string.Format(T["PaymentView.QrHint"], payment.PaymentMethod)</small>
+
+                    <div class="payment-ops-grid">
+                        <div class="payment-ops-card payment-ops-card-action">
+                            @if (payment.PaymentMethod == "BTCPayServer" && payment.Address.StartsWith("http"))
+                            {
+                                <div class="payment-op-block">
+                                    <span class="label">@T["PaymentView.Checkout"]:</span>
+                                    <a href="@payment.Address" target="_blank" rel="noopener noreferrer" class="payment-btn">
+                                        @string.Format(T["PaymentView.OpenCheckout"], payment.PaymentMethod)
+                                    </a>
+                                    <small class="payment-hint">@string.Format(T["PaymentView.QrHint"], payment.PaymentMethod)</small>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="payment-op-block">
+                                    <span class="label">@T["PaymentBuy.InvoiceAddress"]:</span>
+                                    <div class="payment-address payment-address-box">@payment.Address</div>
+                                </div>
+                                <div class="payment-qrcode-block">
+                                    <QRCode Value="@QRCodeValue" />
+                                </div>
+                            }
+
+                            <div class="payment-op-actions">
+                                @if (!payment.IsPaid)
+                                {
+                                    <button class="payment-btn" @onclick="CheckPayment">@T["PaymentBuy.Check"]</button>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="payment-ops-card payment-ops-card-meta">
+                            <div class="payment-meta-row">
+                                <span class="label">@T["Common.Value"]:</span>
+                                <span class="payment-amount">@FormatBtcWithUsdMarkup(payment.Amount)</span>
+                            </div>
+                            <div class="payment-meta-row">
+                                <span class="label">@T["Common.Gateway"]:</span>
+                                <span class="system-value">@(string.IsNullOrWhiteSpace(payment.PaymentMethod) ? "-" : payment.PaymentMethod)</span>
+                            </div>
+                            <div class="payment-meta-row payment-id-row">
+                                <span class="label payment-id-label">@(T["OrderDetails.PaymentId"] == "OrderDetails.PaymentId" ? "ID do pagamento" : T["OrderDetails.PaymentId"]):</span>
+                                <span class="payment-address payment-address-inline">@(string.IsNullOrWhiteSpace(payment.PaymentId) ? "-" : payment.PaymentId)</span>
+                            </div>
+                            <div class="payment-meta-row">
+                                <span class="label">@T["Common.Date"]:</span>
+                                <span class="system-value">@payment.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                            @if (payment.PaidAt != null)
+                            {
+                                <div class="payment-meta-row">
+                                    <span class="label">@T["PaymentDetails.PaidAt"]:</span>
+                                    <span class="system-value">@payment.PaidAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                                </div>
+                            }
+
+                            <div class="payment-meta-actions">
+                                @if (payment.OrderId.HasValue)
+                                {
+                                    <a class="payment-link-btn" href="@($"/orders/{payment.OrderId.Value}")" title="@T["PaymentDetails.ViewOrder"]">
+                                        <span class="payment-link-text">@T["PaymentDetails.ViewOrder"]</span>
+                                    </a>
+                                }
+                                @if (payment.IsPaid)
+                                {
+                                    <a class="payment-btn payment-btn-success" href="@($"/payments/details/{payment.Id}")" title="@(T["PaymentView.BackToPayment"] == "PaymentView.BackToPayment" ? "Voltar para pagamento" : T["PaymentView.BackToPayment"])">
+                                        <i class="fa fa-file-alt"></i>
+                                        <span>@(T["PaymentView.BackToPayment"] == "PaymentView.BackToPayment" ? "Voltar para pagamento" : T["PaymentView.BackToPayment"])</span>
+                                    </a>
+                                }
+                            </div>
+                        </div>
                     </div>
-                </div>
-            }
-            else
-            {
-                <div class="payment-address-block">
-                    <span class="label">@T["PaymentBuy.InvoiceAddress"]:</span>
-                    <div class="payment-address">@payment.Address</div>
-                </div>
-                <div class="payment-qrcode-block">
-                    <QRCode Value="@QRCodeValue" />
-                </div>
-            }
-            <div class="payment-amount-block">
-                <span class="label">@T["Common.Value"]:</span>
-                <span class="payment-amount">@FormatBtcWithUsdMarkup(payment.Amount) (@payment.PaymentMethod)</span>
-            </div>
-            <div class="payment-status-block">
-                <span class="label">@T["Common.Status"]:</span>
-                @if (payment.IsPaid)
-                {
-                    <span class="payment-status-ok">@T["PaymentBuy.PaidReceived"]</span>
-                    <div class="details-actions">
-                        <a class="payment-btn payment-btn-success" href="@($"/payments/details/{payment.Id}")">
-                            <i class="fa fa-file-alt"></i> @T["PaymentView.ViewPaymentDetails"]
-                        </a>
-                    </div>
-                }
-                else
-                {
-                    <span class="payment-status-wait">@T["PaymentBuy.Waiting"]</span>
-                    <button class="payment-btn" @onclick="CheckPayment">@T["PaymentBuy.Check"]</button>
-                }
-            </div>
                 </div>
             }
 

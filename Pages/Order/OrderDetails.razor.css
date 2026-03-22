@@ -135,6 +135,110 @@
     text-align: left;
 }
 
+.payment-details-card .payment-id-label {
+    width: 11.5em;
+    min-width: 11.5em;
+}
+
+.payment-id-row .payment-address-flex {
+    min-width: 0;
+}
+
+.payment-id-row .payment-address {
+    white-space: nowrap;
+    overflow-x: auto;
+}
+
+.order-chat-card {
+    margin: 2.5rem auto 0 auto;
+    max-width: 900px;
+    background: #23272f;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px #0004;
+    border: 1px solid #314454;
+    padding: 2.9rem 2.5rem 2rem;
+}
+
+.chat-title {
+    text-align: center;
+    color: #f9a825;
+    font-weight: 700;
+    font-size: 1.3em;
+    margin: 0 0 2.85rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6em;
+    position: relative;
+    z-index: 2;
+}
+
+.chat-title .fa-comments {
+    color: #f9a825;
+    font-size: 1.2em;
+}
+
+.chat-messages {
+    max-height: 260px;
+    overflow-y: auto;
+    margin-top: 1.1rem;
+    margin-bottom: 1rem;
+    background: #181c22;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.chat-message.comprador {
+    background: #1eaa6f33;
+    color: #1eaa6f;
+}
+
+.chat-message.vendedor {
+    background: #f1c40f33;
+    color: #b38b00;
+}
+
+.chat-message.admin {
+    background: #3498db33;
+    color: #217dbb;
+}
+
+.chat-message {
+    border-radius: 12px;
+    margin-bottom: 0.7em;
+    padding: 0.7em 1.1em;
+    font-size: 1em;
+    box-shadow: 0 1px 4px #0002;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-user {
+    font-weight: 700;
+    margin-bottom: 0.2em;
+}
+
+.chat-date {
+    font-size: 0.85em;
+    color: #aaa;
+    margin-top: 0.2em;
+    align-self: flex-end;
+}
+
+.chat-input-row {
+    display: flex;
+    gap: 1rem;
+}
+
+.chat-input {
+    flex: 1;
+    border-radius: 8px;
+    border: 1px solid #333a;
+    padding: 0.7em 1em;
+    background: #181c22;
+    color: #fff;
+}
+
 .release-modal-question {
     margin: 0 0 0.85rem;
     text-align: center;
@@ -229,5 +333,14 @@
 
     .release-modal-side .evidence-section {
         grid-template-columns: 1fr;
+    }
+
+    .payment-details-card .payment-id-label {
+        width: 8.8em;
+        min-width: 8.8em;
+    }
+
+    .order-chat-card {
+        padding: 2.4rem 1rem 1.25rem;
     }
 }

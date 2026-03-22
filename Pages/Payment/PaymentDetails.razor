@@ -24,61 +24,78 @@
         <article class="entity-shell-card entity-shell-main">
             @if (payment == null)
             {
-                <p>@T["Common.Loading"]</p>
+                <div class="loading-spinner">@T["Common.Loading"]</div>
             }
             else
             {
-                <div class="details-container">
-        <!-- Card da Esquerda: Produto -->
-        <div class="product-card">
-            <img class="product-img" src="@payment.Product?.ImagePath" alt="@payment.Product?.Name" />
-            <div class="product-info">
-                <div class="product-name">@payment.Product?.Name</div>
-                <div class="product-price">@FormatBtcWithUsd(payment.Amount)</div>
+                <div class="payment-receipt-shell">
+                    <div class="payment-receipt-header">
+                        <div class="payment-receipt-heading">
+                            <h2 class="payment-receipt-title">@T["PaymentDetails.Title"]</h2>
+                            <p class="payment-receipt-subtitle">@T["PaymentDetails.Subtitle"]</p>
+                        </div>
+                        <span class="payment-receipt-status @(payment.IsPaid ? "paid" : "pending")">
+                            @(payment.IsPaid ? T["Common.Paid"] : T["Common.Pending"])
+                        </span>
+                    </div>
+
+                    <div class="payment-receipt-grid">
+                        <section class="payment-receipt-card">
+                            <div class="payment-receipt-row">
+                                <span class="label">@T["Common.Value"]:</span>
+                                <span class="payment-receipt-amount">@FormatBtcWithUsd(payment.Amount)</span>
+                            </div>
+                            <div class="payment-receipt-row">
+                                <span class="label">@T["Common.Gateway"]:</span>
+                                <span class="system-value">@(string.IsNullOrWhiteSpace(payment.PaymentMethod) ? "-" : payment.PaymentMethod)</span>
+                            </div>
+                            <div class="payment-receipt-row payment-id-row">
+                                <span class="label payment-id-label">@(T["OrderDetails.PaymentId"] == "OrderDetails.PaymentId" ? "ID do pagamento" : T["OrderDetails.PaymentId"]):</span>
+                                <span class="payment-address payment-address-inline">@(string.IsNullOrWhiteSpace(payment.PaymentId) ? "-" : payment.PaymentId)</span>
+                            </div>
+                            <div class="payment-receipt-row">
+                                <span class="label">@T["Common.Address"]:</span>
+                                <span class="payment-address payment-address-box">@payment.Address</span>
+                            </div>
+                            <div class="payment-receipt-row">
+                                <span class="label">@T["Common.Date"]:</span>
+                                <span class="system-value">@payment.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                            @if (payment.PaidAt != null)
+                            {
+                                <div class="payment-receipt-row">
+                                    <span class="label">@T["PaymentDetails.PaidAt"]:</span>
+                                    <span class="system-value">@payment.PaidAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
+                                </div>
+                            }
+                        </section>
+
+                        <section class="payment-receipt-card payment-reference-card">
+                            <h3 class="payment-reference-title">@T["Common.Details"]</h3>
+                            <div class="payment-reference-item">
+                                <span class="label">@T["Common.Seller"]:</span>
+                                <span class="system-value">@(payment.Product?.User?.UserName ?? "-")</span>
+                            </div>
+                            <div class="payment-reference-item">
+                                <span class="label">@T["Common.Description"]:</span>
+                                <span class="system-value">@(string.IsNullOrWhiteSpace(payment.Product?.Name) ? "-" : payment.Product!.Name)</span>
+                            </div>
+
+                            <div class="payment-reference-actions">
+                                @if (payment.Order != null)
+                                {
+                                    <a class="payment-link-btn" href="@($"/orders/{payment.Order.Id}")" title="@T["PaymentDetails.ViewOrder"]">
+                                        <span class="payment-link-text">@T["PaymentDetails.ViewOrder"]</span>
+                                    </a>
+                                }
+                                <a class="payment-btn payment-btn-success" href="@($"/payments/view/{payment.Id}")">
+                                    <i class="fa fa-wave-square"></i> @T["PaymentView.Title"]
+                                </a>
+                                <button class="back-btn" @onclick="GoBack">@T["Common.Back"]</button>
+                            </div>
+                        </section>
+                    </div>
             </div>
-        </div>
-        <!-- Card da Direita: Pagamento -->
-        <div class="dashboard-card payment-details-card">
-            <div class="details-row">
-                <span class="label">@T["Common.Status"]:</span>
-                <span>
-                    <span class="badge @(payment.IsPaid ? "payment-status-ok" : "payment-status-wait")">
-                        @(payment.IsPaid ? T["Common.Paid"] : T["Common.Pending"])
-                    </span>
-                </span>
-            </div>
-            <div class="details-row">
-                <span class="label">@T["Common.Gateway"]:</span>
-                <span class="system-value">@payment.PaymentMethod</span>
-            </div>
-            <div class="details-row">
-                <span class="label">@T["Common.Address"]:</span>
-                <span class="payment-address">@payment.Address</span>
-            </div>
-            <div class="details-row">
-                <span class="label">@T["Common.Date"]:</span>
-                <span class="system-value">@payment.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
-            </div>
-            @if (payment.PaidAt != null)
-            {
-                <div class="details-row">
-                    <span class="label">@T["PaymentDetails.PaidAt"]:</span>
-                    <span class="system-value">@payment.PaidAt?.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</span>
-                </div>
-            }
-            @if (payment.Order != null)
-            {
-                <div class="details-actions">
-                    <a class="payment-link-btn" href="@($"/orders/{payment.Order.Id}")" title="@T["PaymentDetails.ViewOrder"]">
-                        <span class="payment-link-text">@T["PaymentDetails.ViewOrder"]</span>
-                    </a>
-                </div>
-            }
-            <div class="details-actions">
-                <button class="back-btn" @onclick="GoBack">@T["Common.Back"]</button>
-            </div>
-        </div>
-                </div>
             }
         </article>
     </section>
@@ -98,6 +115,7 @@
 
         payment = await Db.Payments
             .Include(p => p.Product)
+            .ThenInclude(product => product!.User)
             .Include(p => p.Order)
             .FirstOrDefaultAsync(p => p.Id == PaymentId);
     }
