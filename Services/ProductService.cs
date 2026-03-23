@@ -1,11 +1,11 @@
-using DarkMarket.Models;
-using DarkMarket.Data;
+﻿using CryptoMarket.Models;
+using CryptoMarket.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Authorization;
 
 
-namespace DarkMarket.Services
+namespace CryptoMarket.Services
 {
     [Authorize]
     public class ProductService

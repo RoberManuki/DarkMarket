@@ -1,4 +1,4 @@
-# DarkMarket E2E (Playwright)
+﻿# CryptoMarket E2E (Playwright)
 
 This folder contains browser end-to-end tests for real UI interaction scenarios that are not covered by server-side integration tests.
 
@@ -45,7 +45,7 @@ Why 2 tests are skipped:
 ## Prerequisites
 
 - Node.js 20+ and npm
-- DarkMarket app running locally
+- CryptoMarket app running locally
 
 ## Install
 
@@ -124,3 +124,4 @@ npx playwright test --grep "cookie consent"
 
 - These tests are intentionally separated from the .NET test project.
 - They validate browser/runtime behaviors such as JavaScript click handlers and localStorage/cookies.
+

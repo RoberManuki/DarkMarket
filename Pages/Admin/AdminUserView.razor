@@ -1,10 +1,10 @@
-@page "/admin/users/view/{UserId}"
+﻿@page "/admin/users/view/{UserId}"
 
 @attribute [Authorize(Roles = "admin")]
 
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
-@using DarkMarket.Models
+@using CryptoMarket.Models
 
 @inject UserManager<ApplicationUser> UserManager
 @inject NavigationManager NavigationManager
@@ -86,3 +86,4 @@ else
         isLoading = false;
     }
 }
+

@@ -1,4 +1,4 @@
-window.darkMarketModal = (() => {
+﻿window.cryptoMarketModal = (() => {
     let activeModal = null;
     let previousFocusedElement = null;
     let previousBodyOverflow = null;
@@ -111,3 +111,4 @@ window.darkMarketModal = (() => {
         close
     };
 })();
+

@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
-namespace DarkMarket.Data
+namespace CryptoMarket.Data
 {
     public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
     {
@@ -30,7 +30,7 @@ namespace DarkMarket.Data
             if (string.IsNullOrWhiteSpace(connectionString) || connectionString.Contains("__SET_VIA_USER_SECRETS__"))
             {
                 throw new InvalidOperationException(
-                    "DefaultConnection não está configurada para o EF CLI. Defina via 'dotnet user-secrets set \"ConnectionStrings:DefaultConnection\" \"Host=...\" --project .\\DarkMarket.csproj' ou use a variável de ambiente ConnectionStrings__DefaultConnection."
+                    "DefaultConnection nÃ£o estÃ¡ configurada para o EF CLI. Defina via 'dotnet user-secrets set \"ConnectionStrings:DefaultConnection\" \"Host=...\" --project .\\CryptoMarket.csproj' ou use a variÃ¡vel de ambiente ConnectionStrings__DefaultConnection."
                 );
             }
 
@@ -41,3 +41,4 @@ namespace DarkMarket.Data
         }
     }
 }
+

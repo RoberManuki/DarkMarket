@@ -1,8 +1,7 @@
-@page "/admin"
+﻿@page "/admin"
 
 @using System.Globalization
 @using System.Security.Claims
-@using DarkMarket.Configuration
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.JSInterop
@@ -10,11 +9,10 @@
 @attribute [Authorize(Roles = "admin")]
 
 @inject CurrencyPreferenceService CurrencyPreferenceService
+@inject LanguagePreferenceService LanguagePreferenceService
 @inject DashboardMetricsService DashboardMetricsService
 @inject AdminSettingsService AdminSettingsService
-@inject AdminSecurityPolicyService AdminSecurityPolicyService
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject IWebHostEnvironment WebHostEnvironment
 @inject IJSRuntime JSRuntime
 @inject UiTextService T
 
@@ -38,7 +36,7 @@
                 <a href="/admin/delivery-agents">@T["Admin.Nav.DeliveryAgents"]</a>
                 <a href="/admin/orders-review">@T["Admin.Nav.Review"]</a>
                 <a href="/admin/logs">@T["Admin.Nav.Logs"]</a>
-                <a href="/admin/languages">@T["Admin.Nav.Languages"]</a>
+                <a href="/admin/security">@T["Admin.Nav.Security"]</a>
             </nav>
 
             <div class="admin-kpi-grid" aria-label="@T["AdminDashboard.KpiAria"]">
@@ -76,6 +74,26 @@
                 <span><b>@T["AdminDashboard.QuoteQueriesLabel"]</b> @quoteQueriesCount</span>
             </div>
 
+            <div class="admin-settings-card">
+                <span><b>@T["AdminLanguages.Current"]:</b> @selectedLanguage</span>
+            </div>
+
+            <div class="admin-settings-card">
+                <label for="ui-language"><b>@T["AdminLanguages.Select"]:</b></label>
+                <select id="ui-language" class="fiat-select" @bind="selectedLanguage">
+                    @foreach (var language in LanguagePreferenceService.SupportedLanguages)
+                    {
+                        <option value="@language.Code">@language.Label</option>
+                    }
+                </select>
+                <button class="details-btn" @onclick="SaveLanguageAsync">@T["AdminLanguages.Save"]</button>
+
+                @if (!string.IsNullOrWhiteSpace(languageMessage))
+                {
+                    <span class="operation-fee-message ok">@languageMessage</span>
+                }
+            </div>
+
             <div class="admin-settings-card operation-fee-card">
         <label for="operation-fee"><b>@T["AdminDashboard.OperationFeeLabel"]</b></label>
         <input id="operation-fee"
@@ -91,104 +109,6 @@
             <span class="operation-fee-message @(operationFeeSaved ? "ok" : "error")">@operationFeeMessage</span>
         }
             </div>
-
-            <div class="admin-settings-card security-settings-card">
-        <div class="security-header">
-            <h3>@T["AdminDashboard.SecurityTitle"]</h3>
-            <p>@T["AdminDashboard.SecuritySubtitle"]</p>
-        </div>
-
-        <div class="security-panels">
-            <section class="security-panel" aria-label="@T["AdminDashboard.BaselineAria"]">
-                <h4>@T["AdminDashboard.BaselineTitle"]</h4>
-                <div class="security-baseline-meta">
-                    <span class="security-label">@T["AdminDashboard.Environment"]</span>
-                    <span class="security-value security-env-pill">@(WebHostEnvironment.IsDevelopment() ? T["AdminDashboard.EnvironmentDevelopment"] : T["AdminDashboard.EnvironmentProduction"])</span>
-                </div>
-
-                <div class="security-baseline-group">
-                    <h5>@T["AdminDashboard.Credentials"]</h5>
-                    <div class="security-baseline-grid">
-                        <div class="security-baseline-row">
-                            <span class="security-label">@T["AdminDashboard.MinPassword"]</span>
-                            <span class="security-value">@securityPolicy.PasswordRequiredLength @T["AdminDashboard.Characters"]</span>
-                        </div>
-
-                        <div class="security-baseline-row">
-                            <span class="security-label">@T["AdminDashboard.UniqueChars"]</span>
-                            <span class="security-value">@securityPolicy.PasswordRequiredUniqueChars</span>
-                        </div>
-
-                        <div class="security-baseline-row">
-                            <span class="security-label">@T["AdminDashboard.RequireDigit"]</span>
-                            <span class="security-boolean-badge @(securityPolicy.PasswordRequireDigit ? "on" : "off")">@(securityPolicy.PasswordRequireDigit ? T["Common.Yes"] : T["Common.No"])</span>
-                        </div>
-
-                        <div class="security-baseline-row">
-                            <span class="security-label">@T["AdminDashboard.RequireLowercase"]</span>
-                            <span class="security-boolean-badge @(securityPolicy.PasswordRequireLowercase ? "on" : "off")">@(securityPolicy.PasswordRequireLowercase ? T["Common.Yes"] : T["Common.No"])</span>
-                        </div>
-
-                        <div class="security-baseline-row">
-                            <span class="security-label">@T["AdminDashboard.RequireUppercase"]</span>
-                            <span class="security-boolean-badge @(securityPolicy.PasswordRequireUppercase ? "on" : "off")">@(securityPolicy.PasswordRequireUppercase ? T["Common.Yes"] : T["Common.No"])</span>
-                        </div>
-
-                        <div class="security-baseline-row">
-                            <span class="security-label">@T["AdminDashboard.RequireSymbol"]</span>
-                            <span class="security-boolean-badge @(securityPolicy.PasswordRequireNonAlphanumeric ? "on" : "off")">@(securityPolicy.PasswordRequireNonAlphanumeric ? T["Common.Yes"] : T["Common.No"])</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="security-baseline-group">
-                    <h5>@T["AdminDashboard.Session"]</h5>
-                    <div class="security-baseline-grid">
-                        <div class="security-baseline-row">
-                            <span class="security-label">@T["AdminDashboard.SessionDuration"]</span>
-                            <span class="security-value">@securityPolicy.SessionTimeoutMinutes @T["AdminDashboard.Minutes"]</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="security-panel security-runtime-panel" aria-label="@T["AdminDashboard.RuntimeAria"]">
-                <h4>@T["AdminDashboard.RuntimeTitle"]</h4>
-
-                <label class="security-toggle" for="security-require-confirmed">
-                    <input id="security-require-confirmed" type="checkbox" @bind="runtimeRequireConfirmedEmail" />
-                    <span>@T["AdminDashboard.RequireConfirmedEmail"]</span>
-                </label>
-
-                <div class="security-input-grid">
-                    <label for="security-lockout-attempts">@T["AdminDashboard.LockoutAttempts"]</label>
-                    <input id="security-lockout-attempts"
-                           class="fee-input"
-                           type="number"
-                           min="1"
-                           max="20"
-                           step="1"
-                           @bind="runtimeLockoutMaxAttempts" />
-
-                    <label for="security-lockout-minutes">@T["AdminDashboard.LockoutDuration"]</label>
-                    <input id="security-lockout-minutes"
-                           class="fee-input"
-                           type="number"
-                           min="1"
-                           max="1440"
-                           step="1"
-                           @bind="runtimeLockoutMinutes" />
-                </div>
-
-                <button class="details-btn" @onclick="SaveSecurityPolicyAsync">@T["AdminDashboard.SaveSecurityPolicy"]</button>
-
-                @if (!string.IsNullOrWhiteSpace(securityPolicyMessage))
-                {
-                    <span class="operation-fee-message @(securityPolicySaved ? "ok" : "error")">@securityPolicyMessage</span>
-                }
-            </section>
-        </div>
-            </div>
         </article>
     </section>
 </div>
@@ -200,15 +120,11 @@
     private int paidSalesCount;
     private int pendingOrdersCount;
     private decimal paidSalesVolumeBtc;
+    private string selectedLanguage = LanguagePreferenceService.DefaultLanguage;
     private decimal operationFeePercent;
     private string? operationFeeMessage;
+    private string? languageMessage;
     private bool operationFeeSaved;
-    private SecurityPolicySnapshot securityPolicy = SecurityPolicyDefaults.Create(isDevelopment: false);
-    private bool runtimeRequireConfirmedEmail;
-    private int runtimeLockoutMaxAttempts;
-    private int runtimeLockoutMinutes;
-    private string? securityPolicyMessage;
-    private bool securityPolicySaved;
     private ClaimsPrincipal? currentUser;
 
     protected override async Task OnInitializedAsync()
@@ -224,12 +140,7 @@
         pendingOrdersCount = snapshot.PendingOrdersCount;
         quoteQueriesCount = snapshot.QuoteQueriesCount;
         operationFeePercent = await AdminSettingsService.GetOperationFeePercentForAdminAsync(currentUser);
-        securityPolicy = SecurityPolicyDefaults.Create(WebHostEnvironment.IsDevelopment());
-
-        var runtimePolicy = await AdminSecurityPolicyService.GetRuntimePolicyForAdminAsync(currentUser);
-        runtimeRequireConfirmedEmail = runtimePolicy.RequireConfirmedEmail;
-        runtimeLockoutMaxAttempts = runtimePolicy.LockoutMaxFailedAccessAttempts;
-        runtimeLockoutMinutes = runtimePolicy.LockoutMinutes;
+        selectedLanguage = LanguagePreferenceService.SelectedLanguage;
     }
 
     private static string FormatBtc(decimal amount)
@@ -240,7 +151,7 @@
     private async Task ApplyCurrencyPreferenceAsync()
     {
         CurrencyPreferenceService.SetCurrency(selectedFiat);
-        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "darkmarket.fiatCurrency", CurrencyPreferenceService.SelectedFiatCurrency);
+        await JSRuntime.InvokeVoidAsync("localStorage.setItem", "cryptomarket.fiatCurrency", CurrencyPreferenceService.SelectedFiatCurrency);
     }
 
     private async Task SaveOperationFeeAsync()
@@ -266,35 +177,29 @@
         }
     }
 
-    private async Task SaveSecurityPolicyAsync()
+    private async Task SaveLanguageAsync()
     {
+        LanguagePreferenceService.SetLanguage(selectedLanguage);
+
         try
         {
-            var saved = await AdminSecurityPolicyService.SetRuntimePolicyForAdminAsync(
-                currentUser,
-                new RuntimeSecurityPolicy(
-                    runtimeRequireConfirmedEmail,
-                    runtimeLockoutMaxAttempts,
-                    runtimeLockoutMinutes));
-
-            securityPolicySaved = saved;
-
-            if (saved)
-            {
-                securityPolicyMessage = T["AdminDashboard.SecurityPolicySaved"];
-                var runtimePolicy = await AdminSecurityPolicyService.GetRuntimePolicyForAdminAsync(currentUser);
-                runtimeRequireConfirmedEmail = runtimePolicy.RequireConfirmedEmail;
-                runtimeLockoutMaxAttempts = runtimePolicy.LockoutMaxFailedAccessAttempts;
-                runtimeLockoutMinutes = runtimePolicy.LockoutMinutes;
-                return;
-            }
-
-            securityPolicyMessage = T["AdminDashboard.SecurityPolicyRangeError"];
+            await JSRuntime.InvokeVoidAsync("localStorage.setItem", "cryptomarket.uiLanguage", LanguagePreferenceService.SelectedLanguage);
         }
-        catch (UnauthorizedAccessException)
+        catch
         {
-            securityPolicySaved = false;
-            securityPolicyMessage = T["AdminDashboard.AccessDeniedSecurity"];
+            // Keep runtime update even if storage is unavailable.
         }
+
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("cryptoMarketSetCookie", "cryptomarket.uiLanguage", LanguagePreferenceService.SelectedLanguage, 365);
+        }
+        catch
+        {
+            // Keep runtime update even if cookie helper is unavailable.
+        }
+
+        selectedLanguage = LanguagePreferenceService.SelectedLanguage;
+        languageMessage = T["AdminLanguages.Success"];
     }
 }

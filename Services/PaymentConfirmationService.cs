@@ -1,8 +1,8 @@
-using DarkMarket.Data;
-using DarkMarket.Models;
+﻿using CryptoMarket.Data;
+using CryptoMarket.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace DarkMarket.Services
+namespace CryptoMarket.Services
 {
     public class PaymentConfirmationService
     {

@@ -1,12 +1,12 @@
-@page "/admin/payments"
+﻿@page "/admin/payments"
 
 @attribute [Authorize(Roles = "admin")]
 
-@using DarkMarket.Models
+@using CryptoMarket.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.JSInterop
-@using DarkMarket.Shared.Helpers
+@using CryptoMarket.Shared.Helpers
 
 @inject AppDbContext Db
 @inject BitcoinQuoteService BitcoinQuoteService
@@ -42,7 +42,7 @@
             {
                 <div class="orders-review-restored-notice">
                     <span>@T["AdminPayments.RestoredFilters"]</span>
-                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">×</button>
+                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">Ã—</button>
                 </div>
             }
 
@@ -101,7 +101,9 @@
                             </td>
                             <td data-label="@T["Common.Date"]">@p.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
                             <td data-label="@T["Common.Actions"]">
-                                <button class="details-btn action-btn" @onclick="() => ViewPayment(p.Id)">@T["Common.Details"]</button>
+                                <button class="details-btn action-btn icon-only" @onclick="() => ViewPayment(p.Id)" title="@T["Common.Details"]" aria-label="@T["Common.Details"]">
+                                    <i class="fa fa-eye"></i>
+                                </button>
                             </td>
                         </tr>
                     }

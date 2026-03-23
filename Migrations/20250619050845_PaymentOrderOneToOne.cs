@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace DarkMarket.Migrations
+namespace CryptoMarket.Migrations
 {
     /// <inheritdoc />
     public partial class PaymentOrderOneToOne : Migration
@@ -20,3 +20,4 @@ namespace DarkMarket.Migrations
         }
     }
 }
+

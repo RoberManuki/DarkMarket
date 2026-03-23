@@ -1,9 +1,9 @@
-using DarkMarket.Models;
+﻿using CryptoMarket.Models;
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
 
-namespace DarkMarket.Services;
+namespace CryptoMarket.Services;
 
 public sealed record AdminLogExportRow(
     DateTime Timestamp,

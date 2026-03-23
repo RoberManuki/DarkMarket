@@ -1,6 +1,6 @@
-using DarkMarket.Models;
+﻿using CryptoMarket.Models;
 
-namespace DarkMarket.Services;
+namespace CryptoMarket.Services;
 
 public enum AdminLogSortColumn
 {
@@ -56,3 +56,4 @@ public static class AdminLogSorting
         };
     }
 }
+

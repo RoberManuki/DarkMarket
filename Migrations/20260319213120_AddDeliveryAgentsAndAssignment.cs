@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace DarkMarket.Migrations
+namespace CryptoMarket.Migrations
 {
     /// <inheritdoc />
     public partial class AddDeliveryAgentsAndAssignment : Migration
@@ -120,3 +120,4 @@ namespace DarkMarket.Migrations
         }
     }
 }
+

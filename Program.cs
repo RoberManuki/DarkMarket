@@ -1,12 +1,12 @@
-using DarkMarket;
-using DarkMarket.Data;
+﻿using CryptoMarket;
+using CryptoMarket.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
-using DarkMarket.Models;
-using DarkMarket.Services;
-using DarkMarket.Config;
-using DarkMarket.Configuration;
-using DarkMarket.Hubs;
+using CryptoMarket.Models;
+using CryptoMarket.Services;
+using CryptoMarket.Config;
+using CryptoMarket.Configuration;
+using CryptoMarket.Hubs;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
@@ -64,7 +64,7 @@ var defaultConnection = builder.Configuration.GetConnectionString("DefaultConnec
 if (string.IsNullOrWhiteSpace(defaultConnection) || defaultConnection.Contains("__SET_VIA_USER_SECRETS__"))
 {
     throw new InvalidOperationException(
-        "DefaultConnection não configurada. Defina em User Secrets com: dotnet user-secrets set \"ConnectionStrings:DefaultConnection\" \"Host=localhost;Port=5432;Database=darkmarket;Username=freeza;Password=...\" --project .\\DarkMarket.csproj"
+        "DefaultConnection nÃ£o configurada. Defina em User Secrets com: dotnet user-secrets set \"ConnectionStrings:DefaultConnection\" \"Host=localhost;Port=5432;Database=cryptomarket;Username=freeza;Password=...\" --project .\\CryptoMarket.csproj"
     );
 }
 
@@ -115,7 +115,7 @@ app.UseRouting();
 app.Use(async (context, next) =>
 {
     var languagePreference = context.RequestServices.GetRequiredService<LanguagePreferenceService>();
-    context.Request.Cookies.TryGetValue("darkmarket.uiLanguage", out var languageFromCookie);
+    context.Request.Cookies.TryGetValue("cryptomarket.uiLanguage", out var languageFromCookie);
     languagePreference.SetLanguage(languageFromCookie);
     await next();
 });
@@ -138,7 +138,7 @@ app.MapGet("/set-language/{languageCode}", (HttpContext context, string language
         normalized = LanguagePreferenceService.DefaultLanguage;
     }
 
-    context.Response.Cookies.Append("darkmarket.uiLanguage", normalized, new CookieOptions
+    context.Response.Cookies.Append("cryptomarket.uiLanguage", normalized, new CookieOptions
     {
         Path = "/",
         HttpOnly = false,

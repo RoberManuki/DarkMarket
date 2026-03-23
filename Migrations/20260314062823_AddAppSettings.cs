@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace DarkMarket.Migrations
+namespace CryptoMarket.Migrations
 {
     /// <inheritdoc />
     public partial class AddAppSettings : Migration
@@ -31,3 +31,4 @@ namespace DarkMarket.Migrations
         }
     }
 }
+

@@ -1,7 +1,7 @@
-@page "/marketplace/buy/{ProductId:int}"
+﻿@page "/marketplace/buy/{ProductId:int}"
 
-@using DarkMarket.Shared
-@using DarkMarket.Models
+@using CryptoMarket.Shared
+@using CryptoMarket.Models
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.SignalR.Client
 
@@ -106,7 +106,7 @@
                                 {
                                     @foreach (var deliveryAgent in ActiveDeliveryAgents)
                                     {
-                                        <option value="@deliveryAgent.Id">@deliveryAgent.Name (@deliveryAgent.EstimatedBusinessDays dias úteis)</option>
+                                        <option value="@deliveryAgent.Id">@deliveryAgent.Name (@deliveryAgent.EstimatedBusinessDays dias Ãºteis)</option>
                                     }
                                 }
                             </select>
@@ -159,11 +159,18 @@
                         else
                         {
                             <span class="payment-status-wait">@T["PaymentBuy.Waiting"]</span>
-                            <button class="payment-btn" @onclick="CheckPayment" aria-label="@T["PaymentBuy.Check"]">
+                            <button type="button" class="payment-btn" @onclick="OnCheckPaymentClick" aria-label="@T["PaymentBuy.Check"]">
                                 @T["PaymentBuy.Check"]
                             </button>
                         }
                     </div>
+
+                    @if (!string.IsNullOrWhiteSpace(feedbackMessage))
+                    {
+                        <div class="payment-inline-feedback payment-inline-feedback-@feedbackType" role="status" aria-live="polite">
+                            @feedbackMessage
+                        </div>
+                    }
 
                     @if (SelectedMethod == "Testnet" && !string.IsNullOrEmpty(paymentRecord?.PrivateKey))
                     {
@@ -217,6 +224,8 @@
     private bool isLoading = false;
     private decimal? btcUsdRate;
     private decimal? btcBrlRate;
+    private string? feedbackMessage;
+    private string feedbackType = "info";
 
     private PaymentRecord? paymentRecord; // <-- Adicione este campo
 
@@ -305,12 +314,12 @@
         if (Amount < MinBtcAmount)
         {
             await LogService.LogAsync(
-                message: $"Tentativa de pagamento abaixo do mínimo: {Amount} BTC.",
+                message: $"Tentativa de pagamento abaixo do mÃ­nimo: {Amount} BTC.",
                 source: "Payment",
                 level: "Warning",
                 userId: product?.UserId
             );
-            ToastRef?.Show(string.Format(T["PaymentBuy.MinAmountWarning"], FormatBtcWithUsdText(MinBtcAmount)), "warning");
+            NotifyUser(string.Format(T["PaymentBuy.MinAmountWarning"], FormatBtcWithUsdText(MinBtcAmount)), "warning");
             return;
         }
 
@@ -358,24 +367,24 @@
             await Db.SaveChangesAsync();
 
             await LogService.LogAsync(
-                $"Endereço/invoice gerado para produto {ProductId} via {SelectedMethod}.",
+                $"EndereÃ§o/invoice gerado para produto {ProductId} via {SelectedMethod}.",
                 source: "Payment",
                 level: "Info",
                 userId: userId
             );
 
-            ToastRef?.Show(T["PaymentBuy.Generated"], "success");
+            NotifyUser(T["PaymentBuy.Generated"], "success");
         }
         catch (Exception ex)
         {
             await LogService.LogAsync(
-                "Erro ao gerar endereço/invoice.",
+                "Erro ao gerar endereÃ§o/invoice.",
                 source: "Payment",
                 level: "Error",
                 userId: product?.UserId,
                 ex: ex
             );
-            ToastRef?.Show(string.Format(T["PaymentBuy.GenerateError"], ex.Message), "error");
+            NotifyUser(string.Format(T["PaymentBuy.GenerateError"], ex.Message), "error");
         }
         finally
         {
@@ -383,17 +392,32 @@
         }
     }
 
+    private async Task OnCheckPaymentClick()
+    {
+        await CheckPayment();
+    }
+
     private async Task CheckPayment()
     {
-        if (string.IsNullOrEmpty(Address) || IsPaid)
+        if (string.IsNullOrWhiteSpace(Address))
+        {
+            NotifyUser(T["PaymentBuy.NotFoundByAddress"], "error");
             return;
+        }
+
+        if (IsPaid)
+        {
+            NotifyUser(T["PaymentBuy.AlreadyConfirmed"], "success");
+            return;
+        }
 
         try
         {
-            PaymentRecord? payment = Db.Payments.FirstOrDefault(p => p.Address == Address);
+            var normalizedAddress = Address.Trim();
+            PaymentRecord? payment = await Db.Payments.FirstOrDefaultAsync(p => p.Address == normalizedAddress);
             if (payment == null)
             {
-                ToastRef?.Show(T["PaymentBuy.NotFoundByAddress"], "error");
+                NotifyUser(T["PaymentBuy.NotFoundByAddress"], "error");
                 return;
             }
 
@@ -402,18 +426,18 @@
             if (result.AlreadyPaid)
             {
                 IsPaid = true;
-                ToastRef?.Show(T["PaymentBuy.AlreadyConfirmed"], "success");
+                NotifyUser(T["PaymentBuy.AlreadyConfirmed"], "success");
                 return;
             }
 
             if (result.Confirmed)
             {
                 IsPaid = true;
-                ToastRef?.Show(T["PaymentBuy.Confirmed"], "success");
+                NotifyUser(T["PaymentBuy.Confirmed"], "success");
             }
             else
             {
-                ToastRef?.Show(string.Format(T["PaymentBuy.NotReceived"], FormatBtcWithUsdText(result.ReceivedAmount), FormatBtcWithUsdText(Amount)), "warning");
+                NotifyUser(string.Format(T["PaymentBuy.NotReceived"], FormatBtcWithUsdText(result.ReceivedAmount), FormatBtcWithUsdText(Amount)), "warning");
             }
         }
         catch (Exception ex)
@@ -424,8 +448,16 @@
                 level: "Error",
                 ex: ex
             );
-            ToastRef?.Show(T["PaymentBuy.CheckError"], "error");
+            NotifyUser(T["PaymentBuy.CheckError"], "error");
         }
+    }
+
+    private void NotifyUser(string message, string type)
+    {
+        feedbackMessage = message;
+        feedbackType = type;
+        ToastRef?.Show(message, type);
+        _ = InvokeAsync(StateHasChanged);
     }
 
     private string GetBusinessDaysLabel(int days)
@@ -448,3 +480,4 @@
         return BtcUsdFormatter.Format(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
     }
 }
+

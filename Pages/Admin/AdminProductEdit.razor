@@ -1,10 +1,10 @@
-@page "/admin/products/edit/{Id:int}"
+﻿@page "/admin/products/edit/{Id:int}"
 
 @attribute [Authorize(Roles = "admin")]
 
-@using DarkMarket.Models
+@using CryptoMarket.Models
 @using Microsoft.AspNetCore.Authorization
-@using DarkMarket.Shared
+@using CryptoMarket.Shared
 
 @inject ProductService ProductService
 @inject LogService LogService

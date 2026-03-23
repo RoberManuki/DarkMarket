@@ -19,7 +19,7 @@ export default defineConfig({
   webServer: skipWebServer
     ? undefined
     : {
-        command: "dotnet run --project ../DarkMarket.csproj --urls http://127.0.0.1:5000",
+        command: "dotnet run --project ../CryptoMarket.csproj --urls http://127.0.0.1:5000",
         url: baseURL,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,

@@ -1,15 +1,15 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Security.Cryptography;
 using System.Text;
-using DarkMarket.Data;
-using DarkMarket.Enums;
-using DarkMarket.Hubs;
-using DarkMarket.Models;
+using CryptoMarket.Data;
+using CryptoMarket.Enums;
+using CryptoMarket.Hubs;
+using CryptoMarket.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
 
-namespace DarkMarket.Services
+namespace CryptoMarket.Services
 {
     public class BtcPayWebhookService
     {
@@ -66,7 +66,7 @@ namespace DarkMarket.Services
             if (Encoding.UTF8.GetByteCount(body) > maxWebhookBodyBytes)
             {
                 await _log.LogAsync(
-                    $"Payload do webhook excede limite permitido após leitura do corpo. Limite: {maxWebhookBodyBytes} bytes.",
+                    $"Payload do webhook excede limite permitido apÃ³s leitura do corpo. Limite: {maxWebhookBodyBytes} bytes.",
                     source: "Webhook",
                     level: "Warning"
                 );
@@ -90,13 +90,13 @@ namespace DarkMarket.Services
 
             if (payment == null)
             {
-                await _log.LogAsync($"Pagamento não encontrado para invoiceId={invoiceId}", source: "Webhook", level: "Warning");
+                await _log.LogAsync($"Pagamento nÃ£o encontrado para invoiceId={invoiceId}", source: "Webhook", level: "Warning");
                 return Results.Ok();
             }
 
             if (payment.IsPaid)
             {
-                await _log.LogAsync($"Pagamento já está marcado como pago para invoiceId={invoiceId}", source: "Webhook", level: "Info");
+                await _log.LogAsync($"Pagamento jÃ¡ estÃ¡ marcado como pago para invoiceId={invoiceId}", source: "Webhook", level: "Info");
                 await EnsureOrderAsync(payment, invoiceId);
                 return Results.Ok();
             }
@@ -165,8 +165,8 @@ namespace DarkMarket.Services
             }
             catch (JsonException ex)
             {
-                logMessage = $"Payload JSON inválido no webhook: {ex.Message}";
-                responseMessage = "Payload inválido.";
+                logMessage = $"Payload JSON invÃ¡lido no webhook: {ex.Message}";
+                responseMessage = "Payload invÃ¡lido.";
                 return false;
             }
 
@@ -175,15 +175,15 @@ namespace DarkMarket.Services
                 if (!doc.RootElement.TryGetProperty("invoiceId", out var invoiceIdProp) ||
                     !doc.RootElement.TryGetProperty("type", out var typeProp))
                 {
-                    logMessage = "Payload do webhook sem campos obrigatórios (invoiceId/type).";
-                    responseMessage = "Campos obrigatórios ausentes.";
+                    logMessage = "Payload do webhook sem campos obrigatÃ³rios (invoiceId/type).";
+                    responseMessage = "Campos obrigatÃ³rios ausentes.";
                     return false;
                 }
 
                 if (invoiceIdProp.ValueKind != JsonValueKind.String || typeProp.ValueKind != JsonValueKind.String)
                 {
-                    logMessage = "Payload do webhook com tipos inválidos para invoiceId/type.";
-                    responseMessage = "Tipos de campos inválidos.";
+                    logMessage = "Payload do webhook com tipos invÃ¡lidos para invoiceId/type.";
+                    responseMessage = "Tipos de campos invÃ¡lidos.";
                     return false;
                 }
 
@@ -193,7 +193,7 @@ namespace DarkMarket.Services
                 if (string.IsNullOrWhiteSpace(invoiceId) || string.IsNullOrWhiteSpace(status))
                 {
                     logMessage = "Payload do webhook com invoiceId/type vazios.";
-                    responseMessage = "Campos obrigatórios inválidos.";
+                    responseMessage = "Campos obrigatÃ³rios invÃ¡lidos.";
                     return false;
                 }
             }

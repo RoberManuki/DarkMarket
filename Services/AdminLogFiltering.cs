@@ -1,6 +1,6 @@
-using DarkMarket.Models;
+﻿using CryptoMarket.Models;
 
-namespace DarkMarket.Services;
+namespace CryptoMarket.Services;
 
 public sealed class AdminLogFilterCriteria
 {
@@ -62,3 +62,4 @@ public static class AdminLogFiltering
         return query;
     }
 }
+

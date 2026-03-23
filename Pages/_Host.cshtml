@@ -1,6 +1,6 @@
-@page "/"
+﻿@page "/"
 
-@namespace DarkMarket.Pages
+@namespace CryptoMarket.Pages
 
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment HostEnvironment
@@ -13,10 +13,10 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>DarkMarket</title>
+    <title>CryptoMarket</title>
     <base href="~/" />
     <link rel="stylesheet" href="/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="/DarkMarket.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="/CryptoMarket.styles.css" asp-append-version="true" />
     <link rel="icon" href="favicon.ico" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
@@ -26,13 +26,13 @@
     </app>
     <script src="/js/ui-preferences.js"></script>
     <script>
-        window.darkMarketIsDevelopment = @(HostEnvironment.IsDevelopment() ? "true" : "false");
+        window.cryptoMarketIsDevelopment = @(HostEnvironment.IsDevelopment() ? "true" : "false");
     </script>
     <script>
-        window.darkMarketCookieConsent = window.darkMarketCookieConsent || {
-            _storageKey: "darkmarket.cookieConsent.v1",
-            _consentCookie: "darkmarket.cookieConsent",
-            _analyticsCookie: "darkmarket.cookieAnalytics",
+        window.cryptoMarketCookieConsent = window.cryptoMarketCookieConsent || {
+            _storageKey: "cryptomarket.cookieConsent.v1",
+            _consentCookie: "cryptomarket.cookieConsent",
+            _analyticsCookie: "cryptomarket.cookieAnalytics",
             _readCookie: function (name) {
                 var escaped = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
                 var match = document.cookie.match(new RegExp("(?:^|; )" + escaped + "=([^;]*)"));

@@ -1,8 +1,8 @@
-using DarkMarket.Data;
-using DarkMarket.Enums;
+﻿using CryptoMarket.Data;
+using CryptoMarket.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace DarkMarket.Services;
+namespace CryptoMarket.Services;
 
 public sealed record AdminOrderReleaseResult(bool Succeeded, string Reason);
 
@@ -39,7 +39,7 @@ public class AdminOrderReleaseService
         if (order.Status != PaymentStatus.AguardandoRevisaoAdm)
         {
             await _logService.LogAsync(
-                $"Tentativa de repasse recusada por status inválido (OrderId: {orderId}, StatusAtual: {order.Status}).",
+                $"Tentativa de repasse recusada por status invÃ¡lido (OrderId: {orderId}, StatusAtual: {order.Status}).",
                 source: AdminAuditSources.OrdersReview,
                 level: AdminAuditLevels.Refused,
                 userId: adminUserId);
@@ -63,3 +63,4 @@ public class AdminOrderReleaseService
         return new AdminOrderReleaseResult(true, "Released");
     }
 }
+

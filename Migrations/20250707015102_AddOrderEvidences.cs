@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DarkMarket.Migrations
+namespace CryptoMarket.Migrations
 {
     /// <inheritdoc />
     public partial class AddOrderEvidences : Migration
@@ -77,3 +77,4 @@ namespace DarkMarket.Migrations
         }
     }
 }
+

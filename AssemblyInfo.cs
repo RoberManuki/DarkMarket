@@ -1,3 +1,4 @@
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("DarkMarket.Tests")]
+[assembly: InternalsVisibleTo("CryptoMarket.Tests")]
+

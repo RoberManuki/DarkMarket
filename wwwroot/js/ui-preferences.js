@@ -1,4 +1,4 @@
-window.darkMarketSetCookie = (name, value, days) => {
+﻿window.cryptoMarketSetCookie = (name, value, days) => {
     const maxAgeDays = Number.isFinite(days) ? days : 365;
     const safeName = encodeURIComponent(name);
     const safeValue = encodeURIComponent(value ?? "");
@@ -6,7 +6,7 @@ window.darkMarketSetCookie = (name, value, days) => {
     document.cookie = `${safeName}=${safeValue}; path=/; max-age=${maxAge}; samesite=lax`;
 };
 
-window.darkMarketGetCookie = (name) => {
+window.cryptoMarketGetCookie = (name) => {
     const safeName = encodeURIComponent(name) + "=";
     const parts = (document.cookie || "").split(";");
     for (const rawPart of parts) {
@@ -22,3 +22,4 @@ window.darkMarketGetCookie = (name) => {
     }
     return null;
 };
+

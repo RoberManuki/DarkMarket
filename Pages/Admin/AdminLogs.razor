@@ -1,10 +1,10 @@
-@page "/admin/logs"
+﻿@page "/admin/logs"
 @implements IDisposable
 
 @attribute [Authorize(Roles = "admin")]
 
-@using DarkMarket.Models
-@using DarkMarket.Services
+@using CryptoMarket.Models
+@using CryptoMarket.Services
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.JSInterop
@@ -57,7 +57,7 @@
             {
                 <div class="orders-review-restored-notice" role="status">
                     <span>@exportNotice</span>
-                    <button type="button" class="orders-review-restored-close" @onclick="DismissExportNotice" aria-label="@T["AdminCommon.CloseNotice"]">×</button>
+                    <button type="button" class="orders-review-restored-close" @onclick="DismissExportNotice" aria-label="@T["AdminCommon.CloseNotice"]">Ã—</button>
                 </div>
             }
 
@@ -94,7 +94,7 @@
             {
                 <div class="orders-review-restored-notice">
                     <span>@T["AdminLogs.RestoredFilters"]</span>
-                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">×</button>
+                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">Ã—</button>
                 </div>
             }
 
@@ -440,10 +440,10 @@
     {
         if (currentSortColumn != column)
         {
-            return "↕";
+            return "â†•";
         }
 
-        return sortAscending ? "↑" : "↓";
+        return sortAscending ? "â†‘" : "â†“";
     }
 
     private string QuickRangeButtonClass(AdminLogsQuickRangePreset preset)
@@ -528,7 +528,7 @@
 
         var csv = AdminLogsExportService.BuildCsv(export.Rows);
         var fileName = AdminLogsExportService.BuildExportFileName("csv", filterLevel, filterSource, filterStartDate, filterEndDate, export.Truncated);
-        await JS.InvokeVoidAsync("darkMarketDownloadFile", fileName, csv, "text/csv;charset=utf-8;");
+        await JS.InvokeVoidAsync("cryptoMarketDownloadFile", fileName, csv, "text/csv;charset=utf-8;");
 
         exportNotice = export.Truncated
             ? string.Format(T["AdminLogs.ExportTruncated"], ExportMaxRows)
@@ -551,7 +551,7 @@
 
         var json = AdminLogsExportService.BuildJson(export.Rows);
         var fileName = AdminLogsExportService.BuildExportFileName("json", filterLevel, filterSource, filterStartDate, filterEndDate, export.Truncated);
-        await JS.InvokeVoidAsync("darkMarketDownloadFile", fileName, json, "application/json;charset=utf-8;");
+        await JS.InvokeVoidAsync("cryptoMarketDownloadFile", fileName, json, "application/json;charset=utf-8;");
 
         exportNotice = export.Truncated
             ? string.Format(T["AdminLogs.ExportTruncated"], ExportMaxRows)
@@ -679,4 +679,5 @@
     }
 
 }
+
 

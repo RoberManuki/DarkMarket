@@ -1,7 +1,7 @@
-window.darkMarketCookieConsent = (() => {
-    const storageKey = "darkmarket.cookieConsent.v1";
-    const consentCookie = "darkmarket.cookieConsent";
-    const analyticsCookie = "darkmarket.cookieAnalytics";
+﻿window.cryptoMarketCookieConsent = (() => {
+    const storageKey = "cryptomarket.cookieConsent.v1";
+    const consentCookie = "cryptomarket.cookieConsent";
+    const analyticsCookie = "cryptomarket.cookieAnalytics";
 
     const bannerId = "cookie-consent-banner";
     const modalId = "cookie-consent-modal";
@@ -39,9 +39,9 @@ window.darkMarketCookieConsent = (() => {
         }
 
         try {
-            if (typeof window.darkMarketSetCookie === "function") {
-                window.darkMarketSetCookie(consentCookie, analytics ? "all" : "essential", 365);
-                window.darkMarketSetCookie(analyticsCookie, analytics ? "1" : "0", 365);
+            if (typeof window.cryptoMarketSetCookie === "function") {
+                window.cryptoMarketSetCookie(consentCookie, analytics ? "all" : "essential", 365);
+                window.cryptoMarketSetCookie(analyticsCookie, analytics ? "1" : "0", 365);
             }
         } catch {
             // Ignore cookie failures.
@@ -60,8 +60,8 @@ window.darkMarketCookieConsent = (() => {
         }
 
         try {
-            if (typeof window.darkMarketGetCookie === "function") {
-                const cookie = window.darkMarketGetCookie(consentCookie);
+            if (typeof window.cryptoMarketGetCookie === "function") {
+                const cookie = window.cryptoMarketGetCookie(consentCookie);
                 if (cookie === "all") {
                     return true;
                 }
@@ -78,7 +78,7 @@ window.darkMarketCookieConsent = (() => {
     }
 
     function resetConsentForDevelopment() {
-        const envFlag = window.darkMarketIsDevelopment;
+        const envFlag = window.cryptoMarketIsDevelopment;
         const isDevFlag = envFlag === true || envFlag === "true";
         const isLocalHost = window.location && (
             window.location.hostname === "localhost" ||
@@ -181,3 +181,4 @@ window.darkMarketCookieConsent = (() => {
 
     return api;
 })();
+

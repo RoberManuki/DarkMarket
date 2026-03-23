@@ -1,10 +1,10 @@
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 using System.Net.Http.Headers;
-using DarkMarket.Data;
-using DarkMarket.Models;
+using CryptoMarket.Data;
+using CryptoMarket.Models;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DarkMarket.Services
+namespace CryptoMarket.Services
 {
     public class BitcoinQuoteService
     {
@@ -16,7 +16,7 @@ namespace DarkMarket.Services
         public BitcoinQuoteService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IServiceScopeFactory? scopeFactory = null)
         {
             _http = httpClientFactory.CreateClient();
-            _http.DefaultRequestHeaders.UserAgent.ParseAdd("DarkMarket/1.0 (+https://localhost)");
+            _http.DefaultRequestHeaders.UserAgent.ParseAdd("CryptoMarket/1.0 (+https://localhost)");
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -36,8 +36,6 @@ namespace DarkMarket.Services
 
             try
             {
-                await TrackQuoteQueryAsync("CoinGecko", "BTC");
-
                 var url = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=brl,usd";
 
                 CoinGeckoResponse? result;
@@ -65,7 +63,7 @@ namespace DarkMarket.Services
             }
             catch
             {
-                return _cachedQuote; // Retorna último valor em caso de erro
+                return _cachedQuote; // Retorna Ãºltimo valor em caso de erro
             }
         }
 

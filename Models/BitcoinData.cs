@@ -1,4 +1,4 @@
-namespace DarkMarket.Models
+﻿namespace CryptoMarket.Models
 {
     public class BitcoinData
     {

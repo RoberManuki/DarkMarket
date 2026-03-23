@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace DarkMarket.Migrations
+namespace CryptoMarket.Migrations
 {
     /// <inheritdoc />
     public partial class AddOrderIdToPayments : Migration
@@ -66,3 +66,4 @@ namespace DarkMarket.Migrations
         }
     }
 }
+

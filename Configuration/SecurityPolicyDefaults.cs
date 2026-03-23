@@ -1,4 +1,4 @@
-namespace DarkMarket.Configuration;
+﻿namespace CryptoMarket.Configuration;
 
 public sealed record SecurityPolicySnapshot(
     bool RequireConfirmedEmail,
@@ -44,3 +44,4 @@ public static class SecurityPolicyDefaults
             SessionTimeoutMinutes: 30);
     }
 }
+

@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace DarkMarket.Models
+namespace CryptoMarket.Models
 {
     public class PaymentRecord
     {

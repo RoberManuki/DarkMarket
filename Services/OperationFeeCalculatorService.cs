@@ -1,4 +1,4 @@
-namespace DarkMarket.Services;
+﻿namespace CryptoMarket.Services;
 
 public class OperationFeeCalculatorService
 {
@@ -20,3 +20,4 @@ public class OperationFeeCalculatorService
 }
 
 public sealed record OperationFeeBreakdown(decimal Percent, decimal FeeAmount, decimal NetAmount);
+

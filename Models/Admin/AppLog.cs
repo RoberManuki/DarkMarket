@@ -1,6 +1,6 @@
-using System;
+﻿using System;
 
-namespace DarkMarket.Models
+namespace CryptoMarket.Models
 {
     public class AppLog
     {

@@ -1,11 +1,11 @@
-@page "/admin/users"
+﻿@page "/admin/users"
 
 @attribute [Authorize(Roles = "admin")]
 
-@using DarkMarket.Shared
+@using CryptoMarket.Shared
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
-@using DarkMarket.Models
+@using CryptoMarket.Models
 @using Microsoft.JSInterop
 
 @inject LogService LogService
@@ -38,7 +38,7 @@
             {
                 <div class="orders-review-restored-notice">
                     <span>@T["AdminUsers.RestoredFilters"]</span>
-                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">×</button>
+                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">Ã—</button>
                 </div>
             }
 
@@ -74,17 +74,27 @@
                                 }
                             </td>
                             <td data-label="@T["Common.Actions"]">
-                                <button class="details-btn action-btn" @onclick="() => ViewUser(u.Id)">@T["Common.Details"]</button>
-                                <button class="edit-btn action-btn" @onclick="() => EditUser(u.Id)">@T["Products.Edit"]</button>
+                                <button class="details-btn action-btn icon-only" @onclick="() => ViewUser(u.Id)" title="@T["Common.Details"]" aria-label="@T["Common.Details"]">
+                                    <i class="fa fa-eye"></i>
+                                </button>
+                                <button class="edit-btn action-btn icon-only" @onclick="() => EditUser(u.Id)" title="@T["Products.Edit"]" aria-label="@T["Products.Edit"]">
+                                    <i class="fa fa-pencil-alt"></i>
+                                </button>
                                 @if (u.LockoutEnd != null && u.LockoutEnd > DateTimeOffset.Now)
                                 {
-                                    <button class="success-btn action-btn" @onclick="() => UnlockUser(u.Id)">@T["AdminUsers.Unlock"]</button>
+                                    <button class="success-btn action-btn icon-only" @onclick="() => UnlockUser(u.Id)" title="@T["AdminUsers.Unlock"]" aria-label="@T["AdminUsers.Unlock"]">
+                                        <i class="fa fa-unlock"></i>
+                                    </button>
                                 }
                                 else
                                 {
-                                    <button class="warning-btn action-btn" @onclick="() => LockUser(u.Id)">@T["AdminUsers.Lock"]</button>
+                                    <button class="warning-btn action-btn icon-only" @onclick="() => LockUser(u.Id)" title="@T["AdminUsers.Lock"]" aria-label="@T["AdminUsers.Lock"]">
+                                        <i class="fa fa-lock"></i>
+                                    </button>
                                 }
-                                <button class="danger" @onclick="() => DeleteUser(u.Id)">@T["Products.Remove"]</button>
+                                <button class="danger action-btn icon-only" @onclick="() => DeleteUser(u.Id)" title="@T["Products.Remove"]" aria-label="@T["Products.Remove"]">
+                                    <i class="fa fa-trash"></i>
+                                </button>
                             </td>
                         </tr>
                     }

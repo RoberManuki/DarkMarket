@@ -1,8 +1,8 @@
-using DarkMarket.Models;
+﻿using CryptoMarket.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace DarkMarket.Data
+namespace CryptoMarket.Data
 {
     public class AppDbContext : IdentityDbContext<ApplicationUser>
     {

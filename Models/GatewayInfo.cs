@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace DarkMarket.Models
+namespace CryptoMarket.Models
 {
     public class GatewayInfo
     {

@@ -1,8 +1,8 @@
-using DarkMarket.Data;
-using DarkMarket.Enums;
+﻿using CryptoMarket.Data;
+using CryptoMarket.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace DarkMarket.Services;
+namespace CryptoMarket.Services;
 
 public class DashboardMetricsSnapshot
 {

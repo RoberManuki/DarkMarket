@@ -1,6 +1,6 @@
-@page
-@model DarkMarket.Areas.Identity.Pages.Account.RegisterConfirmationModel
-@inject DarkMarket.Services.UiTextService T
+﻿@page
+@model CryptoMarket.Areas.Identity.Pages.Account.RegisterConfirmationModel
+@inject CryptoMarket.Services.UiTextService T
 @{
     ViewData["Title"] = T["Identity.RegisterConfirmation.Title"];
 }
@@ -14,3 +14,4 @@
     <a asp-page="./Login">@T["Identity.Common.GoToLogin"]</a>
     <a asp-page="./ResendEmailConfirmation">@T["Identity.Resend.Title"]</a>
 </div>
+

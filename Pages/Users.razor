@@ -1,8 +1,8 @@
-@* @page "/users"
+﻿@* @page "/users"
 
-@inject DarkMarket.Services.UserService UserService
+@inject CryptoMarket.Services.UserService UserService
 
-<h3>Usuários</h3>
+<h3>UsuÃ¡rios</h3>
 
 <EditForm Model="@newUser" OnValidSubmit="AddUser">
     <InputText @bind-value="newUser.Username" placeholder="Username" />

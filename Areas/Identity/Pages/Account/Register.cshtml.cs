@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -7,10 +7,10 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using DarkMarket.Models;
-using DarkMarket.Services;
+using CryptoMarket.Models;
+using CryptoMarket.Services;
 
-namespace DarkMarket.Areas.Identity.Pages.Account
+namespace CryptoMarket.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
     {

@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace DarkMarket.Areas.Identity.Pages.Account
+namespace CryptoMarket.Areas.Identity.Pages.Account
 {
     public class RegisterConfirmationModel : PageModel
     {
@@ -19,3 +19,4 @@ namespace DarkMarket.Areas.Identity.Pages.Account
         }
     }
 }
+

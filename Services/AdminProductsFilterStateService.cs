@@ -1,6 +1,6 @@
-using Microsoft.JSInterop;
+﻿using Microsoft.JSInterop;
 
-namespace DarkMarket.Services;
+namespace CryptoMarket.Services;
 
 public sealed class AdminProductsFilterState
 {

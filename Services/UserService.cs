@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Identity;
-using DarkMarket.Models;
+﻿using Microsoft.AspNetCore.Identity;
+using CryptoMarket.Models;
 
-namespace DarkMarket.Services
+namespace CryptoMarket.Services
 {
     public class UserService
     {

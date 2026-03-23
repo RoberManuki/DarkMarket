@@ -1068,6 +1068,30 @@ body {
     margin-right: 0.3rem;
 }
 
+.action-btn.icon-only {
+    width: 2.2rem;
+    height: 2.2rem;
+    padding: 0;
+    justify-content: center;
+    margin-right: 0.25rem;
+}
+
+.action-btn.icon-only i {
+    font-size: 0.96rem;
+}
+
+.admin-page .action-btn.icon-only {
+    width: 2.2rem;
+    height: 2.2rem;
+    padding: 0;
+    justify-content: center;
+    margin-right: 0.25rem;
+}
+
+.admin-page .action-btn.icon-only i {
+    font-size: 0.96rem;
+}
+
 .warning-btn {
     background: #757575;
     color: #fff;
@@ -1173,11 +1197,29 @@ body {
 .admin-page .admin-nav a {
     background: #23272b;
     color: #f9a825;
+    border: 1px solid rgba(249, 168, 37, 0.38);
     padding: 0.6rem 1.2rem;
     border-radius: 6px;
     text-decoration: none;
     font-weight: 500;
     transition: background 0.2s, color 0.2s;
+}
+
+.admin-page button.details-btn,
+.admin-page button.back-btn,
+.admin-page button.edit-btn,
+.admin-page button.warning-btn,
+.admin-page button.success-btn,
+.admin-page button.cancel-btn,
+.admin-page button.save-btn,
+.admin-page a.details-btn,
+.admin-page a.back-btn,
+.admin-page a.edit-btn,
+.admin-page a.warning-btn,
+.admin-page a.success-btn,
+.admin-page a.cancel-btn,
+.admin-page a.save-btn {
+    border: 1px solid rgba(249, 168, 37, 0.42);
 }
 
 .admin-page .admin-nav a:hover {
@@ -1243,6 +1285,48 @@ body {
     display: block;
 }
 
+.admin-page .security-header h3 {
+    margin: 0;
+    color: #f3f7fb;
+    letter-spacing: 0.2px;
+}
+
+.admin-page .security-header p {
+    margin: 0.35rem 0 0;
+    color: #aeb8c2;
+    font-size: 0.92rem;
+}
+
+.admin-page .security-panels {
+    margin-top: 0.9rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+}
+
+.admin-page .security-panel {
+    border: 1px solid #343f4b;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #252a31 0%, #1f252c 100%);
+    padding: 0.85rem 0.95rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+}
+
+.admin-page .security-panel h4 {
+    margin: 0;
+    font-size: 0.96rem;
+    color: #f9a825;
+    font-weight: 700;
+}
+
+.admin-page .security-baseline-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+}
+
 .admin-page .security-baseline-row {
     display: flex;
     justify-content: space-between;
@@ -1253,7 +1337,44 @@ body {
 }
 
 .admin-page .security-value {
+    color: #f3f7fb;
+    font-weight: 600;
+    font-size: 0.9rem;
     text-align: right;
+}
+
+.admin-page .security-baseline-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.admin-page .security-env-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    background: #1d3347;
+    border: 1px solid #365876;
+    font-size: 0.82rem;
+}
+
+.admin-page .security-baseline-group {
+    border-top: 1px solid #313942;
+    padding-top: 0.65rem;
+}
+
+.admin-page .security-baseline-group h5 {
+    margin: 0 0 0.55rem;
+    color: #d8e3ee;
+    font-size: 0.86rem;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
+}
+
+.admin-page .security-label {
+    color: #a7b2be;
+    font-size: 0.9rem;
 }
 
 .admin-page .security-boolean-badge {
@@ -1277,6 +1398,63 @@ body {
     color: #ffc3b8;
     background: #3b1f1f;
     border-color: #694040;
+}
+
+.admin-page .security-runtime-panel .details-btn {
+    width: fit-content;
+}
+
+.admin-page .security-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: #f3f7fb;
+    font-weight: 600;
+}
+
+.admin-page .security-toggle input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #f9a825;
+}
+
+.admin-page .security-input-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+}
+
+.admin-page .security-input-grid label {
+    color: #d6dde5;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+@media (max-width: 560px) {
+    .admin-page .security-panels {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-page .security-baseline-grid {
+        grid-template-columns: 1fr;
+        gap: 0.2rem;
+    }
+
+    .admin-page .security-baseline-row {
+        flex-direction: column;
+        align-items: flex-start;
+        border-bottom: 0;
+        padding-bottom: 0.2rem;
+    }
+
+    .admin-page .security-value {
+        text-align: left;
+    }
+
+    .admin-page .security-input-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .dashboard-container,
@@ -1587,6 +1765,16 @@ body {
 
 .products-page .primary-btn:hover {
     background: #c17900;
+}
+
+.products-page .product-thumbnail {
+    width: 160px;
+    height: 160px;
+    object-fit: cover;
+    object-position: center;
+    border-radius: 8px;
+    display: block;
+    background: #181818;
 }
 
 .marketplace-page .product-list {
@@ -2066,6 +2254,67 @@ body {
 
 .delivery-agent-form-row {
     margin-bottom: 0;
+}
+
+.delivery-agent-filter-actions {
+    margin-left: auto;
+}
+
+.delivery-agent-filter-actions .success-btn {
+    margin-right: 0;
+}
+
+.delivery-agent-modal {
+    width: min(640px, 96vw);
+    min-width: min(640px, 96vw);
+    max-width: min(640px, 96vw);
+}
+
+.delivery-agent-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.delivery-agent-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.delivery-agent-field label {
+    color: #d6dde5;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.delivery-agent-field input {
+    padding: 0.55rem 0.65rem;
+    border-radius: 6px;
+    border: 1px solid #314454;
+    background: #1a1f25;
+    color: #f0f0f0;
+    box-shadow: inset 0 1px 2px #0005;
+}
+
+.delivery-agent-status-field {
+    grid-column: 1 / -1;
+}
+
+.delivery-agent-status-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+@media (max-width: 700px) {
+    .delivery-agent-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .delivery-agent-filter-actions {
+        margin-left: 0;
+    }
 }
 
 .filter-marketplace {
@@ -3123,6 +3372,63 @@ input:checked + .slider:before {
     gap: 0.6rem;
 }
 
+.payment-ops-card-action {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.payment-ops-card-action .payment-op-block {
+    align-items: center;
+    width: 100%;
+}
+
+.payment-ops-card-action .payment-address-box {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.payment-ops-card-action .payment-op-actions {
+    justify-content: center;
+    width: 100%;
+}
+
+.payment-inline-feedback {
+    margin-top: 0.75rem;
+    width: 100%;
+    border-radius: 8px;
+    padding: 0.65rem 0.8rem;
+    font-size: 0.92rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.payment-inline-feedback-success {
+    color: #d7ffe2;
+    background: #205b30;
+    border: 1px solid #2f8f48;
+}
+
+.payment-inline-feedback-error {
+    color: #ffd6d6;
+    background: #6f1f1f;
+    border: 1px solid #a33a3a;
+}
+
+.payment-inline-feedback-warning {
+    color: #ffeab8;
+    background: #654a14;
+    border: 1px solid #9c7a2b;
+}
+
+.payment-inline-feedback-info {
+    color: #d6ecff;
+    background: #1d4668;
+    border: 1px solid #2f6f9e;
+}
+
 .payment-qrcode-block {
     display: flex;
     justify-content: center;
@@ -3515,6 +3821,30 @@ input:checked + .slider:before {
 
 .payment-container .payment-btn.payment-btn-generate {
     margin-top: 0.25rem;
+}
+
+.payment-container .payment-amount-block,
+.payment-container .payment-status-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.28rem;
+    width: 100%;
+}
+
+.payment-container .payment-amount-block .label,
+.payment-container .payment-amount-block .system-value,
+.payment-container .payment-status-block .label,
+.payment-container .payment-status-block .payment-status-ok,
+.payment-container .payment-status-block .payment-status-wait {
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+.payment-container .payment-status-block .payment-btn {
+    margin-top: 0.18rem;
 }
 
 .payment-container .generate-invoice-block {

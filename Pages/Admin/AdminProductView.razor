@@ -1,8 +1,8 @@
-@page "/admin/products/view/{Id:int}"
+﻿@page "/admin/products/view/{Id:int}"
 
 @attribute [Authorize(Roles = "admin")]
 
-@using DarkMarket.Models
+@using CryptoMarket.Models
 @using Microsoft.AspNetCore.Authorization
 
 @inject ProductService ProductService

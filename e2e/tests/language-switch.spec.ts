@@ -4,7 +4,7 @@ test.describe("Language switch", () => {
   test("switch to English via flag and persist on protected route", async ({ page }) => {
     await page.context().clearCookies();
     await page.addInitScript(() => {
-      localStorage.removeItem("darkmarket.uiLanguage");
+      localStorage.removeItem("cryptomarket.uiLanguage");
     });
     await page.goto("/");
 
@@ -21,7 +21,7 @@ test.describe("Language switch", () => {
   test("switch to Spanish via flag and persist on protected route", async ({ page }) => {
     await page.context().clearCookies();
     await page.addInitScript(() => {
-      localStorage.removeItem("darkmarket.uiLanguage");
+      localStorage.removeItem("cryptomarket.uiLanguage");
     });
     await page.goto("/");
 
@@ -38,7 +38,7 @@ test.describe("Language switch", () => {
   test("switch to English persists after full refresh", async ({ page }) => {
     await page.context().clearCookies();
     await page.addInitScript(() => {
-      localStorage.removeItem("darkmarket.uiLanguage");
+      localStorage.removeItem("cryptomarket.uiLanguage");
     });
     await page.goto("/");
 

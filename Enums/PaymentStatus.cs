@@ -1,4 +1,4 @@
-namespace DarkMarket.Enums
+﻿namespace CryptoMarket.Enums
 {
     public enum PaymentStatus
     {
@@ -16,4 +16,5 @@ namespace DarkMarket.Enums
         Falha = 10,
     }
 }
+
 

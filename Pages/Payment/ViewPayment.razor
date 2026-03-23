@@ -1,9 +1,9 @@
-@page "/payments/view/{PaymentId:int}"
+﻿@page "/payments/view/{PaymentId:int}"
 
 @attribute [Authorize]
 
-@using DarkMarket.Shared
-@using DarkMarket.Models
+@using CryptoMarket.Shared
+@using CryptoMarket.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.SignalR.Client
@@ -69,9 +69,16 @@
                             <div class="payment-op-actions">
                                 @if (!payment.IsPaid)
                                 {
-                                    <button class="payment-btn" @onclick="CheckPayment">@T["PaymentBuy.Check"]</button>
+                                    <button type="button" class="payment-btn" @onclick="OnCheckPaymentClick">@T["PaymentBuy.Check"]</button>
                                 }
                             </div>
+
+                            @if (!string.IsNullOrWhiteSpace(feedbackMessage))
+                            {
+                                <div class="payment-inline-feedback payment-inline-feedback-@feedbackType" role="status" aria-live="polite">
+                                    @feedbackMessage
+                                </div>
+                            }
                         </div>
 
                         <div class="payment-ops-card payment-ops-card-meta">
@@ -138,6 +145,8 @@
     public string SelectedMethod { get; set; } = "";
     private decimal? btcUsdRate;
     private decimal? btcBrlRate;
+    private string? feedbackMessage;
+    private string feedbackType = "info";
 
     public string QRCodeValue =>
         payment != null && payment.Address != null && payment.Address.StartsWith("lnbc")
@@ -179,9 +188,24 @@
             await hubConnection.DisposeAsync();
     }
 
+    private async Task OnCheckPaymentClick()
+    {
+        await CheckPayment();
+    }
+
     private async Task CheckPayment()
     {
-        if (payment == null || payment.IsPaid) return;
+        if (payment == null)
+        {
+            NotifyUser(T["PaymentView.NotFound"], "error");
+            return;
+        }
+
+        if (payment.IsPaid)
+        {
+            NotifyUser(T["PaymentBuy.AlreadyConfirmed"], "success");
+            return;
+        }
 
         try
         {
@@ -190,7 +214,7 @@
             if (result.AlreadyPaid)
             {
                 payment.IsPaid = true;
-                ToastRef?.Show(T["PaymentBuy.AlreadyConfirmed"], "success");
+                NotifyUser(T["PaymentBuy.AlreadyConfirmed"], "success");
                 return;
             }
 
@@ -198,17 +222,25 @@
             {
                 payment.IsPaid = true;
                 payment.PaidAt = DateTime.UtcNow;
-                ToastRef?.Show(T["PaymentBuy.Confirmed"], "success");
+                NotifyUser(T["PaymentBuy.Confirmed"], "success");
             }
             else
             {
-                ToastRef?.Show(string.Format(T["PaymentBuy.NotReceived"], FormatBtcWithUsdText(result.ReceivedAmount), FormatBtcWithUsdText(payment.Amount)), "warning");
+                NotifyUser(string.Format(T["PaymentBuy.NotReceived"], FormatBtcWithUsdText(result.ReceivedAmount), FormatBtcWithUsdText(payment.Amount)), "warning");
             }
         }
         catch
         {
-            ToastRef?.Show(T["PaymentBuy.CheckError"], "error");
+            NotifyUser(T["PaymentBuy.CheckError"], "error");
         }
+    }
+
+    private void NotifyUser(string message, string type)
+    {
+        feedbackMessage = message;
+        feedbackType = type;
+        ToastRef?.Show(message, type);
+        _ = InvokeAsync(StateHasChanged);
     }
 
     private MarkupString FormatBtcWithUsdMarkup(decimal amount)

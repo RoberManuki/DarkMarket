@@ -1,4 +1,4 @@
-namespace DarkMarket.Models
+﻿namespace CryptoMarket.Models
 {
     public class CryptoQuote
     {
@@ -8,3 +8,4 @@ namespace DarkMarket.Models
         public string Name { get; set; } = string.Empty;
     }
 }
+

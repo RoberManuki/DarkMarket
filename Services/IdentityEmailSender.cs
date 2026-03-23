@@ -1,11 +1,11 @@
-using DarkMarket.Configuration;
+﻿using CryptoMarket.Configuration;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
 using System.Text;
 
-namespace DarkMarket.Services
+namespace CryptoMarket.Services
 {
     public class IdentityEmailSender : IEmailSender
     {
@@ -104,3 +104,4 @@ namespace DarkMarket.Services
         }
     }
 }
+

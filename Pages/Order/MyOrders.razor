@@ -1,12 +1,12 @@
-@page "/orders"
+﻿@page "/orders"
 
 @attribute [Authorize]
 
-@using DarkMarket.Models
+@using CryptoMarket.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
-@using DarkMarket.Shared.Helpers
+@using CryptoMarket.Shared.Helpers
 
 @inject AppDbContext Db
 @inject UserManager<ApplicationUser> UserManager
@@ -81,13 +81,15 @@
                     <td>@FormatBtcWithUsd(t.Amount)</td>
                     <td>
                         <span class="order-status-badge @t.Status.ToString().ToLower()">
-                            @OrderStatusHelper.GetStatusText(t.Status)
+                            @OrderStatusHelper.GetStatusText(t.Status, T)
                         </span>
                     </td>
                     <td>@t.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
                     <td>@otherParty</td>
                     <td>
-                        <button class="details-btn action-btn" @onclick="() => GoToDetails(t.Id)">@T["Common.Details"]</button>
+                        <button class="details-btn action-btn icon-only" @onclick="() => GoToDetails(t.Id)" title="@T["Common.Details"]" aria-label="@T["Common.Details"]">
+                            <i class="fa fa-eye"></i>
+                        </button>
                     </td>
                 </tr>
             }

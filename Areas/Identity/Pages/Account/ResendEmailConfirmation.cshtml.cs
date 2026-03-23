@@ -1,15 +1,15 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
-using DarkMarket.Models;
+using CryptoMarket.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using DarkMarket.Services;
+using CryptoMarket.Services;
 
-namespace DarkMarket.Areas.Identity.Pages.Account
+namespace CryptoMarket.Areas.Identity.Pages.Account
 {
     public class ResendEmailConfirmationModel : PageModel
     {
@@ -78,3 +78,4 @@ namespace DarkMarket.Areas.Identity.Pages.Account
         }
     }
 }
+

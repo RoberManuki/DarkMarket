@@ -1,12 +1,12 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using DarkMarket.Data;
-using DarkMarket.Models;
+using CryptoMarket.Data;
+using CryptoMarket.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DarkMarket.Services
+namespace CryptoMarket.Services
 {
     public class GatewayService : ControllerBase
     {

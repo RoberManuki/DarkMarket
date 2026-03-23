@@ -1,8 +1,8 @@
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using System.Text.Json;
 using System.Text;
 
-namespace DarkMarket.Services
+namespace CryptoMarket.Services
 {
     public class BtcPayServerPaymentService : IBitcoinPaymentService
     {
@@ -75,8 +75,8 @@ namespace DarkMarket.Services
 
         public Task<(string Address, string PaymentId, string PrivateKey)> GenerateAddressWithKeyAsync(decimal amount, string? orderId = null)
         {
-            // Não suportado para BTCPayServer, lance exceção ou implemente se necessário
-            throw new NotImplementedException("GenerateAddressWithKeyAsync não implementado para BtcPayServerPaymentService.");
+            // NÃ£o suportado para BTCPayServer, lance exceÃ§Ã£o ou implemente se necessÃ¡rio
+            throw new NotImplementedException("GenerateAddressWithKeyAsync nÃ£o implementado para BtcPayServerPaymentService.");
         }
     }
 }

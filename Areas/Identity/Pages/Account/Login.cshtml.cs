@@ -1,12 +1,12 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using DarkMarket.Models;
-using DarkMarket.Services;
+using CryptoMarket.Models;
+using CryptoMarket.Services;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
-namespace DarkMarket.Areas.Identity.Pages.Account
+namespace CryptoMarket.Areas.Identity.Pages.Account
 {
     public class LoginModel : PageModel
     {

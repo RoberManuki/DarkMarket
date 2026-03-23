@@ -1,4 +1,4 @@
-@using DarkMarket.Services
+﻿@using CryptoMarket.Services
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
 @inject UiTextService T
@@ -10,9 +10,9 @@
             <p>@L("Cookie.Banner.Description", "We use essential cookies for core functionality and optional cookies for analytics. You can accept all or customize.")</p>
         </div>
         <div class="cookie-consent-actions">
-            <button type="button" class="cookie-btn cookie-btn-neutral" onclick="window.darkMarketCookieConsent.openPreferences()">@L("Cookie.Banner.Customize", "Customize")</button>
-            <button type="button" class="cookie-btn cookie-btn-soft" onclick="window.darkMarketCookieConsent.rejectOptional()">@L("Cookie.Banner.RejectOptional", "Reject optional")</button>
-            <button type="button" class="cookie-btn cookie-btn-primary" onclick="window.darkMarketCookieConsent.acceptAll()">@L("Cookie.Banner.AcceptAll", "Accept all")</button>
+            <button type="button" class="cookie-btn cookie-btn-neutral" onclick="window.cryptoMarketCookieConsent.openPreferences()">@L("Cookie.Banner.Customize", "Customize")</button>
+            <button type="button" class="cookie-btn cookie-btn-soft" onclick="window.cryptoMarketCookieConsent.rejectOptional()">@L("Cookie.Banner.RejectOptional", "Reject optional")</button>
+            <button type="button" class="cookie-btn cookie-btn-primary" onclick="window.cryptoMarketCookieConsent.acceptAll()">@L("Cookie.Banner.AcceptAll", "Accept all")</button>
         </div>
     </div>
 </div>
@@ -39,8 +39,8 @@
         </div>
 
         <div class="cookie-consent-actions">
-            <button type="button" class="cookie-btn cookie-btn-neutral" onclick="window.darkMarketCookieConsent.closePreferences()">@L("Common.Cancel", "Cancel")</button>
-            <button type="button" class="cookie-btn cookie-btn-primary" onclick="window.darkMarketCookieConsent.savePreferences()">@L("Cookie.Modal.SavePreferences", "Save preferences")</button>
+            <button type="button" class="cookie-btn cookie-btn-neutral" onclick="window.cryptoMarketCookieConsent.closePreferences()">@L("Common.Cancel", "Cancel")</button>
+            <button type="button" class="cookie-btn cookie-btn-primary" onclick="window.cryptoMarketCookieConsent.savePreferences()">@L("Cookie.Modal.SavePreferences", "Save preferences")</button>
         </div>
     </div>
 </div>
@@ -55,7 +55,7 @@
 
         try
         {
-            await JSRuntime.InvokeVoidAsync("darkMarketCookieConsent.init");
+            await JSRuntime.InvokeVoidAsync("cryptoMarketCookieConsent.init");
         }
         catch (JSException)
         {
@@ -69,3 +69,4 @@
         return string.Equals(value, key, StringComparison.Ordinal) ? fallback : value;
     }
 }
+

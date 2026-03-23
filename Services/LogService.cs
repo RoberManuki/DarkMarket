@@ -1,7 +1,7 @@
-using DarkMarket.Data;
-using DarkMarket.Models;
+﻿using CryptoMarket.Data;
+using CryptoMarket.Models;
 
-namespace DarkMarket.Services
+namespace CryptoMarket.Services
 {
     public class LogService
     {

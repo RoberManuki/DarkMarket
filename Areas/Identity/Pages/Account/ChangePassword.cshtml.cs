@@ -1,11 +1,11 @@
-using System.ComponentModel.DataAnnotations;
-using DarkMarket.Models;
+﻿using System.ComponentModel.DataAnnotations;
+using CryptoMarket.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace DarkMarket.Areas.Identity.Pages.Account
+namespace CryptoMarket.Areas.Identity.Pages.Account
 {
     [Authorize]
     public class ChangePasswordModel : PageModel
@@ -81,3 +81,4 @@ namespace DarkMarket.Areas.Identity.Pages.Account
         }
     }
 }
+

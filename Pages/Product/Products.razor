@@ -1,8 +1,8 @@
-@page "/products"
+﻿@page "/products"
 
 @attribute [Authorize]
 
-@using DarkMarket.Shared
+@using CryptoMarket.Shared
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.JSInterop
 
@@ -80,8 +80,12 @@
                         </td>
                         <td data-label="@T["Products.CreatedAt"]">@p.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</td>
                         <td data-label="@T["Common.Actions"]">
-                            <button class="edit-btn" @onclick='() => Navigation.NavigateTo($"/products/edit/{p.Id}")'>@T["Products.Edit"]</button>
-                            <button class="danger" @onclick='() => ConfirmDelete(p.Id)'>@T["Products.Remove"]</button>
+                            <button class="edit-btn action-btn icon-only" @onclick='() => Navigation.NavigateTo($"/products/edit/{p.Id}")' title="@T["Products.Edit"]" aria-label="@T["Products.Edit"]">
+                                <i class="fa fa-pencil-alt"></i>
+                            </button>
+                            <button class="danger action-btn icon-only" @onclick='() => ConfirmDelete(p.Id)' title="@T["Products.Remove"]" aria-label="@T["Products.Remove"]">
+                                <i class="fa fa-trash"></i>
+                            </button>
                         </td>
                     </tr>
                 }

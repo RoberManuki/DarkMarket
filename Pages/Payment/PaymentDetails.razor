@@ -1,11 +1,11 @@
-@page "/payments/details/{PaymentId:int}"
+﻿@page "/payments/details/{PaymentId:int}"
 
 @attribute [Authorize]
 
-@using DarkMarket.Models
+@using CryptoMarket.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
-@using DarkMarket.Shared.Helpers
+@using CryptoMarket.Shared.Helpers
 
 @inject AppDbContext Db
 @inject NavigationManager Navigation

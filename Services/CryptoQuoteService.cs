@@ -1,12 +1,12 @@
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Net.Http.Json;
 using System.Net.Http.Headers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using DarkMarket.Data;
-using DarkMarket.Models;
+using CryptoMarket.Data;
+using CryptoMarket.Models;
 
-namespace DarkMarket.Services
+namespace CryptoMarket.Services
 {
     public class CryptoQuoteService
     {
@@ -22,7 +22,7 @@ namespace DarkMarket.Services
         public CryptoQuoteService(IHttpClientFactory httpClientFactory, IConfiguration configuration, IServiceScopeFactory? scopeFactory = null)
         {
             _http = httpClientFactory.CreateClient();
-            _http.DefaultRequestHeaders.UserAgent.ParseAdd("DarkMarket/1.0 (+https://localhost)");
+            _http.DefaultRequestHeaders.UserAgent.ParseAdd("CryptoMarket/1.0 (+https://localhost)");
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
@@ -50,8 +50,6 @@ namespace DarkMarket.Services
 
             try
             {
-                await TrackQuoteQueryAsync("CoinGecko", normalizedCryptoId);
-
                 var encodedId = Uri.EscapeDataString(normalizedCryptoId);
                 var url = $"https://api.coingecko.com/api/v3/simple/price?ids={encodedId}&vs_currencies=brl,usd";
 
@@ -146,3 +144,4 @@ namespace DarkMarket.Services
         }
     }
 }
+

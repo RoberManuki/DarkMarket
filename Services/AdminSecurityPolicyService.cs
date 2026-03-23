@@ -1,13 +1,13 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Security.Claims;
 using System.Text;
-using DarkMarket.Configuration;
-using DarkMarket.Data;
-using DarkMarket.Models;
+using CryptoMarket.Configuration;
+using CryptoMarket.Data;
+using CryptoMarket.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 
-namespace DarkMarket.Services;
+namespace CryptoMarket.Services;
 
 public sealed record RuntimeSecurityPolicy(
     bool RequireConfirmedEmail,
@@ -146,7 +146,8 @@ public class AdminSecurityPolicyService
     {
         if (user?.Identity?.IsAuthenticated != true || !user.IsInRole("admin"))
         {
-            throw new UnauthorizedAccessException("Apenas administradores podem alterar a política de segurança.");
+            throw new UnauthorizedAccessException("Apenas administradores podem alterar a polÃ­tica de seguranÃ§a.");
         }
     }
 }
+

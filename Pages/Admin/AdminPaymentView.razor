@@ -1,10 +1,10 @@
-@page "/admin/payments/view/{Id:int}"
+﻿@page "/admin/payments/view/{Id:int}"
 
 @attribute [Authorize(Roles = "admin")]
 
-@using DarkMarket.Models
+@using CryptoMarket.Models
 @using Microsoft.AspNetCore.Authorization
-@using DarkMarket.Shared.Helpers
+@using CryptoMarket.Shared.Helpers
 
 @inject AppDbContext Db
 @inject BitcoinQuoteService BitcoinQuoteService

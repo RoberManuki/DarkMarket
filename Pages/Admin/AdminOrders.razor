@@ -1,12 +1,12 @@
-@page "/admin/orders"
+﻿@page "/admin/orders"
 
 @attribute [Authorize(Roles = "admin")]
 
-@using DarkMarket.Models
+@using CryptoMarket.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.JSInterop
-@using DarkMarket.Shared.Helpers
+@using CryptoMarket.Shared.Helpers
 
 @inject AppDbContext Db
 @inject NavigationManager NavigationManager
@@ -45,7 +45,7 @@
             {
                 <div class="orders-review-restored-notice">
                     <span>@T["AdminOrders.RestoredFilters"]</span>
-                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">×</button>
+                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">Ã—</button>
                 </div>
             }
 
@@ -105,12 +105,14 @@
                                 <td>@FormatBtcWithUsd(t.Amount)</td>
                                 <td>
                                     <span class="order-status-badge @t.Status.ToString().ToLower()">
-                                        @OrderStatusHelper.GetStatusText(t.Status)
+                                        @OrderStatusHelper.GetStatusText(t.Status, T)
                                     </span>
                                 </td>
                                 <td>@t.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
                                 <td>
-                                    <button class="details-btn action-btn" @onclick="() => GoToDetails(t.Id)">@T["Common.Details"]</button>
+                                    <button class="details-btn action-btn icon-only" @onclick="() => GoToDetails(t.Id)" title="@T["Common.Details"]" aria-label="@T["Common.Details"]">
+                                        <i class="fa fa-eye"></i>
+                                    </button>
                                 </td>
                             </tr>
                         }

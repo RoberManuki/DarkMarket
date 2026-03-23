@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace DarkMarket.Migrations
+namespace CryptoMarket.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -443,3 +443,4 @@ namespace DarkMarket.Migrations
         }
     }
 }
+

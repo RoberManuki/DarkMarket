@@ -1,7 +1,7 @@
-using Microsoft.JSInterop;
+﻿using Microsoft.JSInterop;
 using System.Globalization;
 
-namespace DarkMarket.Services;
+namespace CryptoMarket.Services;
 
 internal static class LocalStorageStateHelpers
 {
@@ -70,3 +70,4 @@ internal static class LocalStorageStateHelpers
             ? js.InvokeVoidAsync("localStorage.setItem", key, value.Value.ToString("o", CultureInfo.InvariantCulture)).AsTask()
             : js.InvokeVoidAsync("localStorage.removeItem", key).AsTask();
 }
+

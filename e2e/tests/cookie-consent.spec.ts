@@ -14,8 +14,8 @@ test.describe("Cookie consent", () => {
   test.beforeEach(async ({ page }) => {
     await page.context().clearCookies();
     await page.addInitScript(() => {
-      localStorage.removeItem("darkmarket.cookieConsent.v1");
-      localStorage.removeItem("darkmarket.uiLanguage");
+      localStorage.removeItem("cryptomarket.cookieConsent.v1");
+      localStorage.removeItem("cryptomarket.uiLanguage");
     });
     await page.goto("/");
   });
@@ -28,7 +28,7 @@ test.describe("Cookie consent", () => {
     await acceptButton.click();
 
     await expect(async () => {
-      const localConsentRaw = await page.evaluate(() => localStorage.getItem("darkmarket.cookieConsent.v1"));
+      const localConsentRaw = await page.evaluate(() => localStorage.getItem("cryptomarket.cookieConsent.v1"));
       expect(localConsentRaw).not.toBeNull();
 
       const localConsent = JSON.parse(localConsentRaw ?? "{}");
@@ -38,10 +38,10 @@ test.describe("Cookie consent", () => {
       await expect(banner).toBeHidden({ timeout: 1_500 });
     }).toPass({ timeout: 8_000 });
 
-    const localConsent = await page.evaluate(() => localStorage.getItem("darkmarket.cookieConsent.v1"));
+    const localConsent = await page.evaluate(() => localStorage.getItem("cryptomarket.cookieConsent.v1"));
     expect(localConsent).not.toBeNull();
 
-    const cookie = (await page.context().cookies()).find(c => c.name === "darkmarket.cookieConsent");
+    const cookie = (await page.context().cookies()).find(c => c.name === "cryptomarket.cookieConsent");
     expect(cookie?.value).toBe("all");
   });
 
@@ -60,7 +60,7 @@ test.describe("Cookie consent", () => {
       await expect(modal).toBeHidden({ timeout: 1_500 });
     }).toPass({ timeout: 12_000 });
 
-    const localConsentRaw = await page.evaluate(() => localStorage.getItem("darkmarket.cookieConsent.v1"));
+    const localConsentRaw = await page.evaluate(() => localStorage.getItem("cryptomarket.cookieConsent.v1"));
     expect(localConsentRaw).not.toBeNull();
 
     const localConsent = JSON.parse(localConsentRaw ?? "{}");
@@ -79,7 +79,7 @@ test.describe("Cookie consent", () => {
 
     await expect(banner).toBeHidden();
 
-    const localConsentRaw = await page.evaluate(() => localStorage.getItem("darkmarket.cookieConsent.v1"));
+    const localConsentRaw = await page.evaluate(() => localStorage.getItem("cryptomarket.cookieConsent.v1"));
     expect(localConsentRaw).not.toBeNull();
 
     const localConsent = JSON.parse(localConsentRaw ?? "{}");
@@ -101,7 +101,7 @@ test.describe("Cookie consent", () => {
     await expect(modal).toBeHidden();
     await expect(page.locator("#cookie-consent-banner")).toBeVisible();
 
-    const localConsentRaw = await page.evaluate(() => localStorage.getItem("darkmarket.cookieConsent.v1"));
+    const localConsentRaw = await page.evaluate(() => localStorage.getItem("cryptomarket.cookieConsent.v1"));
     expect(localConsentRaw).toBeNull();
   });
 });

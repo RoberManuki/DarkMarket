@@ -1,82 +1,180 @@
+﻿@page "/admin/security"
 @page "/admin/languages"
 
 @attribute [Authorize(Roles = "admin")]
 
+@using System.Security.Claims
+@using CryptoMarket.Configuration
 @using Microsoft.AspNetCore.Authorization
-@using Microsoft.JSInterop
+@using Microsoft.AspNetCore.Components.Authorization
 
-@inject LanguagePreferenceService LanguagePreferenceService
+@inject AdminSecurityPolicyService AdminSecurityPolicyService
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IWebHostEnvironment WebHostEnvironment
 @inject UiTextService T
-@inject IJSRuntime JSRuntime
 
 <div class="entity-shell admin-page">
     <section class="entity-shell-hero">
-        <p class="entity-shell-kicker">@T["AdminLanguages.Kicker"]</p>
-        <h1>@T["AdminLanguages.Title"]</h1>
-        <p class="entity-shell-subtitle">@T["AdminLanguages.Subtitle"]</p>
+        <p class="entity-shell-kicker">@T["AdminDashboard.Kicker"]</p>
+        <h1>@T["AdminDashboard.SecurityTitle"]</h1>
+        <p class="entity-shell-subtitle">@T["AdminDashboard.SecuritySubtitle"]</p>
     </section>
 
-    <section class="entity-shell-grid" aria-label="@T["AdminLanguages.Aria"]">
+    <section class="entity-shell-grid" aria-label="@T["AdminDashboard.SecurityTitle"]">
         <article class="entity-shell-card entity-shell-main">
-            <div class="admin-settings-card">
-                <span><b>@T["AdminLanguages.Current"]:</b> @selectedLanguage</span>
-            </div>
+            <div class="admin-settings-card security-settings-card">
+                <div class="security-header">
+                    <h3>@T["AdminDashboard.SecurityTitle"]</h3>
+                    <p>@T["AdminDashboard.SecuritySubtitle"]</p>
+                </div>
 
-            <div class="admin-settings-card">
-                <label for="ui-language"><b>@T["AdminLanguages.Select"]:</b></label>
-                <select id="ui-language" class="fiat-select" @bind="selectedLanguage">
-                    @foreach (var language in LanguagePreferenceService.SupportedLanguages)
-                    {
-                        <option value="@language.Code">@language.Label</option>
-                    }
-                </select>
-                <button class="details-btn" @onclick="SaveLanguageAsync">@T["AdminLanguages.Save"]</button>
+                <div class="security-panels">
+                    <section class="security-panel" aria-label="@T["AdminDashboard.BaselineAria"]">
+                        <h4>@T["AdminDashboard.BaselineTitle"]</h4>
+                        <div class="security-baseline-meta">
+                            <span class="security-label">@T["AdminDashboard.Environment"]</span>
+                            <span class="security-value security-env-pill">@(WebHostEnvironment.IsDevelopment() ? T["AdminDashboard.EnvironmentDevelopment"] : T["AdminDashboard.EnvironmentProduction"])</span>
+                        </div>
 
-                @if (!string.IsNullOrWhiteSpace(message))
-                {
-                    <span class="operation-fee-message ok">@message</span>
-                }
-            </div>
+                        <div class="security-baseline-group">
+                            <h5>@T["AdminDashboard.Credentials"]</h5>
+                            <div class="security-baseline-grid">
+                                <div class="security-baseline-row">
+                                    <span class="security-label">@T["AdminDashboard.MinPassword"]</span>
+                                    <span class="security-value">@securityPolicy.PasswordRequiredLength @T["AdminDashboard.Characters"]</span>
+                                </div>
 
-            <div class="admin-settings-card">
-                <span class="hint-text">@T["AdminLanguages.Hint"]</span>
+                                <div class="security-baseline-row">
+                                    <span class="security-label">@T["AdminDashboard.UniqueChars"]</span>
+                                    <span class="security-value">@securityPolicy.PasswordRequiredUniqueChars</span>
+                                </div>
+
+                                <div class="security-baseline-row">
+                                    <span class="security-label">@T["AdminDashboard.RequireDigit"]</span>
+                                    <span class="security-boolean-badge @(securityPolicy.PasswordRequireDigit ? "on" : "off")">@(securityPolicy.PasswordRequireDigit ? T["Common.Yes"] : T["Common.No"])</span>
+                                </div>
+
+                                <div class="security-baseline-row">
+                                    <span class="security-label">@T["AdminDashboard.RequireLowercase"]</span>
+                                    <span class="security-boolean-badge @(securityPolicy.PasswordRequireLowercase ? "on" : "off")">@(securityPolicy.PasswordRequireLowercase ? T["Common.Yes"] : T["Common.No"])</span>
+                                </div>
+
+                                <div class="security-baseline-row">
+                                    <span class="security-label">@T["AdminDashboard.RequireUppercase"]</span>
+                                    <span class="security-boolean-badge @(securityPolicy.PasswordRequireUppercase ? "on" : "off")">@(securityPolicy.PasswordRequireUppercase ? T["Common.Yes"] : T["Common.No"])</span>
+                                </div>
+
+                                <div class="security-baseline-row">
+                                    <span class="security-label">@T["AdminDashboard.RequireSymbol"]</span>
+                                    <span class="security-boolean-badge @(securityPolicy.PasswordRequireNonAlphanumeric ? "on" : "off")">@(securityPolicy.PasswordRequireNonAlphanumeric ? T["Common.Yes"] : T["Common.No"])</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="security-baseline-group">
+                            <h5>@T["AdminDashboard.Session"]</h5>
+                            <div class="security-baseline-grid">
+                                <div class="security-baseline-row">
+                                    <span class="security-label">@T["AdminDashboard.SessionDuration"]</span>
+                                    <span class="security-value">@securityPolicy.SessionTimeoutMinutes @T["AdminDashboard.Minutes"]</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="security-panel security-runtime-panel" aria-label="@T["AdminDashboard.RuntimeAria"]">
+                        <h4>@T["AdminDashboard.RuntimeTitle"]</h4>
+
+                        <label class="security-toggle" for="security-require-confirmed">
+                            <input id="security-require-confirmed" type="checkbox" @bind="runtimeRequireConfirmedEmail" />
+                            <span>@T["AdminDashboard.RequireConfirmedEmail"]</span>
+                        </label>
+
+                        <div class="security-input-grid">
+                            <label for="security-lockout-attempts">@T["AdminDashboard.LockoutAttempts"]</label>
+                            <input id="security-lockout-attempts"
+                                   class="fee-input"
+                                   type="number"
+                                   min="1"
+                                   max="20"
+                                   step="1"
+                                   @bind="runtimeLockoutMaxAttempts" />
+
+                            <label for="security-lockout-minutes">@T["AdminDashboard.LockoutDuration"]</label>
+                            <input id="security-lockout-minutes"
+                                   class="fee-input"
+                                   type="number"
+                                   min="1"
+                                   max="1440"
+                                   step="1"
+                                   @bind="runtimeLockoutMinutes" />
+                        </div>
+
+                        <button class="details-btn" @onclick="SaveSecurityPolicyAsync">@T["AdminDashboard.SaveSecurityPolicy"]</button>
+
+                        @if (!string.IsNullOrWhiteSpace(securityPolicyMessage))
+                        {
+                            <span class="operation-fee-message @(securityPolicySaved ? "ok" : "error")">@securityPolicyMessage</span>
+                        }
+                    </section>
+                </div>
             </div>
         </article>
     </section>
 </div>
 
 @code {
-    private string selectedLanguage = LanguagePreferenceService.DefaultLanguage;
-    private string? message;
+    private SecurityPolicySnapshot securityPolicy = SecurityPolicyDefaults.Create(isDevelopment: false);
+    private bool runtimeRequireConfirmedEmail;
+    private int runtimeLockoutMaxAttempts;
+    private int runtimeLockoutMinutes;
+    private string? securityPolicyMessage;
+    private bool securityPolicySaved;
+    private ClaimsPrincipal? currentUser;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        selectedLanguage = LanguagePreferenceService.SelectedLanguage;
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        currentUser = authState.User;
+
+        securityPolicy = SecurityPolicyDefaults.Create(WebHostEnvironment.IsDevelopment());
+
+        var runtimePolicy = await AdminSecurityPolicyService.GetRuntimePolicyForAdminAsync(currentUser);
+        runtimeRequireConfirmedEmail = runtimePolicy.RequireConfirmedEmail;
+        runtimeLockoutMaxAttempts = runtimePolicy.LockoutMaxFailedAccessAttempts;
+        runtimeLockoutMinutes = runtimePolicy.LockoutMinutes;
     }
 
-    private async Task SaveLanguageAsync()
+    private async Task SaveSecurityPolicyAsync()
     {
-        LanguagePreferenceService.SetLanguage(selectedLanguage);
-
         try
         {
-            await JSRuntime.InvokeVoidAsync("localStorage.setItem", "darkmarket.uiLanguage", LanguagePreferenceService.SelectedLanguage);
-        }
-        catch
-        {
-            // Keep runtime update even if storage is unavailable.
-        }
+            var saved = await AdminSecurityPolicyService.SetRuntimePolicyForAdminAsync(
+                currentUser,
+                new RuntimeSecurityPolicy(
+                    runtimeRequireConfirmedEmail,
+                    runtimeLockoutMaxAttempts,
+                    runtimeLockoutMinutes));
 
-        try
-        {
-            await JSRuntime.InvokeVoidAsync("darkMarketSetCookie", "darkmarket.uiLanguage", LanguagePreferenceService.SelectedLanguage, 365);
-        }
-        catch
-        {
-            // Keep runtime update even if cookie helper is unavailable.
-        }
+            securityPolicySaved = saved;
 
-        selectedLanguage = LanguagePreferenceService.SelectedLanguage;
-        message = T["AdminLanguages.Success"];
+            if (saved)
+            {
+                securityPolicyMessage = T["AdminDashboard.SecurityPolicySaved"];
+                var runtimePolicy = await AdminSecurityPolicyService.GetRuntimePolicyForAdminAsync(currentUser);
+                runtimeRequireConfirmedEmail = runtimePolicy.RequireConfirmedEmail;
+                runtimeLockoutMaxAttempts = runtimePolicy.LockoutMaxFailedAccessAttempts;
+                runtimeLockoutMinutes = runtimePolicy.LockoutMinutes;
+                return;
+            }
+
+            securityPolicyMessage = T["AdminDashboard.SecurityPolicyRangeError"];
+        }
+        catch (UnauthorizedAccessException)
+        {
+            securityPolicySaved = false;
+            securityPolicyMessage = T["AdminDashboard.AccessDeniedSecurity"];
+        }
     }
 }
+

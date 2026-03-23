@@ -1,13 +1,13 @@
-using DarkMarket.Data;
-using DarkMarket.Configuration;
-using DarkMarket.Models;
+﻿using CryptoMarket.Data;
+using CryptoMarket.Configuration;
+using CryptoMarket.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Globalization;
 
-namespace DarkMarket.Services
+namespace CryptoMarket.Services
 {
     public class AppInitializationService
     {
@@ -71,19 +71,19 @@ namespace DarkMarket.Services
                 if (!createAdminResult.Succeeded)
                 {
                     var errors = string.Join("; ", createAdminResult.Errors.Select(e => e.Description));
-                    _logger.LogError("Falha ao criar usuário admin seed ({AdminEmail}): {Errors}", adminEmail, errors);
+                    _logger.LogError("Falha ao criar usuÃ¡rio admin seed ({AdminEmail}): {Errors}", adminEmail, errors);
                     adminUser = null;
                 }
                 else
                 {
-                    _logger.LogInformation("Usuário admin seed criado: {AdminEmail}", adminEmail);
+                    _logger.LogInformation("UsuÃ¡rio admin seed criado: {AdminEmail}", adminEmail);
                 }
             }
 
             if (adminUser != null && !await _userManager.IsInRoleAsync(adminUser, "admin"))
             {
                 await _userManager.AddToRoleAsync(adminUser, "admin");
-                _logger.LogInformation("Usuário {AdminEmail} promovido a admin.", adminEmail);
+                _logger.LogInformation("UsuÃ¡rio {AdminEmail} promovido a admin.", adminEmail);
             }
 
             if (adminUser != null && !string.IsNullOrWhiteSpace(adminPassword) && syncAdminPassword)
@@ -181,14 +181,14 @@ namespace DarkMarket.Services
                 new DeliveryAgent
                 {
                     Name = "Equipe Centro",
-                    Contact = "centro@darkmarket.local",
+                    Contact = "centro@cryptomarket.local",
                     EstimatedBusinessDays = 2,
                     IsActive = true
                 },
                 new DeliveryAgent
                 {
                     Name = "Equipe Express",
-                    Contact = "express@darkmarket.local",
+                    Contact = "express@cryptomarket.local",
                     EstimatedBusinessDays = 1,
                     IsActive = true
                 }

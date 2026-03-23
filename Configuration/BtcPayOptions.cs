@@ -1,4 +1,4 @@
-namespace DarkMarket.Config
+﻿namespace CryptoMarket.Config
 {
     public class BtcPayOptions
     {

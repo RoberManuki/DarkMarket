@@ -1,4 +1,4 @@
-namespace DarkMarket.Models
+﻿namespace CryptoMarket.Models
 {
     public class CoinGeckoPrice
     {
@@ -6,3 +6,4 @@ namespace DarkMarket.Models
         public decimal Usd { get; set; }
     }
 }
+

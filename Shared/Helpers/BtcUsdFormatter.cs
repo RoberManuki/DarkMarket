@@ -1,7 +1,7 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Microsoft.AspNetCore.Components;
 
-namespace DarkMarket.Shared.Helpers;
+namespace CryptoMarket.Shared.Helpers;
 
 public static class BtcUsdFormatter
 {
@@ -18,7 +18,7 @@ public static class BtcUsdFormatter
         var selectedRate = fiat == "BRL" ? btcBrlRate : btcUsdRate;
 
         if (!selectedRate.HasValue || selectedRate.Value <= 0)
-            return $"{btcText} ({fiat} indisponível no momento)";
+            return $"{btcText} ({fiat} indisponÃ­vel no momento)";
 
         var fiatValue = btcAmount * selectedRate.Value;
         var culture = fiat == "BRL" ? CultureInfo.GetCultureInfo("pt-BR") : CultureInfo.GetCultureInfo("en-US");
@@ -38,7 +38,7 @@ public static class BtcUsdFormatter
         var selectedRate = fiat == "BRL" ? btcBrlRate : btcUsdRate;
 
         if (!selectedRate.HasValue || selectedRate.Value <= 0)
-            return new MarkupString($"{btcText} <span class=\"usd-unavailable-badge\" title=\"Não foi possível carregar a cotação {fiat} agora. Tente novamente em instantes.\">⚠ {fiat} indisponível no momento</span>");
+            return new MarkupString($"{btcText} <span class=\"usd-unavailable-badge\" title=\"NÃ£o foi possÃ­vel carregar a cotaÃ§Ã£o {fiat} agora. Tente novamente em instantes.\">âš  {fiat} indisponÃ­vel no momento</span>");
 
         var fiatValue = btcAmount * selectedRate.Value;
         var culture = fiat == "BRL" ? CultureInfo.GetCultureInfo("pt-BR") : CultureInfo.GetCultureInfo("en-US");

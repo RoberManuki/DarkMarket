@@ -1,10 +1,10 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Security.Claims;
-using DarkMarket.Data;
-using DarkMarket.Models;
+using CryptoMarket.Data;
+using CryptoMarket.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace DarkMarket.Services;
+namespace CryptoMarket.Services;
 
 public class AdminSettingsService
 {
@@ -83,7 +83,8 @@ public class AdminSettingsService
     {
         if (user?.Identity?.IsAuthenticated != true || !user.IsInRole("admin"))
         {
-            throw new UnauthorizedAccessException("Apenas administradores podem alterar configurações administrativas.");
+            throw new UnauthorizedAccessException("Apenas administradores podem alterar configuraÃ§Ãµes administrativas.");
         }
     }
 }
+

@@ -1,4 +1,4 @@
-@using DarkMarket.Services
+﻿@using CryptoMarket.Services
 @inject NavigationManager NavigationManager
 @inject UiTextService T
 
@@ -39,7 +39,8 @@
     private void UpdateSegments()
     {
         var uri = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-        var allSegments = uri.Split('/', StringSplitOptions.RemoveEmptyEntries)
+        var pathOnly = uri.Split('?', '#')[0];
+        var allSegments = pathOnly.Split('/', StringSplitOptions.RemoveEmptyEntries)
             .Where(s => !IsIdSegment(s))
             .ToList();
 

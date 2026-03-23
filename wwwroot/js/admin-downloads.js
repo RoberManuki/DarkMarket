@@ -1,4 +1,4 @@
-window.darkMarketDownloadFile = (fileName, content, mimeType) => {
+﻿window.cryptoMarketDownloadFile = (fileName, content, mimeType) => {
     const blob = new Blob([content], { type: mimeType });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
@@ -8,3 +8,4 @@ window.darkMarketDownloadFile = (fileName, content, mimeType) => {
     document.body.removeChild(link);
     URL.revokeObjectURL(link.href);
 };
+

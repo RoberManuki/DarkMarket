@@ -1,6 +1,6 @@
-using DarkMarket.Models;
+﻿using CryptoMarket.Models;
 
-namespace DarkMarket.Services;
+namespace CryptoMarket.Services;
 
 public class OrderAccessService
 {
@@ -18,3 +18,4 @@ public class OrderAccessService
         return order.BuyerId == userId || order.SellerId == userId;
     }
 }
+

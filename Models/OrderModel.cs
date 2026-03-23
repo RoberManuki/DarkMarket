@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
-using DarkMarket.Enums;
-using DarkMarket.Models;
+using CryptoMarket.Enums;
+using CryptoMarket.Models;
 using Microsoft.EntityFrameworkCore;
 
 [Index(nameof(PaymentId), IsUnique = true)]
@@ -40,12 +40,12 @@ public class OrderModel
 
     public List<OrderMessage> Messages { get; set; } = new();
 
-    // Evidências do comprador
+    // EvidÃªncias do comprador
     public string? BuyerEvidencePath { get; set; }
     public string? BuyerEvidenceComment { get; set; }
     public DateTime? BuyerEvidenceAt { get; set; }
 
-    // Evidências do vendedor
+    // EvidÃªncias do vendedor
     public string? SellerEvidencePath { get; set; }
     public string? SellerEvidenceComment { get; set; }
     public DateTime? SellerEvidenceAt { get; set; }

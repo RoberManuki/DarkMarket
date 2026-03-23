@@ -1,16 +1,16 @@
-@page "/orders/{Id:int}"
+﻿@page "/orders/{Id:int}"
 
 @attribute [Authorize]
 
-@using DarkMarket.Models
-@using DarkMarket.Enums
+@using CryptoMarket.Models
+@using CryptoMarket.Enums
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.EntityFrameworkCore
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.JSInterop
-@using DarkMarket.Shared.Helpers
+@using CryptoMarket.Shared.Helpers
 
 @inject AppDbContext Db
 @inject NavigationManager NavigationManager
@@ -194,17 +194,8 @@ else
                     }
                     <label>@T["OrderDetails.EvidenceFileLabel"]</label>
                     <InputFile OnChange="OnFileSelected" />
-                    <label>@T["OrderDetails.CommentRatingLabel"]</label>
+                    <label>@T["OrderDetails.CommentLabel"]</label>
                     <textarea class="modal-textarea" @bind="confirmComment">@order.BuyerEvidenceComment</textarea>
-                    <label>@T["OrderDetails.RatingLabel"]</label>
-                    <select @bind="confirmRating">
-                        <option value="0">@T["OrderDetails.Select"]</option>
-                        <option value="1">@T["OrderDetails.Star1"]</option>
-                        <option value="2">@T["OrderDetails.Star2"]</option>
-                        <option value="3">@T["OrderDetails.Star3"]</option>
-                        <option value="4">@T["OrderDetails.Star4"]</option>
-                        <option value="5">@T["OrderDetails.Star5"]</option>
-                    </select>
                 </div>
                 <div class="modal-actions">
                     <button class="success-btn" @onclick="ConfirmDelivery">@T["Common.Save"]</button>
@@ -319,12 +310,12 @@ else
         <div class="order-status-card">
             <span class="order-status-label">@T["OrderDetails.OrderStatus"]</span>
             <span class="order-status-badge @order.Status.ToString().ToLower()">
-                @OrderStatusHelper.GetStatusText(order.Status)
+                @OrderStatusHelper.GetStatusText(order.Status, T)
             </span>
         </div>
     </div>
 
-    <!-- Chat da transação -->
+    <!-- Chat da transaÃ§Ã£o -->
     <div class="order-chat-card">
         <h3 class="chat-title">
             <i class="fa fa-comments" aria-hidden="true"></i>
@@ -356,14 +347,13 @@ else
     private List<OrderMessage> chatMessages = new();
     private string newMessage = "";
 
-    // Modal de confirmação de entrega
+    // Modal de confirmaÃ§Ã£o de entrega
     private bool showConfirmModal = false;
     private string? confirmComment;
-    private int confirmRating = 0;
     private IBrowserFile? confirmFile;
     private string? confirmError;
 
-    // Modal de evidência de envio pelo vendedor
+    // Modal de evidÃªncia de envio pelo vendedor
     private bool showSellerEvidenceModal = false;
     private IBrowserFile? sellerEvidenceFile;
     private string? sellerEvidenceComment;
@@ -425,7 +415,7 @@ else
             .OrderBy(m => m.CreatedAt)
             .ToListAsync();
 
-        // Preencher campos de edição de evidência
+        // Preencher campos de ediÃ§Ã£o de evidÃªncia
         confirmComment = order.BuyerEvidenceComment;
         sellerEvidenceComment = order.SellerEvidenceComment;
 
@@ -453,11 +443,6 @@ else
         if (string.IsNullOrWhiteSpace(confirmComment))
         {
             confirmError = T["OrderDetails.ErrorCommentRequired"];
-            return;
-        }
-        if (confirmRating < 1)
-        {
-            confirmError = T["OrderDetails.ErrorRatingRequired"];
             return;
         }
         if (order != null)
@@ -550,21 +535,21 @@ else
         {
             if (showConfirmModal && !wasConfirmModalOpen)
             {
-                await JS.InvokeVoidAsync("darkMarketModal.open", "#confirm-delivery-modal");
+                await JS.InvokeVoidAsync("cryptoMarketModal.open", "#confirm-delivery-modal");
             }
             else if (showSellerEvidenceModal && !wasSellerEvidenceModalOpen)
             {
-                await JS.InvokeVoidAsync("darkMarketModal.open", "#seller-evidence-modal");
+                await JS.InvokeVoidAsync("cryptoMarketModal.open", "#seller-evidence-modal");
             }
             else if (showReleaseModal && !wasReleaseModalOpen)
             {
-                await JS.InvokeVoidAsync("darkMarketModal.open", "#release-funds-modal");
+                await JS.InvokeVoidAsync("cryptoMarketModal.open", "#release-funds-modal");
             }
 
             if (!showConfirmModal && !showSellerEvidenceModal && !showReleaseModal
                 && (wasConfirmModalOpen || wasSellerEvidenceModalOpen || wasReleaseModalOpen))
             {
-                await JS.InvokeVoidAsync("darkMarketModal.close");
+                await JS.InvokeVoidAsync("cryptoMarketModal.close");
             }
         }
         catch

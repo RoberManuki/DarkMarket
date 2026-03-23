@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 
-namespace DarkMarket.Hubs
+namespace CryptoMarket.Hubs
 {
     public class PaymentHub : Hub { }
 }

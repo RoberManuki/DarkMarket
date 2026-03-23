@@ -28,7 +28,7 @@ test.describe("Seeded admin authentication flow", () => {
   test.beforeEach(async ({ page }) => {
     await page.context().clearCookies();
     await page.addInitScript(() => {
-      localStorage.setItem("darkmarket.cookieConsent.v1", JSON.stringify({
+      localStorage.setItem("cryptomarket.cookieConsent.v1", JSON.stringify({
         essential: true,
         analytics: true,
         updatedAtUtc: new Date().toISOString()

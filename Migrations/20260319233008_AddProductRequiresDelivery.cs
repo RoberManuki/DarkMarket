@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace DarkMarket.Migrations
+namespace CryptoMarket.Migrations
 {
     /// <inheritdoc />
     public partial class AddProductRequiresDelivery : Migration
@@ -27,3 +27,4 @@ namespace DarkMarket.Migrations
         }
     }
 }
+

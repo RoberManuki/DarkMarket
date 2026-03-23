@@ -1,9 +1,9 @@
-@page "/admin/orders-review"
+﻿@page "/admin/orders-review"
 @attribute [Authorize(Roles = "admin")]
 
-@using DarkMarket.Enums
-@using DarkMarket.Models
-@using DarkMarket.Services
+@using CryptoMarket.Enums
+@using CryptoMarket.Models
+@using CryptoMarket.Services
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.EntityFrameworkCore
@@ -38,7 +38,7 @@
             {
                 <div class="orders-review-restored-notice">
                     <span>@T["AdminOrdersReview.RestoredFilters"]</span>
-                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">×</button>
+                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">Ã—</button>
                 </div>
             }
 
@@ -92,8 +92,12 @@
                 </td>
                 <td data-label="@T["Common.Actions"]">
                     <div class="order-review-actions">
-                        <a class="details-btn" href="@($"/orders/{order.Id}")">@T["Common.Details"]</a>
-                        <button class="success-btn" @onclick="() => ShowReleaseModalAsync(order.Id)">@T["AdminOrdersReview.Release"]</button>
+                        <a class="details-btn action-btn icon-only" href="@($"/orders/{order.Id}")" title="@T["Common.Details"]" aria-label="@T["Common.Details"]">
+                            <i class="fa fa-eye"></i>
+                        </a>
+                        <button class="success-btn action-btn icon-only" @onclick="() => ShowReleaseModalAsync(order.Id)" title="@T["AdminOrdersReview.Release"]" aria-label="@T["AdminOrdersReview.Release"]">
+                            <i class="fa fa-hand-holding-usd"></i>
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -209,7 +213,7 @@
     private const string SortColumnStorageKey = "admin.ordersReview.sortColumn";
     private const string SortDirectionStorageKey = "admin.ordersReview.sortAscending";
     private bool IsDefaultSort => currentSortColumn == OrderReviewSortColumn.Amount && !sortAscending;
-    private string CurrentSortLabel => $"{SortColumnLabel(currentSortColumn)} {(sortAscending ? "↑" : "↓")}";
+    private string CurrentSortLabel => $"{SortColumnLabel(currentSortColumn)} {(sortAscending ? "â†‘" : "â†“")}";
 
     private IEnumerable<OrderModel> FilteredOrders
     {
@@ -343,11 +347,11 @@
         {
             if (showReleaseModal && !wasReleaseModalOpen)
             {
-                await JS.InvokeVoidAsync("darkMarketModal.open", "#admin-release-funds-modal");
+                await JS.InvokeVoidAsync("cryptoMarketModal.open", "#admin-release-funds-modal");
             }
             else if (!showReleaseModal && wasReleaseModalOpen)
             {
-                await JS.InvokeVoidAsync("darkMarketModal.close");
+                await JS.InvokeVoidAsync("cryptoMarketModal.close");
             }
         }
         catch
@@ -509,10 +513,10 @@
     {
         if (currentSortColumn != column)
         {
-            return "↕";
+            return "â†•";
         }
 
-        return sortAscending ? "↑" : "↓";
+        return sortAscending ? "â†‘" : "â†“";
     }
 
     private string SortButtonClass(OrderReviewSortColumn column)

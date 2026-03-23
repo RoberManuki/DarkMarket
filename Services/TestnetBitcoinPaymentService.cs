@@ -1,12 +1,12 @@
-using NBitcoin;
+﻿using NBitcoin;
 using System.Net.Http.Json;
 using System.Text.Json;
-using DarkMarket.Data;
-using DarkMarket.Models;
-using DarkMarket.Enums;
+using CryptoMarket.Data;
+using CryptoMarket.Models;
+using CryptoMarket.Enums;
 using Microsoft.EntityFrameworkCore;
 
-namespace DarkMarket.Services
+namespace CryptoMarket.Services
 {
     public class TestnetBitcoinPaymentService : IBitcoinPaymentService
     {
@@ -102,13 +102,13 @@ namespace DarkMarket.Services
             var payment = db.Payments.Include(p => p.Product).FirstOrDefault(p => p.PaymentId == paymentId);
             if (payment == null)
             {
-                await log.LogAsync($"[Testnet] Pagamento não encontrado para paymentId={paymentId}", source: "Testnet", level: "Warning");
+                await log.LogAsync($"[Testnet] Pagamento nÃ£o encontrado para paymentId={paymentId}", source: "Testnet", level: "Warning");
                 return false;
             }
 
             if (payment.IsPaid)
             {
-                await log.LogAsync($"[Testnet] Pagamento já está marcado como pago para paymentId={paymentId}", source: "Testnet", level: "Info");
+                await log.LogAsync($"[Testnet] Pagamento jÃ¡ estÃ¡ marcado como pago para paymentId={paymentId}", source: "Testnet", level: "Info");
                 // Garante que a order existe
                 if (!db.Orders.Any(o => o.PaymentId == payment.Id))
                 {
@@ -117,14 +117,14 @@ namespace DarkMarket.Services
                 return true;
             }
 
-            // Aqui você pode adicionar lógica para checar na blockchain se quiser
+            // Aqui vocÃª pode adicionar lÃ³gica para checar na blockchain se quiser
             payment.IsPaid = true;
             payment.PaidAt = DateTime.UtcNow;
             await db.SaveChangesAsync();
 
             await log.LogAsync($"[Testnet] Pagamento marcado como pago para paymentId={paymentId}", source: "Testnet", level: "Info");
 
-            // Cria order se não existir
+            // Cria order se nÃ£o existir
             if (!db.Orders.Any(o => o.PaymentId == payment.Id))
             {
                 await CreateOrderAsync(db, payment, log);
@@ -136,7 +136,7 @@ namespace DarkMarket.Services
         private async Task CreateOrderAsync(AppDbContext db, PaymentRecord payment, LogService log)
         {
             if (string.IsNullOrEmpty(payment.UserId))
-                throw new Exception("UserId do pagamento está vazio ou nulo. Não é possível criar a order.");
+                throw new Exception("UserId do pagamento estÃ¡ vazio ou nulo. NÃ£o Ã© possÃ­vel criar a order.");
 
             var order = new OrderModel
             {

@@ -1,12 +1,12 @@
-@page "/admin/users/edit/{UserId}"
+﻿@page "/admin/users/edit/{UserId}"
 
 @attribute [Authorize(Roles = "admin")]
 
-@using DarkMarket.Shared
+@using CryptoMarket.Shared
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
-@using DarkMarket.Models
-@using DarkMarket.Models.Admin
+@using CryptoMarket.Models
+@using CryptoMarket.Models.Admin
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Components.Forms
 
@@ -108,3 +108,4 @@
         }
     }
 }
+

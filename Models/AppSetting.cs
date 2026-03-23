@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace DarkMarket.Models;
+namespace CryptoMarket.Models;
 
 public class AppSetting
 {
@@ -11,3 +11,4 @@ public class AppSetting
     [MaxLength(512)]
     public string Value { get; set; } = string.Empty;
 }
+

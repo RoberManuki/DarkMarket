@@ -1,4 +1,4 @@
-namespace DarkMarket.Configuration
+﻿namespace CryptoMarket.Configuration
 {
     public class EmailOptions
     {
@@ -9,6 +9,6 @@ namespace DarkMarket.Configuration
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
         public string FromEmail { get; set; } = string.Empty;
-        public string FromName { get; set; } = "DarkMarket";
+        public string FromName { get; set; } = "CryptoMarket";
     }
 }

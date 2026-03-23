@@ -1,7 +1,7 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace DarkMarket.Services
+namespace CryptoMarket.Services
 {
     public class BitcoinPaymentFactory
     {

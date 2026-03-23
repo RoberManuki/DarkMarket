@@ -1,4 +1,4 @@
-namespace DarkMarket.Services;
+﻿namespace CryptoMarket.Services;
 
 public static class AdminPaymentsStorageKeys
 {

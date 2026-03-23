@@ -1,9 +1,9 @@
-@page "/dashboard"
+﻿@page "/dashboard"
 
 @attribute [Authorize]
 
-@using DarkMarket.Shared
-@using DarkMarket.Shared.Helpers
+@using CryptoMarket.Shared
+@using CryptoMarket.Shared.Helpers
 @using Microsoft.AspNetCore.Authorization
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -97,3 +97,4 @@
         return BtcUsdFormatter.FormatMarkup(amount, btcUsdRate, btcBrlRate, CurrencyPreferenceService.SelectedFiatCurrency);
     }
 }
+

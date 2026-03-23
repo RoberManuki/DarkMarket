@@ -1,10 +1,10 @@
-@namespace DarkMarket.Shared
+﻿@namespace CryptoMarket.Shared
 
 @inherits LayoutComponentBase
 
-@using DarkMarket.Models
-@using DarkMarket.Services
-@using DarkMarket.Shared.Components
+@using CryptoMarket.Models
+@using CryptoMarket.Services
+@using CryptoMarket.Shared.Components
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
@@ -49,7 +49,7 @@
                         </a>
                     </div>
                 </div>
-                <h1>DarkMarket</h1>
+                <h1>CryptoMarket</h1>
                 <div class="header-actions">
                     <span class="currency-indicator" title="@T["Layout.HeaderQuoteTitle"]">
                         @T["Layout.HeaderQuote"]: @CurrencyPreferenceService.SelectedFiatCurrency
@@ -120,24 +120,26 @@
 
         try
         {
-            var persistedCurrency = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", "darkmarket.fiatCurrency");
+            var persistedCurrency = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", "cryptomarket.fiatCurrency");
             CurrencyPreferenceService.SetCurrency(persistedCurrency);
 
             var hintedLanguage = GetLanguageHintFromUri();
-            var cookieLanguage = await JSRuntime.InvokeAsync<string?>("darkMarketGetCookie", "darkmarket.uiLanguage");
-            var persistedLanguage = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", "darkmarket.uiLanguage");
+            var cookieLanguage = await JSRuntime.InvokeAsync<string?>("cryptoMarketGetCookie", "cryptomarket.uiLanguage");
+            var persistedLanguage = await JSRuntime.InvokeAsync<string?>("localStorage.getItem", "cryptomarket.uiLanguage");
             LanguagePreferenceService.SetLanguage(hintedLanguage ?? cookieLanguage ?? persistedLanguage);
 
-            await JSRuntime.InvokeVoidAsync("darkMarketSetCookie", "darkmarket.uiLanguage", LanguagePreferenceService.SelectedLanguage, 365);
-            await JSRuntime.InvokeVoidAsync("localStorage.setItem", "darkmarket.uiLanguage", LanguagePreferenceService.SelectedLanguage);
+            await JSRuntime.InvokeVoidAsync("cryptoMarketSetCookie", "cryptomarket.uiLanguage", LanguagePreferenceService.SelectedLanguage, 365);
+            await JSRuntime.InvokeVoidAsync("localStorage.setItem", "cryptomarket.uiLanguage", LanguagePreferenceService.SelectedLanguage);
             selectedLanguage = LanguagePreferenceService.SelectedLanguage;
-            StateHasChanged();
         }
         catch
         {
             CurrencyPreferenceService.SetCurrency("USD");
             selectedLanguage = LanguagePreferenceService.SelectedLanguage;
         }
+
+        // Ensure descendants receive the @ref-backed toast cascade after first render.
+        StateHasChanged();
     }
 
     private string BuildLanguageUrl(string languageCode)

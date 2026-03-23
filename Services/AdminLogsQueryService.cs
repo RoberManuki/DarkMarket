@@ -1,8 +1,8 @@
-using DarkMarket.Data;
-using DarkMarket.Models;
+﻿using CryptoMarket.Data;
+using CryptoMarket.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace DarkMarket.Services;
+namespace CryptoMarket.Services;
 
 public sealed record AdminLogsAuditCounts(
     int All,
@@ -76,3 +76,4 @@ public class AdminLogsQueryService
         return new AdminLogsPageData(totalLogs, effectivePage, logs, counts);
     }
 }
+

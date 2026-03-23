@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
-namespace DarkMarket.Models
+namespace CryptoMarket.Models
 {
     public class ApplicationUser : IdentityUser
     {

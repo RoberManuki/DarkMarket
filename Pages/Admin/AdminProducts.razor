@@ -1,11 +1,11 @@
-@page "/admin/products"
+﻿@page "/admin/products"
 
 @attribute [Authorize(Roles = "admin")]
 
-@using DarkMarket.Models
+@using CryptoMarket.Models
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.JSInterop
-@using DarkMarket.Shared
+@using CryptoMarket.Shared
 
 @inject ProductService ProductService
 @inject LogService LogService
@@ -37,7 +37,7 @@
             {
                 <div class="orders-review-restored-notice">
                     <span>@T["AdminProducts.RestoredFilters"]</span>
-                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">×</button>
+                    <button type="button" class="orders-review-restored-close" @onclick="DismissRestoredNotice" aria-label="@T["AdminCommon.CloseNotice"]">Ã—</button>
                 </div>
             }
 
@@ -73,9 +73,15 @@
                             </td>
                             <td data-label="@T["AdminProducts.CreatedAt"]">@p.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, HH:mm")</td>
                             <td data-label="@T["Common.Actions"]">
-                                <button class="details-btn action-btn" @onclick="() => ViewProduct(p.Id)">@T["Common.Details"]</button>
-                                <button class="edit-btn action-btn" @onclick="() => EditProduct(p.Id)">@T["Products.Edit"]</button>
-                                <button class="danger" @onclick="() => DeleteProduct(p.Id)">@T["Products.Remove"]</button>
+                                <button class="details-btn action-btn icon-only" @onclick="() => ViewProduct(p.Id)" title="@T["Common.Details"]" aria-label="@T["Common.Details"]">
+                                    <i class="fa fa-eye"></i>
+                                </button>
+                                <button class="edit-btn action-btn icon-only" @onclick="() => EditProduct(p.Id)" title="@T["Products.Edit"]" aria-label="@T["Products.Edit"]">
+                                    <i class="fa fa-pencil-alt"></i>
+                                </button>
+                                <button class="danger action-btn icon-only" @onclick="() => DeleteProduct(p.Id)" title="@T["Products.Remove"]" aria-label="@T["Products.Remove"]">
+                                    <i class="fa fa-trash"></i>
+                                </button>
                             </td>
                         </tr>
                     }
